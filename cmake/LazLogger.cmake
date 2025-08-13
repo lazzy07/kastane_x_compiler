@@ -1,9 +1,9 @@
 set(LAZLOGGER_VER "1.0.0")
 set(LAZLOGGER_TAG "v${LAZLOGGER_VER}")
-set(LAZLOGGER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendor/laz_logger-${LAZLOGGER_VER}")
+set(LAZLOGGER_DIR "${CMAKE_SOURCE_DIR}/vendor/laz_logger-${LAZLOGGER_VER}")
 
 if(NOT EXISTS "${LAZLOGGER_DIR}/CMakeLists.txt")
-  file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/vendor")
+  file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor")
   set(_zip "${CMAKE_BINARY_DIR}/laz_logger-${LAZLOGGER_TAG}.zip")
   file(DOWNLOAD
     "https://github.com/lazzy07/laz_logger/archive/refs/tags/${LAZLOGGER_TAG}.zip"
