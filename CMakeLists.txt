@@ -11,6 +11,8 @@ include(Logger)               # For logging cmake outputs properly
 include(GitVersioning)        # Versioninig the compiler properly, this is being used by the project, to keep track of the correct version
 include(CodeFormat)           # Formatting the files, static checks done by the clang-tidy, clang-format
 include(LazLogger)            # Adding laz_logger library for c++ logging
+include(AntlrInstall)         # Adding antlr grammar compiler for grammar/parsing sabre files 
+include(AntlrJar)             # Downloading antlr4 jar, to generate C++ classes
 
 # Printing the correct project versions
 log_status("Project version from Git: ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
