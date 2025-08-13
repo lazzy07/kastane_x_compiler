@@ -1,15 +1,17 @@
 grammar KasX;
 
-prog: statement* EOF;
+prog
+  : statement* EOF                  # Program
+;       
 
 statement
-  : type_declaration
-  | entity_declaration
-  | property_declaration
-  | initial_state_declaration
-  | action_definition
-  | trigger_definition
-  | utility_function
+  : type_declaration               # TypeDeclaration
+  | entity_declaration             # EntityDeclaration
+  | property_declaration           # PropertyDeclaration
+  | initial_state_declaration      # InitialStateDeclaration
+  | action_definition              # ActionDefinition
+  | trigger_definition             # TriggerDefinition
+  | utility_function               # UtilityFunction
   ;
 
 /* 
