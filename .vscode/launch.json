@@ -1,0 +1,22 @@
+{
+  "version": "2.0.0",
+  "configurations": [
+    {
+      "name": "Debug ANTLR4 grammar",
+      "type": "antlr-debug",
+      "request": "launch",
+      "input": "${input:inputFile}",
+      "grammar": "libs/kasx_lib/grammar/KasX.g4",
+      "printParseTree": true,
+      "visualParseTree": true
+    }
+  ],
+  "inputs": [
+    {
+      "id": "inputFile",
+      "type": "promptString",
+      "description": "Enter the path to the input file",
+      "default": "tests/modules/05.sabre"
+    }
+  ]
+}
