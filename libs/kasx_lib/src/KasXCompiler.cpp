@@ -2,13 +2,22 @@
 #include <kasx/KasXCompiler.hpp>
 #include <lazlogger/LoggerManager.hpp>
 
-KasX::Compiler::KasXCompiler::KasXCompiler() {
-  auto logger = LazLogger::LoggerManager();
-
-  logger.Initialize({.core = {.name = CORE_LOGGER_NAME, .file = "log/core/kasx_compiler_lib.txt"},
-                     .cli = {.name = CLI_LOGGER_NAME, .file = "log/cli/kasx_log_lib.txt"}});
-
-  CORE_TRACE("Compiler Initialized");
-}
+KasX::Compiler::KasXCompiler::KasXCompiler() { CORE_TRACE("Compiler Initialized"); }
 
 KasX::Compiler::KasXCompiler::~KasXCompiler() { CORE_TRACE("Compiler Terminated"); }
+
+void KasX::Compiler::KasXCompiler::Compile(DomainData data, COMPILER_OPTIONS options) {
+  CLI_INFO("Compiling {} : {}", data.domainName, data.path.string());
+}
+
+void KasX::Compiler::KasXCompiler::InitLogger() {
+  if (m_Logger) {
+    CORE_ERROR("Logger already being initialized");
+  }
+
+  m_Logger = std::make_unique<LazLogger::LoggerManager>();
+
+  m_Logger->Initialize(
+      {.core = {.name = CORE_LOGGER_NAME, .file = "log/core/kasx_compiler_lib.txt"},
+       .cli = {.name = CLI_LOGGER_NAME, .file = "log/cli/kasx_log_lib.txt"}});
+}

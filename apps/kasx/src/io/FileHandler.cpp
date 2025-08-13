@@ -6,19 +6,22 @@ KasX::App::IO::FileHandler::FileHandler() { CORE_TRACE("FileHandler Initialized"
 
 KasX::App::IO::FileHandler::~FileHandler() { CORE_TRACE("FileHandle Terminated"); }
 
-std::unique_ptr<std::ifstream> KasX::App::IO::FileHandler::OpenProblemFile(
-    const std::string &filePath) {
-  auto file = std::make_unique<std::ifstream>(filePath);
+KasX::DomainData KasX::App::IO::FileHandler::OpenProblemFile(const KasX::Path &filePath) {
+  std::ifstream file(filePath);
 
-  if (!file->is_open()) {
-    CLI_ERROR("Cannot open file: {}", filePath);
+  if (!file.is_open()) {
+    CLI_ERROR("Cannot open file: {}", filePath.string());
+    return;
   }
 
-  if (file->bad()) {
-    CLI_ERROR("Unrecoverable error opening file: {}", filePath);
+  if (file.bad()) {
+    CLI_ERROR("Unrecoverable error opening file: {}", filePath.string());
+    return;
   }
 
-  return file;
+  std::string domainName = std::filesystem::path(filePath).stem().string();
+
+  return {std::move(domainName), std::move(file), filePath};
 }
 
 std::filesystem::path KasX::App::IO::FileHandler::ExecutableDir() {

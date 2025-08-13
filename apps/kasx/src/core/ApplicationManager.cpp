@@ -1,6 +1,8 @@
 #include "ApplicationManager.hpp"
 
 #include <Log.hpp>
+#include <kasx/KasXCompiler.hpp>
+#include <kasx/Types.hpp>
 
 #include "../io/FileHandler.hpp"
 #include "Execution.hpp"
@@ -9,6 +11,8 @@
 KasX::App::Core::ApplicationManager::ApplicationManager(KasX::App::CLI::CompiledArgument arguments)
     : m_Arguments(arguments) {
   CORE_TRACE("Application Manager Created");
+
+  KasX::Compiler::KasXCompiler::InitLogger();
 }
 
 KasX::App::Core::ApplicationManager::~ApplicationManager() {
@@ -29,8 +33,13 @@ void KasX::App::Core::ApplicationManager::Execute() {
 
       KasX::App::IO::FileHandler *fileHandler = new KasX::App::IO::FileHandler();
 
-      std::unique_ptr<std::ifstream> stream = fileHandler->OpenProblemFile(filePath);
+      KasX::DomainData domainData = fileHandler->OpenProblemFile(filePath);
 
+      KasX::Compiler::KasXCompiler *compiler = new KasX::Compiler::KasXCompiler();
+
+      compiler->Compile(std::move(domainData), {});
+
+      delete compiler;
       delete fileHandler;
       return;
     }

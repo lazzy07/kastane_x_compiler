@@ -1,8 +1,7 @@
 #pragma once
 
 #include <filesystem>
-#include <fstream>
-#include <memory>
+#include <kasx/Types.hpp>
 
 namespace KasX::App::IO {
 class FileHandler {
@@ -10,7 +9,7 @@ class FileHandler {
   FileHandler();
   ~FileHandler();
 
-  std::unique_ptr<std::ifstream> OpenProblemFile(const std::string &filePath);
-  std::filesystem::path ExecutableDir();
+  DomainData OpenProblemFile(const KasX::Path &filePath);
+  KasX::Path ExecutableDir();
 };
 }  // namespace KasX::App::IO
