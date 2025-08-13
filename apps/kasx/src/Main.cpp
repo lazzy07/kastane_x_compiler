@@ -1,5 +1,6 @@
 #include <Log.hpp>
 #include <iostream>
+#include <kasx/KasXCompiler.hpp>
 #include <lazlogger/LoggerManager.hpp>
 
 #include "./cli/ArgsParser.hpp"
@@ -20,8 +21,11 @@ int main(int argc, char *argv[]) {
 
   KasX::App::Core::ApplicationManager *app = new KasX::App::Core::ApplicationManager(arguments);
 
+  KasX::Compiler::KasXCompiler *compiler = new KasX::Compiler::KasXCompiler();
+
   app->Execute();
 
+  delete compiler;
   delete app;
   CORE_TRACE("Main Appliaction Terminated");
   logger.Terminate();
