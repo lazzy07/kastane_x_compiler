@@ -1,2 +1,4 @@
 /build
 /vendor
+/libs/kasx_lib/grammar/.antlr
+/dist
