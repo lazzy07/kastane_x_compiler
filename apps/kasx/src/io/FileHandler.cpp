@@ -11,12 +11,12 @@ KasX::DomainData KasX::App::IO::FileHandler::OpenProblemFile(const KasX::Path &f
 
   if (!file.is_open()) {
     CLI_ERROR("Cannot open file: {}", filePath.string());
-    return;
+    return {};
   }
 
   if (file.bad()) {
     CLI_ERROR("Unrecoverable error opening file: {}", filePath.string());
-    return;
+    return {};
   }
 
   std::string domainName = std::filesystem::path(filePath).stem().string();
