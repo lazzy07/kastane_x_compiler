@@ -1,5 +1,6 @@
-set(LAZLOGGER_TAG v1.0.0)
-set(LAZLOGGER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor/laz_logger-1.0.0)
+set(LAZLOGGER_VER "1.0.0")
+set(LAZLOGGER_TAG "v${LAZLOGGER_VER}")
+set(LAZLOGGER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendor/laz_logger-${LAZLOGGER_VER}")
 
 if(NOT EXISTS "${LAZLOGGER_DIR}/CMakeLists.txt")
   file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/vendor")
@@ -12,7 +13,7 @@ if(NOT EXISTS "${LAZLOGGER_DIR}/CMakeLists.txt")
   if(NOT rc EQUAL 0)
     message(FATAL_ERROR "Failed to extract laz_logger ${LAZLOGGER_TAG}")
   endif()
-  file(RENAME "${CMAKE_BINARY_DIR}/laz_logger-1.0.0" "${LAZLOGGER_DIR}")
+  file(RENAME "${CMAKE_BINARY_DIR}/laz_logger-${LAZLOGGER_VER}" "${LAZLOGGER_DIR}")
 endif()
 
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
