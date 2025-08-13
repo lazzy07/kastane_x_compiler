@@ -77,5 +77,12 @@ endforeach()
 # Setting installers directory
 set(CMAKE_INSTALL_PREFIX "${_dist_base}/install")
 log_status("Installers directory set to: ${CMAKE_INSTALL_PREFIX}")
-
 log_status("Output folder configs: FINISHED")
+
+# ########## Adding subprojects to the main project
+log_status("Adding sub-projects: STARTED")
+# Add the executable
+add_subdirectory(apps/kasx)
+# Add the kasx_lib
+add_subdirectory(libs/kasx_lib)
+log_status("Adding sub-projects: FINISHED")
