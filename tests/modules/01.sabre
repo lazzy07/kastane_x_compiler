@@ -1,0 +1,28 @@
+// Line Comment : Should be ignored
+
+/*
+  Multiline comment should be ignored
+*/
+
+type location;
+type character : location;
+type human : character;
+type monster : character;
+type place : location;
+type item;
+
+type item;
+type place;
+type basketballPlace : place;
+type arrestPlace : place;
+type crime; 
+type citizen : character;
+type police : character;
+type detective : police;
+type inspector : police;
+
+type location;
+type character : location;
+type place : location;
+type item;
+type money : item;

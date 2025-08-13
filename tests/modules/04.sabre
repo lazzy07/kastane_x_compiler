@@ -1,0 +1,45 @@
+type location;
+type character : location;
+type human : character;
+type monster : character;
+type place : location;
+type item;
+
+entity Aladdin : human;
+entity Jafar : human;
+entity Jasmine : human;
+entity Dragon : monster;
+entity Genie : monster;
+entity Castle : place;
+entity Mountain : place;
+entity Lamp : place, item;
+
+property path(from : place, to : place) : boolean;
+property alive(character : character) : boolean;
+property master(character : character) : character;
+property loves(lover : character, beloved : character) : boolean;
+property spouse(human : human) : human;
+property happy(character : character) : boolean;
+property fears(character : character, monster : monster) : boolean;
+property afraid(character : character) : boolean;
+property at(character : character) : place;
+property at(item : item) : location;
+property tasks(character : character) : number;
+property task_kill(worker : character, requester : character, monster : monster) : boolean;
+property task_love(worker : character, requester : character, beloved : character) : boolean;
+property task_bring(worker : character, requester : character, item : item) : boolean;
+
+path(Castle, Mountain);
+path(Mountain, Castle);
+alive(Aladdin);
+master(Aladdin) = Jafar;
+at(Aladdin) = Castle;
+alive(Jafar);
+at(Jafar) = Castle;
+alive(Jasmine);
+at(Jasmine) = Castle;
+alive(Dragon);
+at(Dragon) = Mountain;
+at(Lamp) = Dragon;
+alive(Genie);
+at(Genie) = Lamp;

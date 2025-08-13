@@ -1,0 +1,15 @@
+type location;
+type character : location;
+type human : character;
+type monster : character;
+type place : location;
+type item;
+
+entity Aladdin : human;
+entity Jafar : human;
+entity Jasmine : human;
+entity Dragon : monster;
+entity Genie : monster;
+entity Castle : place;
+entity Mountain : place;
+entity Lamp : place, item;

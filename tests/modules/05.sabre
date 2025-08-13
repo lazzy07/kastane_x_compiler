@@ -1,0 +1,317 @@
+
+action travel(character : character, from : place, to : place) {
+	precondition:
+		from != to &
+		path(from, to) &
+		alive(character) &
+		at(character) == from;
+	effect:
+		at(character) = to;
+	consenting: character;
+	observing(c : character): alive(c) & (at(c) == from | at(c) == to);
+};
+
+action slay(slayer : character, monster : monster, place : place) {
+	precondition:
+		slayer != monster &
+		alive(slayer) &
+		at(slayer) == place &
+		alive(monster) &
+		at(monster) == place;
+	effect:
+		!alive(monster);
+	consenting: slayer;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action pillage(pillager : character, body : character, item : item, place : place) {
+	precondition:
+		alive(pillager) &
+		at(pillager) == place &
+		!alive(body) &
+		at(body) == place &
+		at(item) == body;
+	effect:
+		at(item) = pillager;
+	consenting: pillager;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action give(giver : character, receiver : character, item : item, place : place) {
+	precondition:
+		giver != receiver &
+		alive(giver) &
+		at(giver) == place &
+		alive(receiver) &
+		at(receiver) == place &
+		at(item) == giver;
+	effect:
+		at(item) = receiver;
+	consenting: giver;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action summon(character : character, Genie, Lamp, place : place) {
+	precondition:
+		character != Genie &
+		alive(character) &
+		at(character) == place &
+		alive(Genie) &
+		at(Genie) == Lamp &
+		at(Lamp) == character;
+	effect:
+		at(Genie) = place &
+		if(master(Genie) == ?)
+			master(Genie) = character;
+	consenting: character;
+	observing(c : character): alive(c) & (at(c) == Lamp | at(c) == place);
+};
+
+action love_spell(Genie, beloved : character, lover : character) {
+	precondition:
+		Genie != beloved &
+		Genie != lover &
+		beloved != lover &
+		alive(Genie) &
+		at(Genie) != Lamp &
+		alive(beloved) &
+		!loves(beloved, lover) &
+		alive(lover);
+	effect:
+		loves(beloved, lover);
+	consenting: Genie;
+	observing(c : character): c == Genie | c == beloved | c == lover;
+};
+
+action marry(first : human, second : human, place : place) {
+	precondition:
+		first != second &
+		alive(first) &
+		loves(first, second) &
+		spouse(first) == ? &
+		at(first) == place &
+		alive(second) &
+		loves(second, first) &
+		spouse(second) == ? &
+		at(second) == place;
+	effect:
+		spouse(first) = second &
+		spouse(second) = first;
+	consenting: first, second;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action fall_in_love(lover : human, beloved : human, place : place) {
+	precondition:
+		lover != beloved &
+		!loves(lover, beloved) &
+		spouse(lover) == ? &
+		at(lover) == place &
+		!loves(beloved, lover) &
+		at(beloved) == place;
+	effect:
+		loves(lover, beloved);
+	observing(c : character): c == lover | c == beloved;
+};
+
+action command_kill(requester : character, worker : character, monster : monster, place : place) {
+	precondition:
+		requester != worker &
+		requester != monster &
+		worker != monster &
+		alive(requester) &
+		fears(requester, monster) &
+		at(requester) == place &
+		alive(worker) &
+		master(worker) == requester &
+		at(worker) == place &
+		alive(monster);
+	effect:
+		task_kill(worker, requester, monster);
+	consenting: requester;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action command_love(requester : character, worker : character, beloved : human, place : place) {
+	precondition:
+		requester != worker &
+		requester != beloved &
+		worker != beloved &
+		alive(requester) &
+		at(requester) == place &
+		alive(worker) &
+		master(worker) == requester &
+		at(worker) == place &
+		!loves(beloved, requester);
+	effect:
+		task_love(worker, requester, beloved);
+	consenting: requester;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action command_bring(requester : character, worker : character, item : item, place : place) {
+	precondition:
+		requester != worker &
+		alive(requester) &
+		at(requester) == place &
+		alive(worker) &
+		master(worker) == requester &
+		at(worker) == place &
+		at(item) != requester;
+	effect:
+		task_bring(worker, requester, item);
+	consenting: requester;
+	observing(c : character): alive(c) & at(c) == place;
+};
+
+action appear_threatening(monster : monster, character : character, place : place) {
+	precondition:
+		monster != character &
+		alive(monster) &
+		at(monster) == place &
+		alive(character) &
+		!fears(character, monster) &
+		at(character) == place;
+	effect:
+		fears(character, monster);
+	observing(c : character): c == character;
+};
+
+trigger parted(character : human, spouse : human) {
+	precondition:
+		!alive(character) &
+		spouse(character) == spouse;
+	effect:
+		spouse(character) = ?;
+};
+
+trigger see_alive(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		alive(other) &
+		at(other) == place &
+		believes(character, !alive(other));
+	effect:
+		believes(character, alive(other));
+};
+
+trigger see_dead(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		!alive(other) &
+		at(other) == place &
+		believes(character, alive(other));
+	effect:
+		believes(character, !alive(other));
+};
+
+trigger happy(character : human, spouse : human) {
+	precondition:
+		alive(character) &
+		loves(character, spouse) &
+		spouse(character) == spouse &
+		!happy(character);
+	effect:
+		happy(character);
+};
+
+trigger unhappy(character : human) {
+	precondition:
+		alive(character) &
+		!exists(spouse : human)
+			(loves(character, spouse) & spouse(character) == spouse) &
+		happy(character);
+	effect:
+		!happy(character);
+};
+
+trigger afraid(character : character) {
+	precondition:
+		alive(character) &
+		exists(m : monster)
+			(alive(m) & fears(character, m)) &
+		!afraid(character);
+	effect:
+		afraid(character);
+};
+
+trigger not_afraid(character : character) {
+	precondition:
+		alive(character) &
+		!exists(m : monster)
+			(alive(m) & fears(character, m)) &
+		afraid(character);
+	effect:
+		!afraid(character);
+};
+
+trigger see_character_at(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) == place &
+		believes(character, at(other) != place);
+	effect:
+		believes(character, at(other) = place);
+};
+
+trigger see_character_not_at(character : character, other : character, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) != place &
+		believes(character, at(other) == place);
+	effect:
+		believes(character, at(other) = ?);
+};
+
+trigger see_has(character : character, other : character, item : item, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) == place &
+		at(item) == other &
+		believes(character, at(item) != other);
+	effect:
+		believes(character, at(item) = other);
+};
+
+trigger see_hasnt(character : character, other : character, item : item, place : place) {
+	precondition:
+		alive(character) &
+		at(character) == place &
+		at(other) == place &
+		at(item) != other &
+		believes(character, at(item) == other);
+	effect:
+		believes(character, at(item) = ?);
+};
+
+trigger accomplish_task_kill(worker : character, requester : character, monster : monster) {
+	precondition:
+		!alive(monster) &
+		task_kill(worker, requester, monster);
+	effect:
+		tasks(worker) = tasks(worker) + 1 &
+		!task_kill(worker, requester, monster);
+};
+
+trigger accomplish_task_love(worker : character, requester : character, beloved : character) {
+	precondition:
+		loves(beloved, requester) &
+		task_love(worker, requester, beloved);
+	effect:
+		tasks(worker) = tasks(worker) + 1 &
+		!task_love(worker, requester, beloved);
+};
+
+trigger accomplish_task_bring(worker : character, requester : character, item : item) {
+	precondition:
+		at(item) == requester &
+		task_bring(worker, requester, item);
+	effect:
+		tasks(worker) = tasks(worker) + 1 &
+		!task_bring(worker, requester, item);
+};
