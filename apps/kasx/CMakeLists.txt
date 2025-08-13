@@ -25,11 +25,16 @@ add_executable(
   ${EXE_SRC_FILES}
 )
 
-target_link_libraries(kasx PRIVATE lazlogger)
+target_link_libraries( 
+kasx PRIVATE 
+lazlogger
+kasx_compiler
+)
 
 target_include_directories(
   kasx
   PRIVATE "${CMAKE_BINARY_DIR}/generated"
+  PUBLIC "${CMAKE_SOURCE_DIR}/libs/kasx_lib/include"
 )
 
 target_compile_definitions(kasx PRIVATE
