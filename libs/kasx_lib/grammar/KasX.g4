@@ -1,17 +1,17 @@
 grammar KasX;
 
 prog
-  : statement* EOF                  # Program
+  : definition* EOF                # Program
 ;       
 
-statement
+definition
   : type_declaration               # TypeDeclaration
   | entity_declaration             # EntityDeclaration
-  | property_declaration           # PropertyDeclaration
+  | fluent_declaration             # FluentDeclaration
   | initial_state_declaration      # InitialStateDeclaration
   | action_definition              # ActionDefinition
   | trigger_definition             # TriggerDefinition
-  | utility_function               # UtilityFunction
+  | utility_definition               # UtilityFunction
   ;
 
 /* 
@@ -20,8 +20,8 @@ statement
     type character : location;
 */ 
 type_declaration
-  : KEYWORD_TYPE IDENTIFIER SEMICOLON
-  | KEYWORD_TYPE IDENTIFIER COLON IDENTIFIER SEMICOLON
+  : TYPE_DEFINITION_KEYWORD IDENTIFIER DEFINITION_SEPARATOR
+  | TYPE_DEFINITION_KEYWORD IDENTIFIER COLON IDENTIFIER DEFINITION_SEPARATOR
   ;
 
 /*
@@ -37,7 +37,7 @@ types_list
     entity Tom : character, location;
 */
 entity_declaration
-  : KEYWORD_ENTITY IDENTIFIER COLON types_list SEMICOLON
+  : ENTITY_DEFINITION_KEYWORD IDENTIFIER COLON types_list DEFINITION_SEPARATOR
   ;
 
 /*
@@ -45,8 +45,8 @@ entity_declaration
     property path(from : place, to : place) : boolean;
     property alive(character : character) : boolean;
 */
-property_declaration
-  : KEYWORD_PROPERTY function_header COLON data_type SEMICOLON
+fluent_declaration
+  : FLUENT_DEFINITION_KEYWORD function_header COLON data_type DEFINITION_SEPARATOR
   ;
 
 /* 
@@ -71,7 +71,7 @@ param
   Action interpretation
 */
 action_definition
-  : KEYWORD_ACTION function_header START_CUR_BRACES action_body END_CUR_BRACES SEMICOLON
+  : ACTION_DEFINITION_KEYWORD function_header START_CUR_BRACES action_body END_CUR_BRACES DEFINITION_SEPARATOR
   ;
 
 /* 
@@ -80,7 +80,7 @@ action_definition
     walk(c: character, from: place, to: place)
 */
 function_header
-  : IDENTIFIER START_BRACKET param_list END_BRACKET
+  : IDENTIFIER OPEN_BRACKET param_list CLOSE_BRACKET
   ;
 
 action_body
@@ -91,28 +91,28 @@ action_body
   ;
 
 precondition_block
-  : FUN_KEYWORD_PRECONDITION COLON conditions_list SEMICOLON
+  : PRECONDITION_KEYWORD COLON conditions_list DEFINITION_SEPARATOR
   ;
 
 effect_block
-  : FUN_KEYWORD_EFFECT COLON conditions_list SEMICOLON
+  : EFFECT_KEYWORD COLON conditions_list DEFINITION_SEPARATOR
   ;
 
 consenting_list
-  : FUN_KEYWORD_CONSENTING COLON identifiers_list SEMICOLON
+  : CONSENTING_KEYWORD COLON identifiers_list DEFINITION_SEPARATOR
   ;
 
 observing_fun
-  : FUN_KEYWORD_OBSERVING START_BRACKET IDENTIFIER COLON data_type END_BRACKET COLON conditions_list SEMICOLON
+  : OBSERVING_KEYWORD OPEN_BRACKET IDENTIFIER COLON data_type CLOSE_BRACKET COLON conditions_list DEFINITION_SEPARATOR
   ;
 
 initial_state_declaration
-  : IDENTIFIER START_BRACKET types_list END_BRACKET SEMICOLON
-  | IDENTIFIER START_BRACKET types_list END_BRACKET OP_BINARY_ASSIGN data_type SEMICOLON
+  : IDENTIFIER OPEN_BRACKET types_list CLOSE_BRACKET DEFINITION_SEPARATOR
+  | IDENTIFIER OPEN_BRACKET types_list CLOSE_BRACKET ASSIGNMENT_KEYWORD data_type DEFINITION_SEPARATOR
   ;
 
 trigger_definition
-  : KEYWORD_TRIGGER function_header START_CUR_BRACES trigger_body END_CUR_BRACES SEMICOLON
+  : TRIGGER_DEFINITION_KEYWORD function_header START_CUR_BRACES trigger_body END_CUR_BRACES DEFINITION_SEPARATOR
   ;
 
 trigger_body
@@ -120,8 +120,8 @@ trigger_body
     effect_block
   ;
 
-utility_function
-  : KEYWORD_UTILITY START_BRACKET (IDENTIFIER)? END_BRACKET COLON boolean_expression SEMICOLON
+utility_definition
+  : UTILITY_DEFINITION_KEYWORD OPEN_BRACKET (IDENTIFIER)? CLOSE_BRACKET COLON boolean_expression DEFINITION_SEPARATOR
   ;
 
 
@@ -133,31 +133,44 @@ conditions_list
   : boolean_expression
   | fluent;
 
-belives_predicate
-  : KEYWORD_BELIEVES START_BRACKET IDENTIFIER COMMA boolean_expression END_BRACKET
+belives_expression
+  : KEYWORD_BELIEVES OPEN_BRACKET IDENTIFIER COMMA boolean_expression CLOSE_BRACKET
   ;
 
 exists_clause
-  : KEYWORD_EXISTS START_BRACKET param END_BRACKET boolean_expression
+  : EXISTENTIAL_QUANTIFICATION_KEYWORD OPEN_BRACKET param CLOSE_BRACKET boolean_expression
   ;
 
 boolean_expression
-  : OP_UNARY_NOT boolean_expression
-  | OP_BINARY_MINUS boolean_expression
-  | START_BRACKET boolean_expression END_BRACKET
+  : unary_not_expression
+  | negation_expression
+  | OPEN_BRACKET boolean_expression CLOSE_BRACKET
   | boolean_expression binary_op boolean_expression
-  | KEYWORD_BELIEVES START_BRACKET IDENTIFIER COMMA 
-  | belives_predicate
+  | belives_expression
   | fluent
   | if_else_block
   | exists_clause
+  | sum_function
   | IDENTIFIER
   | NUMBER
-  | VALUE_UNKNOWN
+  | UNKNOWN_KEYWORD
+  | NULL_CLAUSE_KEYWORD
+  ;
+
+sum_function
+  : SUM_KEYWORD OPEN_BRACKET IDENTIFIER COLON IDENTIFIER CLOSE_BRACKET boolean_expression
+  ;
+
+unary_not_expression
+  : NEGATION_KEYWORD boolean_expression
+  ;
+
+negation_expression
+  : SUBTRACTION_KEYWORD boolean_expression
   ;
 
 fluent
-  : IDENTIFIER START_BRACKET argument_list END_BRACKET
+  : IDENTIFIER OPEN_BRACKET argument_list CLOSE_BRACKET
   ;
 
 argument_list
@@ -165,26 +178,26 @@ argument_list
   ;
 
 if_else_block
-    : KEYWORD_IF START_BRACKET boolean_expression END_BRACKET 
+    : CONDITIONAL_FIRST_BRANCH_KEYWORD OPEN_BRACKET boolean_expression CLOSE_BRACKET 
     conditions_list 
-    (KEYWORD_ELSE conditions_list)? 
-    SEMICOLON?
+    (CONDITIONAL_LAST_BRANCH_KEYWORD conditions_list)? 
+    DEFINITION_SEPARATOR?
     ;
 
 binary_op
-  : OP_BINARY_MINUS
-  | OP_BINARY_PLUS
-  | OP_BINARY_DIV
-  | OP_BINARY_MULTI
-  | OP_BINARY_LESS
-  | OP_BINARY_GREATER
-  | OP_BINARY_LESS_EQ
-  | OP_BINARY_GREATER_EQ
-  | OP_BINARY_NOT_EQUAL
-  | OP_BINARY_EQUAL
-  | OP_BINARY_ASSIGN
-  | OP_BINARY_OR
-  | OP_BINARY_AND
+  : SUBTRACTION_KEYWORD
+  | ADDITION_KEYWORD
+  | DIVISION_KEYWORD
+  | MULTIPLICATION_KEYWORD
+  | LESS_THAN_KEYWORD
+  | GREATER_THAN_KEYWORD
+  | LESS_THAN_OR_EQUAL_TO_KEYWORD
+  | GREATER_THAN_OR_EQUAL_TO_KEYWORD
+  | NOT_EQUAL_TO_KEYWORD
+  | EQUAL_TO_KEYWORD
+  | ASSIGNMENT_KEYWORD
+  | DISJUNCTION_KEYWORD
+  | CONJUNCTION_KEYWORD
   ;
 
 /*
@@ -195,9 +208,9 @@ binary_op
     character (Interpreted as an Identifier)
 */
 data_type
-  : VALUE_UNKNOWN
-  | DATATYPE_NUMBER
-  | DATATYPE_BOOLEAN
+  : UNKNOWN_KEYWORD
+  | NUMBER_KEYWORD
+  | BOOLEAN_KEYWORD
   | IDENTIFIER
   | NUMBER
   ;
@@ -214,59 +227,73 @@ BLOCK_COMMENT: '/*' .*? '*/' -> skip;
 WS: [ \t\r\n]+ -> skip;
 
 /* Tokens */
-KEYWORD_TYPE : 'type';
-KEYWORD_ENTITY: 'entity';
-KEYWORD_PROPERTY: 'property';
-KEYWORD_ACTION: 'action';
-KEYWORD_TRIGGER: 'trigger';
+TYPE_DEFINITION_KEYWORD : 'type';
+ENTITY_DEFINITION_KEYWORD: 'entity';
+FLUENT_DEFINITION_KEYWORD: 'property';
+ACTION_DEFINITION_KEYWORD: 'action';
+TRIGGER_DEFINITION_KEYWORD: 'trigger';
 KEYWORD_BELIEVES: 'believes';
-KEYWORD_UTILITY: 'utility';
-KEYWORD_EXISTS: 'exists';
+UTILITY_DEFINITION_KEYWORD: 'utility';
+EXISTENTIAL_QUANTIFICATION_KEYWORD: 'exists';
+// TODO: Implement
+CONDITIONAL_EFFECT_KEYWORD: 'when';
+// TODO: Implement
+UNIVERSAL_QUANTIFICATION_KEYWORD: 'forall';
+//TODO: Implement
+PRODUCT_KEYWORD: 'product';
+//TODO: Implement
+SUM_KEYWORD: 'sum';
+//TODO: Implement
+GOAL_KEYWORD: 'goal';
 
 /* Data type declarations */
-DATATYPE_NUMBER: 'number';
-DATATYPE_BOOLEAN: 'boolean';
+NUMBER_KEYWORD: 'number';
+BOOLEAN_KEYWORD: 'boolean';
 
 /* Function Keywords */
-FUN_KEYWORD_PRECONDITION: 'precondition';
-FUN_KEYWORD_EFFECT: 'effect';
-FUN_KEYWORD_CONSENTING: 'consenting';
-FUN_KEYWORD_OBSERVING: 'observing';
+PRECONDITION_KEYWORD: 'precondition';
+EFFECT_KEYWORD: 'effect';
+CONSENTING_KEYWORD: 'consenting';
+OBSERVING_KEYWORD: 'observing';
 
 /* Flow controller keywords */
-KEYWORD_IF: 'if';
-KEYWORD_ELSE: 'else';
+CONDITIONAL_FIRST_BRANCH_KEYWORD: 'if';
+CONDITIONAL_LAST_BRANCH_KEYWORD: 'else';
+CONDITIONAL_MIDDLE_BRANCH_KEYWORD: 'elseif';
 
 /* Identifiers and numbers */
 NUMBER: [0-9]+;
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
-VALUE_UNKNOWN: '?';
+UNKNOWN_KEYWORD: '?';
+FALSE_KEYWORD: 'False';
+TRUE_KEYWORD: 'True';
+NULL_CLAUSE_KEYWORD: 'nil';
 
 /* Operators */
-OP_BINARY_EQUAL: '==';
-OP_BINARY_NOT_EQUAL: '!=';
-OP_BINARY_GREATER_EQ: '>=';
-OP_BINARY_LESS_EQ: '<=';
+EQUAL_TO_KEYWORD: '==';
+NOT_EQUAL_TO_KEYWORD: '!=';
+GREATER_THAN_OR_EQUAL_TO_KEYWORD: '>=';
+LESS_THAN_OR_EQUAL_TO_KEYWORD: '<=';
 
-OP_BINARY_ASSIGN: '=';
-OP_UNARY_NOT: '!';
-OP_BINARY_OR: '|';
-OP_BINARY_AND: '&';
-OP_BINARY_GREATER: '>';
-OP_BINARY_LESS: '<';
+ASSIGNMENT_KEYWORD: '=';
+NEGATION_KEYWORD: '!';
+DISJUNCTION_KEYWORD: '|';
+CONJUNCTION_KEYWORD: '&';
+GREATER_THAN_KEYWORD: '>';
+LESS_THAN_KEYWORD: '<';
 
-OP_BINARY_MULTI: '*';
-OP_BINARY_DIV: '/';
-OP_BINARY_PLUS: '+';
-OP_BINARY_MINUS: '-';
+MULTIPLICATION_KEYWORD: '*';
+DIVISION_KEYWORD: '/';
+ADDITION_KEYWORD: '+';
+SUBTRACTION_KEYWORD: '-';
 
 // Punctuation
-START_BRACKET: '(';
-END_BRACKET: ')';
+OPEN_BRACKET: '(';
+CLOSE_BRACKET: ')';
 START_CUR_BRACES: '{';
 END_CUR_BRACES: '}';
 
-SEMICOLON: ';';
+DEFINITION_SEPARATOR: ';';
 COLON: ':';
 COMMA: ',';
 
