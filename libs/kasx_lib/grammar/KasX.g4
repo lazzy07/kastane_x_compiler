@@ -149,10 +149,15 @@ boolean_expression
   | if_else_block
   | exists_clause
   | sum_function
+  | forall_function
   | IDENTIFIER
   | NUMBER
   | UNKNOWN_KEYWORD
   | NULL_CLAUSE_KEYWORD
+  ;
+
+forall_function
+  : UNIVERSAL_QUANTIFICATION_KEYWORD OPEN_BRACKET IDENTIFIER COLON IDENTIFIER CLOSE_BRACKET boolean_expression
   ;
 
 sum_function
