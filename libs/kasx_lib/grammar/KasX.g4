@@ -107,7 +107,7 @@ observing_fun
   ;
 
 initial_state_declaration
-  : boolean_expression DEFINITION_SEPARATOR;
+  : arithmetic_expression DEFINITION_SEPARATOR;
 
 trigger_definition
   : TRIGGER_DEFINITION_KEYWORD function_header START_CUR_BRACES trigger_body END_CUR_BRACES DEFINITION_SEPARATOR
@@ -119,7 +119,7 @@ trigger_body
   ;
 
 utility_definition
-  : UTILITY_DEFINITION_KEYWORD OPEN_BRACKET (IDENTIFIER)? CLOSE_BRACKET COLON boolean_expression DEFINITION_SEPARATOR
+  : UTILITY_DEFINITION_KEYWORD OPEN_BRACKET (IDENTIFIER)? CLOSE_BRACKET COLON arithmetic_expression DEFINITION_SEPARATOR
   ;
 
 
@@ -128,22 +128,22 @@ identifiers_list
   ;
 
 conditions_list
-  : boolean_expression
+  : arithmetic_expression
   | fluent;
 
 belives_expression
-  : KEYWORD_BELIEVES OPEN_BRACKET IDENTIFIER COMMA boolean_expression CLOSE_BRACKET
+  : KEYWORD_BELIEVES OPEN_BRACKET IDENTIFIER COMMA arithmetic_expression CLOSE_BRACKET
   ;
 
 exists_clause
-  : EXISTENTIAL_QUANTIFICATION_KEYWORD OPEN_BRACKET param CLOSE_BRACKET boolean_expression
+  : EXISTENTIAL_QUANTIFICATION_KEYWORD OPEN_BRACKET param CLOSE_BRACKET arithmetic_expression
   ;
 
-boolean_expression
+arithmetic_expression
   : unary_not_expression
   | negation_expression
-  | OPEN_BRACKET boolean_expression CLOSE_BRACKET
-  | boolean_expression binary_op boolean_expression
+  | OPEN_BRACKET arithmetic_expression CLOSE_BRACKET
+  | arithmetic_expression binary_op arithmetic_expression
   | belives_expression
   | fluent
   | if_else_block
@@ -156,24 +156,28 @@ boolean_expression
   | NULL_CLAUSE_KEYWORD
   ;
 
+inheritance_expression
+  : arithmetic_expression COLON arithmetic_expression
+  ;
+
 forall_function
-  : UNIVERSAL_QUANTIFICATION_KEYWORD OPEN_BRACKET IDENTIFIER COLON IDENTIFIER CLOSE_BRACKET boolean_expression
+  : UNIVERSAL_QUANTIFICATION_KEYWORD OPEN_BRACKET IDENTIFIER COLON IDENTIFIER CLOSE_BRACKET arithmetic_expression
   ;
 
 sum_function
-  : SUM_KEYWORD OPEN_BRACKET IDENTIFIER COLON IDENTIFIER CLOSE_BRACKET boolean_expression
+  : SUM_KEYWORD OPEN_BRACKET IDENTIFIER COLON IDENTIFIER CLOSE_BRACKET arithmetic_expression
   ;
 
 unary_not_expression
-  : NEGATION_KEYWORD boolean_expression
+  : NEGATION_KEYWORD arithmetic_expression
   ;
 
 negation_expression
-  : SUBTRACTION_KEYWORD boolean_expression
+  : SUBTRACTION_KEYWORD arithmetic_expression
   ;
 
 fluent
-  : IDENTIFIER OPEN_BRACKET argument_list CLOSE_BRACKET
+  : IDENTIFIER OPEN_BRACKET argument_list? CLOSE_BRACKET
   ;
 
 argument_list
@@ -181,8 +185,10 @@ argument_list
   ;
 
 if_else_block
-    : CONDITIONAL_FIRST_BRANCH_KEYWORD OPEN_BRACKET boolean_expression CLOSE_BRACKET 
+    : CONDITIONAL_FIRST_BRANCH_KEYWORD OPEN_BRACKET arithmetic_expression CLOSE_BRACKET 
     conditions_list 
+    (CONDITIONAL_MIDDLE_BRANCH_KEYWORD OPEN_BRACKET arithmetic_expression CLOSE_BRACKET
+     conditions_list)*
     (CONDITIONAL_LAST_BRANCH_KEYWORD conditions_list)? 
     DEFINITION_SEPARATOR?
     ;
@@ -201,6 +207,7 @@ binary_op
   | ASSIGNMENT_KEYWORD
   | DISJUNCTION_KEYWORD
   | CONJUNCTION_KEYWORD
+  | COLON // Used to check inheritance
   ;
 
 /*
