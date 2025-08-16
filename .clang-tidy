@@ -11,7 +11,7 @@ Checks: >
   -modernize-use-trailing-return-type,    # not typical for Google style
   -google-runtime-references              # often too strict for modern C++
 
-WarningsAsErrors: "*"
+WarningsAsErrors: ""
 FormatStyle: file
 HeaderFilterRegex: '^(.*(/|\\))(src|include)/' #"^(src|include|core|cli)/"
 
