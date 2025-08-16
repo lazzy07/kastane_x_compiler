@@ -21,7 +21,7 @@ class KasXCompiler {
   static void InitLogger();
 
  private:
-  inline static std::unique_ptr<LazLogger::LoggerManager> m_Logger =
+  inline static std::unique_ptr<LazLogger::LoggerManager> s_Logger =
       nullptr;  // Reference to the LIB logger
 };
 }  // namespace KasX::Compiler

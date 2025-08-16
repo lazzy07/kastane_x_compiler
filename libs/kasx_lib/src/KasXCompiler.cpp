@@ -11,13 +11,13 @@ void KasX::Compiler::KasXCompiler::Compile(DomainData data, COMPILER_OPTIONS opt
 }
 
 void KasX::Compiler::KasXCompiler::InitLogger() {
-  if (m_Logger) {
+  if (s_Logger) {
     CORE_ERROR("Logger already being initialized");
   }
 
-  m_Logger = std::make_unique<LazLogger::LoggerManager>();
+  s_Logger = std::make_unique<LazLogger::LoggerManager>();
 
-  m_Logger->Initialize(
+  s_Logger->Initialize(
       {.core = {.name = CORE_LOGGER_NAME, .file = "log/core/kasx_compiler_lib.txt"},
        .cli = {.name = CLI_LOGGER_NAME, .file = "log/cli/kasx_log_lib.txt"}});
 }
