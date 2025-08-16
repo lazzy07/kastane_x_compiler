@@ -24,12 +24,17 @@ type_declaration
   | TYPE_DEFINITION_KEYWORD IDENTIFIER COLON types_list DEFINITION_SEPARATOR
   ;
 
+type_name
+  : IDENTIFIER
+  | ENTITY_DEFINITION_KEYWORD
+  ;
+
 /*
     Types list (Helper grammar):
       location, character
 */
 types_list
-  : (IDENTIFIER (COMMA IDENTIFIER)*)?
+  : (type_name (COMMA type_name)*)?
   ;
 
 /* 
@@ -221,6 +226,7 @@ data_type
   : UNKNOWN_KEYWORD
   | NUMBER_KEYWORD
   | BOOLEAN_KEYWORD
+  | ENTITY_DEFINITION_KEYWORD
   | IDENTIFIER
   | NUMBER
   ;
@@ -247,7 +253,6 @@ UTILITY_DEFINITION_KEYWORD: 'utility';
 EXISTENTIAL_QUANTIFICATION_KEYWORD: 'exists';
 // TODO: Implement
 CONDITIONAL_EFFECT_KEYWORD: 'when';
-// TODO: Implement
 UNIVERSAL_QUANTIFICATION_KEYWORD: 'forall';
 //TODO: Implement
 PRODUCT_KEYWORD: 'product';
