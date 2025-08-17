@@ -1,8 +1,7 @@
-#include <Log.hpp>
 #include <kasx/KasXCompiler.hpp>
 #include <lazlogger/LoggerManager.hpp>
 
-#include "./visitors/ProgramVisitor.hpp"
+#include "./core/Domain.hpp"
 
 KasX::Compiler::KasXCompiler::KasXCompiler() { CORE_TRACE("Compiler Initialized"); }
 
@@ -15,6 +14,8 @@ void KasX::Compiler::KasXCompiler::Compile(DomainData data, COMPILER_OPTIONS opt
   }
 
   CLI_INFO("Domain found and, Started compiling {} : {}", data.domainName, data.path.string());
+
+  KasX::Compiler::Core::Domain domain(data);
 }
 
 void KasX::Compiler::KasXCompiler::InitLogger() {

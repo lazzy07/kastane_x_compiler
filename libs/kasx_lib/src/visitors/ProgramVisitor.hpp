@@ -1,9 +1,11 @@
 #pragma once
 
-#include <antlr/KasXBaseVisitor.h>
+#include <memory>
 
 namespace KasX::Compiler::Visitor {
-class ProgramVisitor : public KasXBaseVisitor {
+class ProgramVisitor {
  public:
+  ProgramVisitor();
+  ~ProgramVisitor();
 };
 }  // namespace KasX::Compiler::Visitor
