@@ -2,12 +2,19 @@
 #include <kasx/KasXCompiler.hpp>
 #include <lazlogger/LoggerManager.hpp>
 
+#include "./visitors/ProgramVisitor.hpp"
+
 KasX::Compiler::KasXCompiler::KasXCompiler() { CORE_TRACE("Compiler Initialized"); }
 
 KasX::Compiler::KasXCompiler::~KasXCompiler() { CORE_TRACE("Compiler Terminated"); }
 
 void KasX::Compiler::KasXCompiler::Compile(DomainData data, COMPILER_OPTIONS options) {
-  CLI_INFO("Compiling {} : {}", data.domainName, data.path.string());
+  if (data.domainName.empty()) {
+    CLI_ERROR("Cannot compile undefined domain");
+    return;
+  }
+
+  CLI_INFO("Domain found and, Started compiling {} : {}", data.domainName, data.path.string());
 }
 
 void KasX::Compiler::KasXCompiler::InitLogger() {
