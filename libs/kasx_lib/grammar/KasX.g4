@@ -11,7 +11,7 @@ definition
   | initial_state_declaration      # InitialStateDeclaration
   | action_definition              # ActionDefinition
   | trigger_definition             # TriggerDefinition
-  | utility_definition               # UtilityFunction
+  | utility_definition             # UtilityFunction
   ;
 
 /* 
