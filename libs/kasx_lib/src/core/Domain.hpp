@@ -4,7 +4,7 @@
 namespace KasX::Compiler::Core {
 class Domain {
  public:
-  Domain(DomainData &data);
+  explicit Domain(DomainData &data);
   ~Domain();
 
  private:
