@@ -1,4 +1,4 @@
-set(LAZLOGGER_VER "1.0.0")
+set(LAZLOGGER_VER "1.1.0")
 set(LAZLOGGER_TAG "v${LAZLOGGER_VER}")
 set(LAZLOGGER_DIR "${CMAKE_SOURCE_DIR}/vendor/laz_logger-${LAZLOGGER_VER}")
 
@@ -19,4 +19,4 @@ endif()
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 add_subdirectory("${LAZLOGGER_DIR}" EXCLUDE_FROM_ALL)
 
-list(FILTER ALL_CXX_FILES EXCLUDE REGEX ".*/vendor/laz_logger-1\\.0\\.0/.*")
+list(FILTER ALL_CXX_FILES EXCLUDE REGEX ".*/vendor/laz_logger-1\\.1\\.0/.*")
