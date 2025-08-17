@@ -13,7 +13,7 @@ Checks: >
 
 WarningsAsErrors: ""
 FormatStyle: file
-HeaderFilterRegex: '^(.*(/|\\))(src|include)/' #"^(src|include|core|cli)/"
+HeaderFilterRegex: '^(?!.*(vendor|build)/).*$'
 
 CheckOptions:
   # Keep "add braces" reasonable for short one-liners
