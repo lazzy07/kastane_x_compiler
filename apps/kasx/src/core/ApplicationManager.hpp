@@ -6,7 +6,7 @@
 namespace KasX::App::Core {
 class ApplicationManager {
  public:
-  ApplicationManager(KasX::App::CLI::CompiledArgument arguments);
+  explicit ApplicationManager(KasX::App::CLI::CompiledArgument arguments);
   ~ApplicationManager();
 
   void Execute();
