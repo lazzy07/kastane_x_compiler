@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Log.hpp>
 #include <fstream>
 #include <kasx/Types.hpp>
 #include <lazlogger/LoggerManager.hpp>
