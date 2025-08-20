@@ -11,8 +11,8 @@ class Domain;
 namespace KasX::Compiler::Visitor {
 class ProgramVisitor : public KasXBaseVisitor {
  public:
-  ProgramVisitor(KasX::Compiler::Core::Domain *domain);
-  ~ProgramVisitor();
+  explicit ProgramVisitor(KasX::Compiler::Core::Domain *domain);
+  ~ProgramVisitor() override;
 
   std::any visitTypeDeclarationNoParents(KasXParser::TypeDeclarationNoParentsContext *ctx) override;
   std::any visitTypesList(KasXParser::TypesListContext *ctx) override;
