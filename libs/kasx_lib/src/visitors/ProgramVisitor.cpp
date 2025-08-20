@@ -1,7 +1,6 @@
 #include "ProgramVisitor.hpp"
 
 #include "../core/Domain.hpp"
-#include "AntlrSafeBase.hpp"
 // Fixer added
 #include <Log.hpp>
 #include <kasx/Types.hpp>
