@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 
   KasX::App::CLI::CompiledArgument arguments = argsParser.ParseArguments(argc, argv);
 
-  KasX::App::Core::ApplicationManager *app = new KasX::App::Core::ApplicationManager(arguments);
+  auto *app = new KasX::App::Core::ApplicationManager(arguments);
 
   app->Execute();
 
