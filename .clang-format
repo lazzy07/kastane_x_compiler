@@ -1,7 +1,7 @@
-# .clang-format
+---
+Language: Cpp
 
 BasedOnStyle: Google
-Language: Cpp
 
 IndentWidth: 2
 TabWidth: 2
