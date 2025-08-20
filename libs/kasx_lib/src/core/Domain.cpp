@@ -90,7 +90,7 @@ void KasX::Compiler::Core::Domain::InitNewType(const std::string &name, const Fi
 
   m_Definitions.emplace(typeDef->name, std::move(data));
   m_Types.push_back(std::move(typeDef));
-  CLI_INFO("Type-Definition added {}", name);
+  CLI_INFO("Type-Definition added: {}", name);
 }
 
 KasX::Compiler::Core::DefinitionData *KasX::Compiler::Core::Domain::GetDefinition(
