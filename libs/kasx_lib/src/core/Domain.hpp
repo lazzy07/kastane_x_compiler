@@ -3,7 +3,6 @@
 #include <memory>
 #include <vector>
 
-#include "../data_structures/Definition.hpp"
 #include "../data_structures/DefinitionTypes.hpp"
 #include "../data_structures/Type.hpp"
 #include "../visitors/ProgramVisitor.hpp"

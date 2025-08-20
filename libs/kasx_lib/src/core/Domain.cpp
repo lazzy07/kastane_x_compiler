@@ -39,7 +39,7 @@ void KasX::Compiler::Core::Domain::InitDefaultTypes() {
 
 void KasX::Compiler::Core::Domain::InitNewType(const std::string &name, const FileTrace &trace,
                                                const std::vector<std::string> &parents) {
-  auto currentDef = this->GetDefinition(name);
+  auto *currentDef = this->GetDefinition(name);
 
   if (currentDef != nullptr) {
     CLI_ERROR("Cannot create the definition {} since it already exists.", name);
@@ -81,7 +81,7 @@ void KasX::Compiler::Core::Domain::InitNewType(const std::string &name, const Fi
   data->id = typeDef->id;
 
   for (auto parentRef : parentRefs) {
-    auto parentType = m_Types.at(parentRef).get();
+    auto *parentType = m_Types.at(parentRef).get();
     if (parentType != nullptr) {
       parentType->children.push_back(typeDef->id);
       CLI_TRACE("Type Child: {} added to the Parent: {}", typeDef->name, parentType->name);
