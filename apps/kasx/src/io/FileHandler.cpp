@@ -1,5 +1,6 @@
 #include "FileHandler.hpp"
 
+#include <filesystem>
 #include <Log.hpp>
 
 KasX::App::IO::FileHandler::FileHandler() { CORE_TRACE("FileHandler Initialized"); }

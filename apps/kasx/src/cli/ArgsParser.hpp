@@ -1,5 +1,4 @@
 #pragma once
-#include "../core/Execution.hpp"
 #include "CompiledArgument.hpp"
 
 namespace KasX::App::CLI {

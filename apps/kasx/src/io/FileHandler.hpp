@@ -1,6 +1,5 @@
 #pragma once
 
-#include <filesystem>
 #include <kasx/Types.hpp>
 
 namespace KasX::App::IO {

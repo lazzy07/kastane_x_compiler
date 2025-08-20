@@ -1,7 +1,6 @@
 #include "VersionPrinter.hpp"
 
 #include <Log.hpp>
-#include <iostream>
 #include <kasx/Version.hpp>
 
 void KasX::App::Core::VersionPrinter::printVersionDetails() {

@@ -1,10 +1,8 @@
 #include <Log.hpp>
-#include <iostream>
 #include <lazlogger/LoggerManager.hpp>
 
 #include "./cli/ArgsParser.hpp"
 #include "./core/ApplicationManager.hpp"
-#include "./core/Execution.hpp"
 
 int main(int argc, char *argv[]) {
   auto logger = LazLogger::LoggerManager();
