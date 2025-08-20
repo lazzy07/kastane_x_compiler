@@ -20,6 +20,19 @@ enum COMPILER_OPTIONS {
 };
 
 /**
+ * @brief Datatype used to define id # of data-structure tables
+ *
+ */
+using definition_id = uint16_t;
+
+using linetrace_data = size_t;
+
+struct FileTrace {
+  linetrace_data lineNumber;
+  linetrace_data columnNumber;
+};
+
+/**
  * Domain Data is passed into the compiler when the application is presented with a problem file
  */
 struct DomainData {

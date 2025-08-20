@@ -16,6 +16,7 @@ void KasX::Compiler::KasXCompiler::Compile(DomainData data, COMPILER_OPTIONS opt
   CLI_INFO("Domain found and, Started compiling {} : {}", data.domainName, data.path.string());
 
   KasX::Compiler::Core::Domain domain(data);
+  domain.InitVisitor();
 }
 
 void KasX::Compiler::KasXCompiler::InitLogger() {
