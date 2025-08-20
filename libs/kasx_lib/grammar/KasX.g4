@@ -20,8 +20,8 @@ definition
     type character : location;
 */ 
 type_declaration
-  : TYPE_DEFINITION_KEYWORD IDENTIFIER DEFINITION_SEPARATOR
-  | TYPE_DEFINITION_KEYWORD IDENTIFIER COLON types_list DEFINITION_SEPARATOR
+  : TYPE_DEFINITION_KEYWORD IDENTIFIER DEFINITION_SEPARATOR                     # TypeDeclarationNoParents
+  | TYPE_DEFINITION_KEYWORD IDENTIFIER COLON types_list DEFINITION_SEPARATOR    # TypeDeclarationWithParents
   ;
 
 type_name
@@ -34,7 +34,7 @@ type_name
       location, character
 */
 types_list
-  : (type_name (COMMA type_name)*)?
+  : (type_name (COMMA type_name)*)?                                             # TypesList
   ;
 
 /* 
