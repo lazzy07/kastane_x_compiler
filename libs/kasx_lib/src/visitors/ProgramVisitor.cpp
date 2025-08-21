@@ -1,9 +1,12 @@
 #include "ProgramVisitor.hpp"
 
 #include "../core/Domain.hpp"
+#include "KasXParser.h"
 // Fixer added
 #include <Log.hpp>
+#include <any>
 #include <kasx/Types.hpp>
+#include <vector>
 
 KasX::Compiler::Visitor::ProgramVisitor::ProgramVisitor(KasX::Compiler::Core::Domain *domain)
     : KasXBaseVisitor(), m_Domain(domain) {
@@ -46,5 +49,19 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationWithParent
   size_t column = token->getCharPositionInLine() + 1;
 
   m_Domain->InitNewType(name, {line, column}, parents);
+  return {};
+}
+
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitEntityDeclaration(KasXParser::EntityDeclarationContext* ctx){
+  const std::string name = ctx->IDENTIFIER()->getText();
+
+  auto parents = std::any_cast<std::vector<std::string>>(visit(ctx->types_list()));
+
+  antlr4::Token *token = ctx->IDENTIFIER()->getSymbol();
+  size_t line = token->getLine();
+  size_t column = token->getCharPositionInLine() + 1;
+
+  m_Domain->InitNewEntity(name, {line, column}, parents);
+
   return {};
 }

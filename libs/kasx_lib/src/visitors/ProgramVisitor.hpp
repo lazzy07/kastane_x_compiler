@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include <any>
 #include "AntlrSafeBase.hpp"
 
 namespace KasX::Compiler::Core {
@@ -17,6 +18,7 @@ class ProgramVisitor : public KasXBaseVisitor {
   std::any visitTypesList(KasXParser::TypesListContext *ctx) override;
   std::any visitTypeDeclarationWithParents(
       KasXParser::TypeDeclarationWithParentsContext *ctx) override;
+  std::any visitEntityDeclaration(KasXParser::EntityDeclarationContext *ctx) override;
 
  private:
   KasX::Compiler::Core::Domain *m_Domain;

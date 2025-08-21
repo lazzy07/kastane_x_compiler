@@ -5,13 +5,13 @@ prog
 ;       
 
 definition
-  : type_declaration               # TypeDeclaration
-  | entity_declaration             # EntityDeclaration
-  | fluent_declaration             # FluentDeclaration
-  | initial_state_declaration      # InitialStateDeclaration
-  | action_definition              # ActionDefinition
-  | trigger_definition             # TriggerDefinition
-  | utility_definition             # UtilityFunction
+  : type_declaration               
+  | entity_declaration             
+  | fluent_declaration             
+  | initial_state_declaration      
+  | action_definition              
+  | trigger_definition             
+  | utility_definition             
   ;
 
 /* 
@@ -42,7 +42,7 @@ types_list
     entity Tom : character, location;
 */
 entity_declaration
-  : ENTITY_DEFINITION_KEYWORD IDENTIFIER COLON types_list DEFINITION_SEPARATOR
+  : ENTITY_DEFINITION_KEYWORD IDENTIFIER COLON types_list DEFINITION_SEPARATOR  # EntityDeclaration
   ;
 
 /*

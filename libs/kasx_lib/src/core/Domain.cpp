@@ -42,7 +42,7 @@ void KasX::Compiler::Core::Domain::InitNewType(const std::string &name, const Fi
   auto *currentDef = this->GetDefinition(name);
 
   if (currentDef != nullptr) {
-    CLI_ERROR("Cannot create the definition {} since it already exists.", name);
+    CLI_ERROR("Cannot create the type {} since it already exists.", name);
     return;
   }
 
@@ -105,4 +105,62 @@ KasX::Compiler::Core::DefinitionData *KasX::Compiler::Core::Domain::GetDefinitio
 
   CLI_TRACE("Definition: {} - already exists", name);
   return dataPtr->second.get();
+}
+
+void KasX::Compiler::Core::Domain::InitNewEntity(const std::string &name, const FileTrace &trace,
+                                               const std::vector<std::string> &parents){
+  auto *currentDef = this->GetDefinition(name);
+
+  if (currentDef != nullptr) {
+    //TODO: Handle error properly
+    CLI_ERROR("Cannot create the entity {} since definition already exists.", name);
+    return;
+  }
+
+  CLI_TRACE("Creating new entity definition: {}", name);
+
+  auto entityDef = std::make_unique<KasX::Compiler::DataStructures::Entity>();
+
+  std::vector<definition_id> typeRefs;
+
+  for (const auto &parent : parents) {
+    auto *parentRef = this->GetDefinition(parent);
+    if (parentRef != nullptr) {
+      if (parentRef->type == KasX::Compiler::DataStructures::DEFINITION_TYPES::TYPE_DEFINITION) {
+        CLI_TRACE("For entity: {} - type: {} found", name, parent);
+
+        typeRefs.push_back(parentRef->id);
+      } else {
+        // TODO: Handle the error properly
+        CLI_ERROR("Reference with the name {} already exists which is not an entity");
+      }
+
+    } else {
+      // TODO: Handle the error properly!
+      CLI_ERROR("Could not find type {} for entity {}", parent, name);
+      return;
+    }
+  }
+
+  entityDef->id = m_Entities.size();
+  entityDef->name = name;
+  entityDef->trace = trace;
+  entityDef->types = typeRefs;
+
+  std::unique_ptr<DefinitionData> data = std::make_unique<DefinitionData>();
+  // Setting the definition type to "entity"
+  data->type = KasX::Compiler::DataStructures::DEFINITION_TYPES::ENTITY_DEFINITION;
+  data->id = entityDef->id;
+
+  for (auto typeRef : typeRefs) {
+    auto *parentType = m_Types.at(typeRef).get();
+    if (parentType != nullptr) {
+      parentType->entities.push_back(entityDef->id);
+      CLI_TRACE("Entity: {} added to the Type: {}", entityDef->name, parentType->name);
+    }
+  }
+
+  m_Definitions.emplace(entityDef->name, std::move(data));
+  m_Entities.push_back(std::move(entityDef));
+  CLI_INFO("Entity-Definition added: {}", name);
 }
