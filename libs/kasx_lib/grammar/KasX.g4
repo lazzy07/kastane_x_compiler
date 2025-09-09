@@ -51,7 +51,7 @@ entity_declaration
     property alive(character : character) : boolean;
 */
 fluent_declaration
-  : FLUENT_DEFINITION_KEYWORD function_header COLON data_type DEFINITION_SEPARATOR
+  : FLUENT_DEFINITION_KEYWORD function_header COLON data_type DEFINITION_SEPARATOR # FluentDeclaration
   ;
 
 /* 
@@ -59,7 +59,7 @@ fluent_declaration
     from : place, to : place
 */
 param_list
-  : (param (COMMA param)*)?
+  : (param (COMMA param)*)?                                                        # ParamList
   ;
 
 /*
@@ -68,8 +68,8 @@ param_list
     to : place
 */
 param
-  : IDENTIFIER COLON data_type
-  | IDENTIFIER
+  : IDENTIFIER COLON data_type                                                     # ParamWithDataType
+  | IDENTIFIER                                                                     # ParamWithoutDataType
   ;
 
 /* 
@@ -85,7 +85,7 @@ action_definition
     walk(c: character, from: place, to: place)
 */
 function_header
-  : IDENTIFIER OPEN_BRACKET param_list CLOSE_BRACKET
+  : IDENTIFIER OPEN_BRACKET param_list CLOSE_BRACKET  # FunctionHeader
   ;
 
 action_body

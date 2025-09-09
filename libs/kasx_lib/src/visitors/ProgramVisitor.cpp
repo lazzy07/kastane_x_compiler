@@ -6,6 +6,7 @@
 #include <Log.hpp>
 #include <any>
 #include <kasx/Types.hpp>
+#include <utility>
 #include <vector>
 
 KasX::Compiler::Visitor::ProgramVisitor::ProgramVisitor(KasX::Compiler::Core::Domain *domain)
@@ -64,4 +65,27 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitEntityDeclaration(KasXPar
   m_Domain->InitNewEntity(name, {line, column}, parents);
 
   return {};
+}
+
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitFluentDeclaration(KasXParser::FluentDeclarationContext* ctx){
+  return {};
+}
+
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamWithoutDataType(KasXParser::ParamWithoutDataTypeContext* ctx){
+  const std::string name = ctx->IDENTIFIER()->getText();
+
+  return std::pair<std::string, std::string>(name, "");
+}
+
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamWithDataType(KasXParser::ParamWithDataTypeContext* ctx){
+  const std::string name = ctx->IDENTIFIER()->getText();
+}
+
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamList(KasXParser::ParamListContext* ctx){
+
+}
+
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitFunctionHeader(KasXParser::FunctionHeaderContext* ctx){
+  const std::string name = ctx->IDENTIFIER()->getText();
+
 }

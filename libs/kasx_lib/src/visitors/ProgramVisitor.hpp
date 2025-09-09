@@ -19,7 +19,11 @@ class ProgramVisitor : public KasXBaseVisitor {
   std::any visitTypeDeclarationWithParents(
       KasXParser::TypeDeclarationWithParentsContext *ctx) override;
   std::any visitEntityDeclaration(KasXParser::EntityDeclarationContext *ctx) override;
-
+  std::any visitFluentDeclaration(KasXParser::FluentDeclarationContext *ctx) override;
+  std::any visitFunctionHeader(KasXParser::FunctionHeaderContext* ctx) override;
+  std::any visitParamList(KasXParser::ParamListContext* ctx) override;
+  std::any visitParamWithDataType(KasXParser::ParamWithDataTypeContext* ctx) override;
+  std::any visitParamWithoutDataType(KasXParser::ParamWithoutDataTypeContext* ctx) override;
  private:
   KasX::Compiler::Core::Domain *m_Domain;
 };
