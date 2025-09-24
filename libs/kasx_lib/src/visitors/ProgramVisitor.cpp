@@ -55,6 +55,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationWithParent
     KasXParser::TypeDeclarationWithParentsContext *ctx) {
   const std::string name = ctx->IDENTIFIER()->getText();
   auto parents = std::any_cast<std::vector<std::string>>(visit(ctx->types_list()));
+  CLI_TRACE("Visitor: Visiting type-declraration with parents: {}", name);
 
   antlr4::Token *token = ctx->IDENTIFIER()->getSymbol();
   size_t line = token->getLine();
