@@ -31,6 +31,8 @@ class Scope {
   void InitNewEntity(const std::string &name, const KasX::Compiler::Trace::Range &range,
                      const std::vector<std::string> &parents = {});
 
+  inline SCOPE_TYPES GetScopeType() { return m_Type; };
+
  private:
   std::string m_Name;
   SCOPE_TYPES m_Type;
@@ -45,5 +47,7 @@ class Scope {
       m_Entities;  // Entities definitions
 
   void AddDefinition(const std::string &name, std::unique_ptr<DefinitionData> data);
+  std::vector<KasX::definition_id> GetParentIDs(const std::string &name,
+                                                const std::vector<std::string> &parents);
 };
 }  // namespace KasX::Compiler::Core
