@@ -1,19 +1,11 @@
 #pragma once
 #include <kasx/Types.hpp>
 #include <memory>
-#include <vector>
 
-#include "../data_structures/DefinitionTypes.hpp"
-#include "../data_structures/Type.hpp"
 #include "../visitors/ProgramVisitor.hpp"
-#include "../data_structures/Entity.hpp"
+#include "Scope.hpp"
 
 namespace KasX::Compiler::Core {
-struct DefinitionData {
-  KasX::Compiler::DataStructures::DEFINITION_TYPES type;
-  definition_id id;
-};
-
 class Domain {
  public:
   explicit Domain(DomainData &data);
@@ -21,11 +13,8 @@ class Domain {
 
   void InitVisitor();
   void InitDefaultTypes();
-  void InitNewType(const std::string &name, const FileTrace &trace,
-                   const std::vector<std::string> &parents = {});
-  void InitNewEntity(const std::string &name, const FileTrace& trace, const std::vector<std::string> &parents = {});
 
-  DefinitionData *GetDefinition(const std::string &name);
+  [[nodiscard]] inline KasX::Compiler::Core::Scope *GetCurrentScope() { return m_CurrentScope; };
 
  private:
   // Meta-Data that the domain initialized with
@@ -33,9 +22,9 @@ class Domain {
   // Program visitor for the domain
   std::unique_ptr<KasX::Compiler::Visitor::ProgramVisitor> m_ProgramVisitor;
 
-  // Definition holders
-  std::unordered_map<std::string, std::unique_ptr<DefinitionData>> m_Definitions;
-  std::vector<std::unique_ptr<KasX::Compiler::DataStructures::Type>> m_Types;
-  std::vector<std::unique_ptr<KasX::Compiler::DataStructures::Entity>> m_Entities;
+  // Global Scope
+  KasX::Compiler::Core::Scope m_GlobalScope;
+  KasX::Compiler::Core::Scope
+      *m_CurrentScope;  // Yes, this is not an error! Im using raw pointers here.
 };
 }  // namespace KasX::Compiler::Core

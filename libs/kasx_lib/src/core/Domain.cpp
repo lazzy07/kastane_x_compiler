@@ -2,13 +2,18 @@
 
 #include <Log.hpp>
 
-#include "../visitors/AntlrSafeRuntime.hpp"
+#include "KasXLexer.h"
+#include "Scope.hpp"
 
-KasX::Compiler::Core::Domain::Domain(DomainData &data) {
+KasX::Compiler::Core::Domain::Domain(DomainData &data)
+    : m_GlobalScope("global", SCOPE_TYPES::GLOBAL) {
   CORE_TRACE("Domain Initialized");
 
   m_DomainData = std::move(data);
   m_ProgramVisitor = std::make_unique<Visitor::ProgramVisitor>(this);
+
+  // Making the global scope the current scope at the begining
+  m_CurrentScope = &m_GlobalScope;
 }
 
 KasX::Compiler::Core::Domain::~Domain() { CORE_TRACE("Domain Terminated"); }
@@ -32,135 +37,7 @@ void KasX::Compiler::Core::Domain::InitVisitor() {
 
 void KasX::Compiler::Core::Domain::InitDefaultTypes() {
   CLI_TRACE("Initial types added: number, boolean, entity");
-  this->InitNewType("number", {});
-  this->InitNewType("boolean", {});
-  this->InitNewType("entity", {});
-}
-
-void KasX::Compiler::Core::Domain::InitNewType(const std::string &name, const FileTrace &trace,
-                                               const std::vector<std::string> &parents) {
-  auto *currentDef = this->GetDefinition(name);
-
-  if (currentDef != nullptr) {
-    CLI_ERROR("Cannot create the type {} since it already exists.", name);
-    return;
-  }
-
-  CLI_TRACE("Creating new type definition: {}", name);
-
-  std::vector<definition_id> parentRefs;
-
-  for (const auto &parent : parents) {
-    auto *parentRef = this->GetDefinition(parent);
-    if (parentRef != nullptr) {
-      if (parentRef->type == KasX::Compiler::DataStructures::DEFINITION_TYPES::TYPE_DEFINITION) {
-        CLI_TRACE("Parent found for: {} - Parent type: {}", name, parent);
-
-        parentRefs.push_back(parentRef->id);
-      } else {
-        // TODO: Handle the error properly
-        CLI_ERROR("Reference with the name {} already exists which is not a type");
-      }
-
-    } else {
-      // TODO: Handle the error properly!
-      CLI_ERROR("Could not find parent type for : {} of parent type {}", name, parent);
-      return;
-    }
-  }
-
-  auto typeDef = std::make_unique<KasX::Compiler::DataStructures::Type>();
-  typeDef->id = m_Types.size();
-  typeDef->name = name;
-  typeDef->trace = trace;
-  typeDef->parents = parentRefs;
-
-  std::unique_ptr<DefinitionData> data = std::make_unique<DefinitionData>();
-  // Setting the definition type to "type"
-  data->type = KasX::Compiler::DataStructures::DEFINITION_TYPES::TYPE_DEFINITION;
-  data->id = typeDef->id;
-
-  for (auto parentRef : parentRefs) {
-    auto *parentType = m_Types.at(parentRef).get();
-    if (parentType != nullptr) {
-      parentType->children.push_back(typeDef->id);
-      CLI_TRACE("Type Child: {} added to the Parent: {}", typeDef->name, parentType->name);
-    }
-  }
-
-  m_Definitions.emplace(typeDef->name, std::move(data));
-  m_Types.push_back(std::move(typeDef));
-  CLI_INFO("Type-Definition added: {}", name);
-}
-
-KasX::Compiler::Core::DefinitionData *KasX::Compiler::Core::Domain::GetDefinition(
-    const std::string &name) {
-  CLI_TRACE("Checking if definition already exists: {}", name);
-
-  auto dataPtr = m_Definitions.find(name);
-  if (dataPtr == m_Definitions.end()) {
-    CLI_TRACE("Definition {} - does not exist", name);
-    return nullptr;
-  }
-
-  CLI_TRACE("Definition: {} - already exists", name);
-  return dataPtr->second.get();
-}
-
-void KasX::Compiler::Core::Domain::InitNewEntity(const std::string &name, const FileTrace &trace,
-                                               const std::vector<std::string> &parents){
-  auto *currentDef = this->GetDefinition(name);
-
-  if (currentDef != nullptr) {
-    //TODO: Handle error properly
-    CLI_ERROR("Cannot create the entity {} since definition already exists.", name);
-    return;
-  }
-
-  CLI_TRACE("Creating new entity definition: {}", name);
-
-  auto entityDef = std::make_unique<KasX::Compiler::DataStructures::Entity>();
-
-  std::vector<definition_id> typeRefs;
-
-  for (const auto &parent : parents) {
-    auto *parentRef = this->GetDefinition(parent);
-    if (parentRef != nullptr) {
-      if (parentRef->type == KasX::Compiler::DataStructures::DEFINITION_TYPES::TYPE_DEFINITION) {
-        CLI_TRACE("For entity: {} - type: {} found", name, parent);
-
-        typeRefs.push_back(parentRef->id);
-      } else {
-        // TODO: Handle the error properly
-        CLI_ERROR("Reference with the name {} already exists which is not an entity");
-      }
-
-    } else {
-      // TODO: Handle the error properly!
-      CLI_ERROR("Could not find type {} for entity {}", parent, name);
-      return;
-    }
-  }
-
-  entityDef->id = m_Entities.size();
-  entityDef->name = name;
-  entityDef->trace = trace;
-  entityDef->types = typeRefs;
-
-  std::unique_ptr<DefinitionData> data = std::make_unique<DefinitionData>();
-  // Setting the definition type to "entity"
-  data->type = KasX::Compiler::DataStructures::DEFINITION_TYPES::ENTITY_DEFINITION;
-  data->id = entityDef->id;
-
-  for (auto typeRef : typeRefs) {
-    auto *parentType = m_Types.at(typeRef).get();
-    if (parentType != nullptr) {
-      parentType->entities.push_back(entityDef->id);
-      CLI_TRACE("Entity: {} added to the Type: {}", entityDef->name, parentType->name);
-    }
-  }
-
-  m_Definitions.emplace(entityDef->name, std::move(data));
-  m_Entities.push_back(std::move(entityDef));
-  CLI_INFO("Entity-Definition added: {}", name);
+  this->m_GlobalScope.InitNewType("number", {});
+  this->m_GlobalScope.InitNewType("boolean", {});
+  this->m_GlobalScope.InitNewType("entity", {});
 }
