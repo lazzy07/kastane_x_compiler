@@ -9,6 +9,8 @@
 #include <utility>
 #include <vector>
 
+#include "../trace/Range.hpp"
+
 KasX::Compiler::Visitor::ProgramVisitor::ProgramVisitor(KasX::Compiler::Core::Domain *domain)
     : KasXBaseVisitor(), m_Domain(domain) {
   CORE_TRACE("Program Visitor Initialized");
@@ -21,12 +23,21 @@ KasX::Compiler::Visitor::ProgramVisitor::~ProgramVisitor() {
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationNoParents(
     KasXParser::TypeDeclarationNoParentsContext *ctx) {
   antlr4::Token *token = ctx->IDENTIFIER()->getSymbol();
-  size_t line = token->getLine();
-  size_t column = token->getCharPositionInLine() + 1;
+  linetrace_data line = token->getLine();
+  linetrace_data column = token->getCharPositionInLine() + 1;
 
   std::string typeIdentifier = ctx->IDENTIFIER()->toString();
-  CLI_TRACE("Visiting type-declraration without parents: {}", typeIdentifier);
-  m_Domain->InitNewType(typeIdentifier, {line, column});
+  CLI_TRACE("Visitor: Visiting type-declraration without parents: {}", typeIdentifier);
+
+  linetrace_data end = column + typeIdentifier.length();
+
+  KasX::Compiler::Trace::Range range;
+  range.start.line = line;
+  range.end.line = line;
+  range.start.character = column;
+  range.end.character = end;
+
+  m_Domain->GetCurrentScope()->InitNewType(typeIdentifier, range);
   return nullptr;
 }
 
@@ -49,11 +60,21 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationWithParent
   size_t line = token->getLine();
   size_t column = token->getCharPositionInLine() + 1;
 
-  m_Domain->InitNewType(name, {line, column}, parents);
+  linetrace_data end = column + name.length();
+
+  KasX::Compiler::Trace::Range range;
+  range.start.line = line;
+  range.end.line = line;
+  range.start.character = column;
+  range.end.character = end;
+
+  m_Domain->GetCurrentScope()->InitNewType(name, range, parents);
+  // m_Domain->InitNewType(name, {line, column}, parents);
   return {};
 }
 
-std::any KasX::Compiler::Visitor::ProgramVisitor::visitEntityDeclaration(KasXParser::EntityDeclarationContext* ctx){
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitEntityDeclaration(
+    KasXParser::EntityDeclarationContext *ctx) {
   const std::string name = ctx->IDENTIFIER()->getText();
 
   auto parents = std::any_cast<std::vector<std::string>>(visit(ctx->types_list()));
@@ -62,30 +83,37 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitEntityDeclaration(KasXPar
   size_t line = token->getLine();
   size_t column = token->getCharPositionInLine() + 1;
 
-  m_Domain->InitNewEntity(name, {line, column}, parents);
+  // m_Domain->InitNewEntity(name, {line, column}, parents);
 
   return {};
 }
 
-std::any KasX::Compiler::Visitor::ProgramVisitor::visitFluentDeclaration(KasXParser::FluentDeclarationContext* ctx){
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitFluentDeclaration(
+    KasXParser::FluentDeclarationContext *ctx) {
   return {};
 }
 
-std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamWithoutDataType(KasXParser::ParamWithoutDataTypeContext* ctx){
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamWithoutDataType(
+    KasXParser::ParamWithoutDataTypeContext *ctx) {
   const std::string name = ctx->IDENTIFIER()->getText();
 
   return std::pair<std::string, std::string>(name, "");
 }
 
-std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamWithDataType(KasXParser::ParamWithDataTypeContext* ctx){
-  const std::string name = ctx->IDENTIFIER()->getText();
-}
-
-std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamList(KasXParser::ParamListContext* ctx){
-
-}
-
-std::any KasX::Compiler::Visitor::ProgramVisitor::visitFunctionHeader(KasXParser::FunctionHeaderContext* ctx){
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamWithDataType(
+    KasXParser::ParamWithDataTypeContext *ctx) {
   const std::string name = ctx->IDENTIFIER()->getText();
 
+  return {};
+}
+
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamList(
+    KasXParser::ParamListContext *ctx) {
+  return {};
+}
+
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitFunctionHeader(
+    KasXParser::FunctionHeaderContext *ctx) {
+  const std::string name = ctx->IDENTIFIER()->getText();
+  return {};
 }
