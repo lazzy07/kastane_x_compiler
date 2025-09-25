@@ -27,7 +27,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationNoParents(
   linetrace_data column = token->getCharPositionInLine() + 1;
 
   std::string typeIdentifier = ctx->IDENTIFIER()->toString();
-  CLI_TRACE("Visitor: Visiting type-declraration without parents: {}", typeIdentifier);
+  CLI_TRACE("Visitor: Visiting type-declaration without parents: {}", typeIdentifier);
 
   linetrace_data end = column + typeIdentifier.length();
 
@@ -55,7 +55,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationWithParent
     KasXParser::TypeDeclarationWithParentsContext *ctx) {
   const std::string name = ctx->IDENTIFIER()->getText();
   auto parents = std::any_cast<std::vector<std::string>>(visit(ctx->types_list()));
-  CLI_TRACE("Visitor: Visiting type-declraration with parents: {}", name);
+  CLI_TRACE("Visitor: Visiting type-declaration with parents: {}", name);
 
   antlr4::Token *token = ctx->IDENTIFIER()->getSymbol();
   size_t line = token->getLine();

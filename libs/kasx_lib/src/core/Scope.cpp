@@ -32,7 +32,7 @@ void KasX::Compiler::Core::Scope::AddDefinition(const std::string &name,
                                                 std::unique_ptr<DefinitionData> data) {
   // username - lazzy07 TODO: Handle the error
   if (m_Type != SCOPE_TYPES::GLOBAL) {
-    CLI_ERROR("Declrations must be inside the global scope");
+    CLI_ERROR("Declarations must be inside the global scope");
     return;
   }
 
@@ -87,6 +87,31 @@ void KasX::Compiler::Core::Scope::InitNewType(const std::string &name,
   type->parents = parentIDs;
   type->trace = range;
   type->name = name;
+
+  // If there are no parents defined, the parent should be 'entity'
+  if (parentIDs.empty()) {
+    // No parent id, set the parent to 'entity', but only if it is not 'entity'
+    if (name != "entity") {
+      DefinitionData *entityDefinition = m_Definitions.find("entity")->second.get();
+      definition_id entityID = entityDefinition->id;
+
+      m_Types.at(entityID).get()->children.push_back(typeID);
+      CLI_TRACE("Type definition with no parents '{}' added to entity type as a child", name);
+    }
+  }
+
+  // Adding the new child to the parent
+  for (definition_id parentID : parentIDs) {
+    DataStructures::Type *parent = m_Types.at(parentID).get();
+    parent->children.push_back(typeID);
+  }
+
+  // Adding the new type to the definitions
+  AddDefinition(type->name, std::move(definitionData));
+
+  // Add the new type to the types of the scope
+  CLI_INFO("New type {} added to the scope: {}.", type->name, this->m_Name);
+  m_Types.push_back(std::move(type));
 }
 
 void KasX::Compiler::Core::Scope::InitNewEntity(const std::string &name,
