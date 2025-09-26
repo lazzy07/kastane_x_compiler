@@ -60,6 +60,11 @@ std::vector<KasX::definition_id> KasX::Compiler::Core::Scope::GetParentIDs(
       return {};
     }
 
+    if (parentDef->type != DataStructures::DEFINITION_TYPES::TYPE_DEFINITION) {
+      CLI_ERROR("Parent/Type '{}' for '{}' does not exist as a type", parent, name);
+      return {};
+    }
+
     parentIDs.push_back(parentDef->id);
   }
 
@@ -69,7 +74,17 @@ std::vector<KasX::definition_id> KasX::Compiler::Core::Scope::GetParentIDs(
 void KasX::Compiler::Core::Scope::InitNewType(const std::string &name,
                                               const KasX::Compiler::Trace::Range &range,
                                               const std::vector<std::string> &parents) {
+  if (m_Type != SCOPE_TYPES::GLOBAL) {
+    CORE_ERROR("Type declarations should be done only inside the global scope");
+    return;
+  }
+
   CORE_TRACE("New type initialization started: {}", name);
+
+  if (GetDefinition(name) != nullptr) {
+    CLI_ERROR("Type '{}' already exists as a definition", name);
+    return;
+  }
 
   std::vector<KasX::definition_id> parentIDs = GetParentIDs(name, parents);
 
@@ -116,4 +131,45 @@ void KasX::Compiler::Core::Scope::InitNewType(const std::string &name,
 
 void KasX::Compiler::Core::Scope::InitNewEntity(const std::string &name,
                                                 const KasX::Compiler::Trace::Range &range,
-                                                const std::vector<std::string> &parents) {}
+                                                const std::vector<std::string> &types) {
+  CORE_TRACE("New entity initialization started: {}", name);
+
+  // First check if the entity already exists or not
+  if (GetDefinition(name) != nullptr) {
+    CLI_ERROR("Entity '{}' already exists as a definition", name);
+    return;
+  }
+
+  definition_id entityID = m_Entities.size();
+
+  if (types.size() > 0) {
+    // Typename declaration is correct (size wise), has exactly one type
+    auto typesVec = GetParentIDs(name, types);
+
+    auto definitionData = std::make_unique<DefinitionData>();
+    definitionData->id = entityID;
+    definitionData->type = DataStructures::ENTITY_DEFINITION;
+
+    auto entity = std::make_unique<DataStructures::Entity>();
+    entity->id = entityID;
+    entity->name = name;
+    entity->types = typesVec;
+    entity->trace = range;
+
+    m_Entities.push_back(std::move(entity));
+
+    if (typesVec.size() > 0) {
+      // Types are correct!
+      for (definition_id typeID : typesVec) {
+        m_Types.at(typeID).get()->entities.push_back(entityID);
+      }
+    }
+
+    AddDefinition(name, std::move(definitionData));
+
+    CLI_INFO("Entity '{}' added to the scope: {}", name, m_Name);
+
+  } else {
+    CLI_ERROR("Type is not declared for '{}'", name);
+  }
+}

@@ -70,20 +70,28 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationWithParent
   range.end.character = end;
 
   m_Domain->GetCurrentScope()->InitNewType(name, range, parents);
-  // m_Domain->InitNewType(name, {line, column}, parents);
   return {};
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitEntityDeclaration(
     KasXParser::EntityDeclarationContext *ctx) {
   const std::string name = ctx->IDENTIFIER()->getText();
-
+  CLI_TRACE("Visitor: Visiting entity-declaration: {}", name);
   auto parents = std::any_cast<std::vector<std::string>>(visit(ctx->types_list()));
 
   antlr4::Token *token = ctx->IDENTIFIER()->getSymbol();
   size_t line = token->getLine();
   size_t column = token->getCharPositionInLine() + 1;
 
+  linetrace_data end = column + name.length();
+
+  KasX::Compiler::Trace::Range range;
+  range.start.line = line;
+  range.end.line = line;
+  range.start.character = column;
+  range.end.character = end;
+
+  m_Domain->GetCurrentScope()->InitNewEntity(name, range, parents);
   // m_Domain->InitNewEntity(name, {line, column}, parents);
 
   return {};

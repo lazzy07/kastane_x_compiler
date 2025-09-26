@@ -29,7 +29,7 @@ class Scope {
   void InitNewType(const std::string &name, const KasX::Compiler::Trace::Range &range,
                    const std::vector<std::string> &parents = {});
   void InitNewEntity(const std::string &name, const KasX::Compiler::Trace::Range &range,
-                     const std::vector<std::string> &parents = {});
+                     const std::vector<std::string> &type = {});
 
   inline SCOPE_TYPES GetScopeType() { return m_Type; };
 
