@@ -2,12 +2,12 @@
 
 #include <string>
 #include <vector>
-#include <memory>
-#include <utility>
+
+#include "Parameter.hpp"
 
 namespace KasX::Compiler::DataStructures::Helpers {
-  struct FunctionHeader{
-    std::string name;
-    std::vector<std::unique_ptr<std::pair<std::string, std::string>>> param;
-  };
-}
+struct FunctionHeader {
+  std::string name;
+  std::vector<Parameter> params;
+};
+}  // namespace KasX::Compiler::DataStructures::Helpers

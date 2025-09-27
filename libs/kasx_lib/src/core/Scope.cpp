@@ -1,6 +1,7 @@
 #include "Scope.hpp"
 
 #include <Log.hpp>
+#include <cstddef>
 #include <memory>
 #include <vector>
 
@@ -75,7 +76,7 @@ void KasX::Compiler::Core::Scope::InitNewType(const std::string &name,
                                               const KasX::Compiler::Trace::Range &range,
                                               const std::vector<std::string> &parents) {
   if (m_Type != SCOPE_TYPES::GLOBAL) {
-    CORE_ERROR("Type declarations should be done only inside the global scope");
+    CORE_ERROR("Type declarations should be done only inside the global scope: {}", name);
     return;
   }
 
@@ -134,6 +135,11 @@ void KasX::Compiler::Core::Scope::InitNewEntity(const std::string &name,
                                                 const std::vector<std::string> &types) {
   CORE_TRACE("New entity initialization started: {}", name);
 
+  if (m_Type != SCOPE_TYPES::GLOBAL) {
+    CORE_ERROR("Entity declarations should be done only inside the global scope: {}", name);
+    return;
+  }
+
   // First check if the entity already exists or not
   if (GetDefinition(name) != nullptr) {
     CLI_ERROR("Entity '{}' already exists as a definition", name);
@@ -172,4 +178,46 @@ void KasX::Compiler::Core::Scope::InitNewEntity(const std::string &name,
   } else {
     CLI_ERROR("Type is not declared for '{}'", name);
   }
+}
+
+void KasX::Compiler::Core::Scope::InitNewFluent(const std::string &name,
+                                                const KasX::Compiler::Trace::Range &range,
+                                                const ParamList &params,
+                                                const std::string &dataType) {
+  CLI_TRACE("Started initializing a new fluent '{}' with data type: '{}'", name, dataType);
+
+  if (m_Type != SCOPE_TYPES::GLOBAL) {
+    CORE_ERROR("Fluent declarations should be done only inside the global scope: {}", name);
+    return;
+  }
+
+  // First check if the fluent already exists or not
+  if (GetDefinition(name) != nullptr) {
+    CLI_ERROR("Entity '{}' already exists as a definition", name);
+    return;
+  }
+
+  definition_id dataTypeID;
+  DefinitionData *dataTypeDef = GetDefinition(dataType);
+
+  if (dataTypeDef == nullptr) {
+    CLI_ERROR("Data type '{}' of the fluent '{}' does not exist", dataType, name);
+    return;
+  }
+
+  if (dataTypeDef->type != DataStructures::DEFINITION_TYPES::TYPE_DEFINITION) {
+    CLI_ERROR("Data type '{}' of the fluent '{}' exist, but not as a data type", dataType, name);
+  }
+
+  definition_id fluentID = m_Fluents.size();
+
+  auto definitionData = std::make_unique<DefinitionData>();
+  definitionData->id = fluentID;
+  definitionData->type = DataStructures::FLUENT_DEFINITION;
+
+  auto fluent = std::make_unique<DataStructures::Fluent>();
+  fluent->id = fluentID;
+  fluent->name = name;
+  fluent->trace = range;
+  fluent->dataType = dataTypeDef->id;
 }

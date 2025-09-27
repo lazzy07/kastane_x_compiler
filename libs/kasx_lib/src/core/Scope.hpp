@@ -7,9 +7,14 @@
 
 #include "../data_structures/DefinitionTypes.hpp"
 #include "../data_structures/Entity.hpp"
+#include "../data_structures/Fluent.hpp"
 #include "../data_structures/Type.hpp"
+#include "../data_structures/helpers/Parameter.hpp"
 #include "../trace/Range.hpp"
 #include "kasx/Types.hpp"
+
+using Param = std::pair<std::string, std::string>;
+using ParamList = std::vector<Param>;
 
 namespace KasX::Compiler::Core {
 struct DefinitionData {
@@ -31,6 +36,9 @@ class Scope {
   void InitNewEntity(const std::string &name, const KasX::Compiler::Trace::Range &range,
                      const std::vector<std::string> &type = {});
 
+  void InitNewFluent(const std::string &name, const KasX::Compiler::Trace::Range &range,
+                     const ParamList &params, const std::string &dataType);
+
   inline SCOPE_TYPES GetScopeType() { return m_Type; };
 
  private:
@@ -45,6 +53,8 @@ class Scope {
   std::vector<std::unique_ptr<KasX::Compiler::DataStructures::Type>> m_Types;  // Types definitions
   std::vector<std::unique_ptr<KasX::Compiler::DataStructures::Entity>>
       m_Entities;  // Entities definitions
+  std::vector<std::unique_ptr<KasX::Compiler::DataStructures::Fluent>>
+      m_Fluents;  // Fluent definitions
 
   void AddDefinition(const std::string &name, std::unique_ptr<DefinitionData> data);
   std::vector<KasX::definition_id> GetParentIDs(const std::string &name,

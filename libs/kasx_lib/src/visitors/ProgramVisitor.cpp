@@ -99,6 +99,16 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitEntityDeclaration(
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitFluentDeclaration(
     KasXParser::FluentDeclarationContext *ctx) {
+  auto funcHeader = std::any_cast<std::pair<std::string, ParamList>>(visit(ctx->function_header()));
+
+  std::string name = funcHeader.first;
+  ParamList params = funcHeader.second;
+
+  const std::string dataType = ctx->data_type()->getText();
+
+  KasX::Compiler::Trace::Range range;
+
+  m_Domain->GetCurrentScope()->InitNewFluent(name, range, params, dataType);
   return {};
 }
 
@@ -106,23 +116,47 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamWithoutDataType(
     KasXParser::ParamWithoutDataTypeContext *ctx) {
   const std::string name = ctx->IDENTIFIER()->getText();
 
-  return std::pair<std::string, std::string>(name, "");
+  CLI_TRACE("Visitor: Visiting parameter '{}' without a datatype", name);
+
+  return Param{name, ""};
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamWithDataType(
     KasXParser::ParamWithDataTypeContext *ctx) {
   const std::string name = ctx->IDENTIFIER()->getText();
+  const std::string dataType = ctx->data_type()->getText();
 
-  return {};
+  CLI_TRACE("Visitor: Visiting parameter '{}' with datatype: '{}'", name, dataType);
+
+  return Param{name, dataType};
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamList(
     KasXParser::ParamListContext *ctx) {
-  return {};
+  const auto noOfElems = ctx->param().size();
+
+  CLI_TRACE("Visitor: Visiting the parameter list with {} elements", noOfElems);
+
+  ParamList out;
+  out.reserve(noOfElems);
+
+  for (auto *pctx : ctx->param()) {
+    auto param = std::any_cast<Param>(visit(pctx));
+    out.push_back(std::move(param));
+  }
+
+  return out;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitFunctionHeader(
     KasXParser::FunctionHeaderContext *ctx) {
   const std::string name = ctx->IDENTIFIER()->getText();
-  return {};
+  CLI_TRACE("Visitor: Visiting Function header: {}", name);
+  ParamList params;
+
+  if (auto *paramList = ctx->param_list()) {              // guard: list is optional
+    params = std::any_cast<ParamList>(visit(paramList));  // visit to get the value
+  }
+
+  return std::pair<std::string, ParamList>(name, std::move(params));
 }
