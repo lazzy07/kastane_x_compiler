@@ -1,8 +1,9 @@
 #include "Scope.hpp"
 
 #include <Log.hpp>
-#include <cstddef>
 #include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "kasx/Types.hpp"
@@ -191,13 +192,6 @@ void KasX::Compiler::Core::Scope::InitNewFluent(const std::string &name,
     return;
   }
 
-  // First check if the fluent already exists or not
-  if (GetDefinition(name) != nullptr) {
-    CLI_ERROR("Entity '{}' already exists as a definition", name);
-    return;
-  }
-
-  definition_id dataTypeID;
   DefinitionData *dataTypeDef = GetDefinition(dataType);
 
   if (dataTypeDef == nullptr) {
@@ -217,7 +211,81 @@ void KasX::Compiler::Core::Scope::InitNewFluent(const std::string &name,
 
   auto fluent = std::make_unique<DataStructures::Fluent>();
   fluent->id = fluentID;
-  fluent->name = name;
   fluent->trace = range;
   fluent->dataType = dataTypeDef->id;
+
+  std::string finalName = name + "(";
+
+  // Adding fluent parameters
+  definition_id index = 0;
+  for (const Param &param : params) {
+    auto paramData = std::make_unique<DataStructures::Helpers::Parameter>();
+
+    paramData->name = param.first;
+
+    if (index != 0) {
+      finalName += ",";
+    }
+
+    paramData->id = index;
+
+    if (!param.second.empty()) {
+      finalName += ":";
+      auto *paramDataType = GetDefinition(param.second);
+
+      if (paramDataType != nullptr) {
+        if (paramDataType->type == DataStructures::DEFINITION_TYPES::TYPE_DEFINITION) {
+          paramData->dataType = DataStructures::DEFINITION_TYPES::TYPE_DEFINITION;
+          paramData->index = paramDataType->id;
+          finalName += std::to_string(paramDataType->id);
+        } else {
+          CLI_ERROR("Parameter '{}' of the fluent '{}' definition found: '{}' but it is not a type",
+                    param.first, name, param.second);
+          return;
+        }
+      } else {
+        CLI_ERROR("Parameter '{}' of the fluent '{}' datatype cannot be found: '{}'", param.first,
+                  name, param.second);
+        return;
+      }
+    } else {
+      auto *paramDataType = GetDefinition(param.first);
+
+      if (paramDataType != nullptr) {
+        if (paramDataType->type == DataStructures::DEFINITION_TYPES::ENTITY_DEFINITION) {
+          paramData->dataType = DataStructures::DEFINITION_TYPES::ENTITY_DEFINITION;
+          paramData->index = paramDataType->id;
+        } else {
+          CLI_ERROR(
+              "Parameter '{}' of the fluent '{}' definition found: '{}' but it is not an entity",
+              param.first, name, param.second);
+          return;
+        }
+      } else {
+        CLI_ERROR("Parameter (Entity) '{}' of the fluent '{}' cannot be found", param.first, name,
+                  param.second);
+        return;
+      }
+    }
+    CLI_TRACE("Parameter '{}' added to the fluent '{}'", paramData->name, name);
+    fluent->parameters.push_back(std::move(paramData));
+    index++;
+  }
+
+  finalName += "):" + std::to_string(fluent->dataType);
+
+  // First check if the fluent already exists or not
+  if (GetDefinition(finalName) != nullptr) {
+    CLI_ERROR("Entity '{}' already exists as a definition", finalName);
+    return;
+  }
+
+  // Setting the fluent name.
+  fluent->name = finalName;
+
+  AddDefinition(finalName, std::move(definitionData));
+
+  m_Fluents.push_back(std::move(fluent));
+
+  CLI_INFO("Fluent declaration added: '{}'", finalName);
 }

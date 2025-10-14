@@ -55,6 +55,7 @@ class Scope {
       m_Entities;  // Entities definitions
   std::vector<std::unique_ptr<KasX::Compiler::DataStructures::Fluent>>
       m_Fluents;  // Fluent definitions
+  std::vector<std::unique_ptr<DataStructures::Helpers::Parameter>> m_Parameters;
 
   void AddDefinition(const std::string &name, std::unique_ptr<DefinitionData> data);
   std::vector<KasX::definition_id> GetParentIDs(const std::string &name,

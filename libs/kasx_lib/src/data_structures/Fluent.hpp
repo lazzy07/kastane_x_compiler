@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include "Definition.hpp"
@@ -9,6 +10,6 @@
 namespace KasX::Compiler::DataStructures {
 struct Fluent : public Definition {
   definition_id dataType;
-  std::vector<Helpers::Parameter> parameters;
+  std::vector<std::unique_ptr<Helpers::Parameter>> parameters;
 };
 }  // namespace KasX::Compiler::DataStructures
