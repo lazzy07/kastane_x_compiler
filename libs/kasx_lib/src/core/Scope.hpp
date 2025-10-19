@@ -8,6 +8,7 @@
 #include "../data_structures/DefinitionTypes.hpp"
 #include "../data_structures/Entity.hpp"
 #include "../data_structures/Fluent.hpp"
+#include "../data_structures/InitialFluent.hpp"
 #include "../data_structures/Type.hpp"
 #include "../data_structures/helpers/Parameter.hpp"
 #include "../trace/Range.hpp"
@@ -56,6 +57,8 @@ class Scope {
   std::vector<std::unique_ptr<KasX::Compiler::DataStructures::Fluent>>
       m_Fluents;  // Fluent definitions
   std::vector<std::unique_ptr<DataStructures::Helpers::Parameter>> m_Parameters;
+  std::vector<std::unique_ptr<KasX::Compiler::DataStructures::InitialFluent>>
+      m_InitialFluents;  // Initial fluent values are stored in here.
 
   void AddDefinition(const std::string &name, std::unique_ptr<DefinitionData> data);
   std::vector<KasX::definition_id> GetParentIDs(const std::string &name,
