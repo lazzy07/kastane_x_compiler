@@ -42,6 +42,8 @@ class Scope {
 
   inline SCOPE_TYPES GetScopeType() { return m_Type; };
 
+  void InitInitialFulent(const std::string &name, const KasX::Compiler::Trace::Range &range);
+
  private:
   std::string m_Name;
   SCOPE_TYPES m_Type;
