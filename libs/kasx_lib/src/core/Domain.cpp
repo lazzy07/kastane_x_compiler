@@ -37,6 +37,8 @@ void KasX::Compiler::Core::Domain::InitVisitor() {
 
 void KasX::Compiler::Core::Domain::InitDefaultTypes() {
   CLI_TRACE("Initial types added: number, boolean, entity, character");
+
+  // Initializing default types of Sabre domains.
   this->m_GlobalScope.InitNewType("entity", {});
   this->m_GlobalScope.InitNewType("character", {});
   this->m_GlobalScope.InitNewType("number", {});
