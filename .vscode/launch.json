@@ -15,7 +15,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${command:cmake.launchTargetPath}",
-      "args": ["tests/problems/aladdin.txt"],
+      "args": ["tests/problems/basketball.txt"],
       "cwd": "${workspaceFolder}",
       "MIMode": "gdb",
       "externalConsole": false,
