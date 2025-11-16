@@ -145,15 +145,15 @@ exists_clause
   ;
 
 arithmetic_expression
-  : unary_not_expression
-  | negation_expression
-  | OPEN_BRACKET arithmetic_expression CLOSE_BRACKET
-  | arithmetic_expression binary_op arithmetic_expression
-  | belives_expression
+  : unary_not_expression                                          # expr_not
+  | negation_expression                                           # expr_negation
+  | OPEN_BRACKET arithmetic_expression CLOSE_BRACKET              
+  | arithmetic_expression binary_op arithmetic_expression         # expr_binary_op
+  | belives_expression                                            # expr_belives
   | fluent
-  | if_else_block
-  | exists_clause
-  | sum_function
+  | if_else_block                                                 # expr_if_else
+  | exists_clause                                                 # expr_exists
+  | sum_function                                                  
   | forall_function
   | IDENTIFIER
   | NUMBER
@@ -199,20 +199,20 @@ if_else_block
     ;
 
 binary_op
-  : SUBTRACTION_KEYWORD
-  | ADDITION_KEYWORD
-  | DIVISION_KEYWORD
-  | MULTIPLICATION_KEYWORD
-  | LESS_THAN_KEYWORD
-  | GREATER_THAN_KEYWORD
-  | LESS_THAN_OR_EQUAL_TO_KEYWORD
-  | GREATER_THAN_OR_EQUAL_TO_KEYWORD
-  | NOT_EQUAL_TO_KEYWORD
-  | EQUAL_TO_KEYWORD
-  | ASSIGNMENT_KEYWORD
-  | DISJUNCTION_KEYWORD
-  | CONJUNCTION_KEYWORD
-  | COLON // Used to check inheritance
+  : SUBTRACTION_KEYWORD                   # substraction_op
+  | ADDITION_KEYWORD                      # addition_op
+  | DIVISION_KEYWORD                      # division_op
+  | MULTIPLICATION_KEYWORD                # multiplication_op
+  | LESS_THAN_KEYWORD                     # less_than_op
+  | GREATER_THAN_KEYWORD                  # greater_than_op
+  | LESS_THAN_OR_EQUAL_TO_KEYWORD         # less_than_eq_op
+  | GREATER_THAN_OR_EQUAL_TO_KEYWORD      # greater_than_eq_op
+  | NOT_EQUAL_TO_KEYWORD                  # not_equal_op
+  | EQUAL_TO_KEYWORD                      # equal_to_op
+  | ASSIGNMENT_KEYWORD                    # assignment_op
+  | DISJUNCTION_KEYWORD                   # disjunction_op
+  | CONJUNCTION_KEYWORD                   # conjunction_op
+  | COLON                                 # inheritance_op // Used to check inheritance
   ;
 
 /*
