@@ -7,21 +7,18 @@ Checks: >
   modernize-*,
   readability-*,
   clang-analyzer-*,
-  -readability-identifier-naming,         # too noisy until you define your own rules
-  -modernize-use-trailing-return-type,    # not typical for Google style
-  -google-runtime-references              # often too strict for modern C++
+  -readability-identifier-naming,         
+  -modernize-use-trailing-return-type,
+  -google-runtime-references         
 
 WarningsAsErrors: ""
 FormatStyle: file
 HeaderFilterRegex: '^(?!.*(vendor|build)/).*$'
 
 CheckOptions:
-  # Keep "add braces" reasonable for short one-liners
   - key: readability-braces-around-statements.ShortStatementLines
     value: "1"
-  # Prefer nullptr over NULL/0
   - key: modernize-use-nullptr.NullMacros
     value: "NULL"
-  # Avoid false positives on ctor init-lines wrapping
   - key: readability-implicit-bool-conversion.AllowIntegerConditions
     value: "true"
