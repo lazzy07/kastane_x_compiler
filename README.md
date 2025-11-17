@@ -8,7 +8,7 @@ This project uses `antlr4` compiler generator to write the Grammar required. You
 
 ## Project Structure
 
-This project is designed to be highly portable, if you dont need `Data Structures` created, you can turn it off.
+This project is designed to be highly portable, if you don't need `Data Structures` created, you can turn it off.
 
 ## Testing
 
@@ -31,5 +31,19 @@ git init
 git add .
 git commit -m "Initial commit"
 git tag -a v1.0.0 -m "Version 1.0.0"
-
 ```
+
+
+## Compiling and running the project
+
+This project uses CMake. To build the project,
+
+```bash
+cd debug
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+cmake --build build -j
+```
+```
+```
+```
+
