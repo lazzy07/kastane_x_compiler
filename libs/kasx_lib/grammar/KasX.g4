@@ -145,20 +145,20 @@ exists_clause
   ;
 
 arithmetic_expression
-  : unary_not_expression                                          # expr_not
-  | negation_expression                                           # expr_negation
-  | OPEN_BRACKET arithmetic_expression CLOSE_BRACKET              
-  | arithmetic_expression binary_op arithmetic_expression         # expr_binary_op
-  | belives_expression                                            # expr_belives
-  | fluent
-  | if_else_block                                                 # expr_if_else
-  | exists_clause                                                 # expr_exists
-  | sum_function                                                  
-  | forall_function
-  | IDENTIFIER
-  | NUMBER
-  | UNKNOWN_KEYWORD
-  | NULL_CLAUSE_KEYWORD
+  : unary_not_expression                                          # ExprNot
+  | negation_expression                                           # ExprNegation
+  | OPEN_BRACKET arithmetic_expression CLOSE_BRACKET              # ExprInBracket
+  | arithmetic_expression binary_op arithmetic_expression         # ExprBinaryOp
+  | belives_expression                                            # ExprBelives
+  | fluent                                                        # ExprFluent
+  | if_else_block                                                 # ExprIfElse
+  | exists_clause                                                 # ExprExists
+  | sum_function                                                  # ExprSum
+  | forall_function                                               # ExprForAll
+  | IDENTIFIER                                                    # ExprIdentifier
+  | NUMBER                                                        # ExprNumber
+  | UNKNOWN_KEYWORD                                               # ExprUnknown
+  | NULL_CLAUSE_KEYWORD                                           # ExprNullClause
   ;
 
 inheritance_expression
