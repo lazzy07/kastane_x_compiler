@@ -10,5 +10,5 @@ UseTab: Never
 ColumnLimit: 130
 
 DerivePointerAlignment: false
-PointerAlignment: Right      # int* p
-ReferenceAlignment: Right    # T& t
+PointerAlignment: Left      # int* p
+ReferenceAlignment: Left    # T& t
