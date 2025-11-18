@@ -8,13 +8,13 @@
 namespace KasX::Compiler::Core {
 class Domain {
  public:
-  explicit Domain(DomainData &data);
+  explicit Domain(DomainData& data);
   ~Domain();
 
   void InitVisitor();
   void InitDefaultTypes();
 
-  [[nodiscard]] inline KasX::Compiler::Core::Scope *GetCurrentScope() { return m_CurrentScope; };
+  [[nodiscard]] KasX::Compiler::Core::Scope* GetCurrentScope() { return m_CurrentScope; };
 
  private:
   // Meta-Data that the domain initialized with
@@ -24,7 +24,6 @@ class Domain {
 
   // Global Scope
   KasX::Compiler::Core::Scope m_GlobalScope;
-  KasX::Compiler::Core::Scope
-      *m_CurrentScope;  // Yes, this is not an error! Im using raw pointers here.
+  KasX::Compiler::Core::Scope* m_CurrentScope;  // Yes, this is not an error! Im using raw pointers here.
 };
 }  // namespace KasX::Compiler::Core
