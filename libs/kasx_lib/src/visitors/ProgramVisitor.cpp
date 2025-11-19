@@ -183,12 +183,34 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNot(KasXParser::ExprN
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNegation(KasXParser::ExprNegationContext* ctx) {
   CLI_TRACE("Visitor: Visiting Negation expression");
-
   return 0;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprInheritance(KasXParser::ExprInheritanceContext* ctx) {
-  CLI_TRACE("Visitor: Visiting inheritance expression");
+  CLI_TRACE("Visitor: Visiting Inheritance expression");
 
   return 0;
+}
+
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitInitialStateDecl(KasXParser::InitialStateDeclContext* ctx) {
+  CLI_TRACE("Visitor: Visiting Initial State Declaration");
+  visit(ctx->arithmetic_expression());
+  return 0;
+}
+
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitFluentVal(KasXParser::FluentValContext* ctx) {
+  CLI_TRACE("Visitor: Visiting Fluent");
+  auto arguments = std::any_cast<std::vector<std::string>>(visit(ctx->argument_list()));
+  return 0;
+}
+
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitArgumentList(KasXParser::ArgumentListContext* ctx) {
+  CLI_TRACE("Visitor: Visting Argument List (Identifiers)");
+  std::vector<std::string> arguments;
+
+  for (auto* identifier : ctx->IDENTIFIER()) {
+    arguments.push_back(identifier->getText());
+  }
+
+  return arguments;
 }

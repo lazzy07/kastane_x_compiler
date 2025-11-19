@@ -41,6 +41,13 @@ class ProgramVisitor : public KasXBaseVisitor {
   std::any visitExprNegation(KasXParser::ExprNegationContext* ctx) override;
   std::any visitExprInheritance(KasXParser::ExprInheritanceContext* ctx) override;
 
+  // Visiting fluents
+  std::any visitFluentVal(KasXParser::FluentValContext* ctx) override;
+  std::any visitArgumentList(KasXParser::ArgumentListContext* ctx) override;
+
+  // ---- Visiting initial state declarations
+  std::any visitInitialStateDecl(KasXParser::InitialStateDeclContext* ctx) override;
+
  private:
   KasX::Compiler::Core::Domain* m_Domain;
 };
