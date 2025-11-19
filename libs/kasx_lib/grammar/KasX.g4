@@ -162,7 +162,7 @@ arithmetic_expression
   ;
 
 inheritance_expression
-  : arithmetic_expression COLON arithmetic_expression
+  : arithmetic_expression COLON arithmetic_expression             # ExprInheritance
   ;
 
 forall_function

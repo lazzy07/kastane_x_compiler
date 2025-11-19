@@ -186,3 +186,9 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNegation(KasXParser::
 
   return 0;
 }
+
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprInheritance(KasXParser::ExprInheritanceContext* ctx) {
+  CLI_TRACE("Visitor: Visiting inheritance expression");
+
+  return 0;
+}

@@ -39,6 +39,7 @@ class ProgramVisitor : public KasXBaseVisitor {
   // Unary expressions
   std::any visitExprNot(KasXParser::ExprNotContext* ctx) override;
   std::any visitExprNegation(KasXParser::ExprNegationContext* ctx) override;
+  std::any visitExprInheritance(KasXParser::ExprInheritanceContext* ctx) override;
 
  private:
   KasX::Compiler::Core::Domain* m_Domain;
