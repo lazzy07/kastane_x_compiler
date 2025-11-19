@@ -112,7 +112,8 @@ observing_fun
   ;
 
 initial_state_declaration
-  : arithmetic_expression DEFINITION_SEPARATOR;
+  : arithmetic_expression DEFINITION_SEPARATOR                                # InitialStateDecl
+  ;
 
 trigger_definition
   : TRIGGER_DEFINITION_KEYWORD function_header START_CUR_BRACES trigger_body END_CUR_BRACES DEFINITION_SEPARATOR
@@ -182,11 +183,11 @@ negation_expression
   ;
 
 fluent
-  : IDENTIFIER OPEN_BRACKET argument_list? CLOSE_BRACKET
+  : IDENTIFIER OPEN_BRACKET argument_list? CLOSE_BRACKET        # FluentVal
   ;
 
 argument_list
-  : IDENTIFIER (COMMA IDENTIFIER)*
+  : IDENTIFIER (COMMA IDENTIFIER)*                              # ArgumentList
   ;
 
 if_else_block
