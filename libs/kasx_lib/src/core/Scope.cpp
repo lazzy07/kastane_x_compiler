@@ -87,14 +87,14 @@ void KasX::Compiler::Core::Scope::InitNewType(const std::string& name, const Kas
   std::vector<KasX::definition_id> parentIDs = GetParentIDs(name, parents);
 
   // If the function continues here, all the parents are found, no errors.
-  definition_id typeID = this->m_Types.size();
+  definition_id typeID = this->m_TypeDeclarations.size();
 
   // Creating definition data for the type declaration
   auto definitionData = std::make_unique<DefinitionData>();
   definitionData->id = typeID;
   definitionData->type = KasX::Compiler::DataStructures::DEFINITION_TYPES::TYPE_DEFINITION;
 
-  auto type = std::make_unique<KasX::Compiler::DataStructures::Type>();
+  auto type = std::make_unique<KasX::Compiler::DataStructures::TypeDecl>();
 
   type->id = typeID;
   type->parents = parentIDs;
@@ -108,14 +108,14 @@ void KasX::Compiler::Core::Scope::InitNewType(const std::string& name, const Kas
       DefinitionData* entityDefinition = m_Definitions.find("entity")->second.get();
       definition_id entityID = entityDefinition->id;
 
-      m_Types.at(entityID).get()->children.push_back(typeID);
+      m_TypeDeclarations.at(entityID).get()->children.push_back(typeID);
       CLI_TRACE("Type definition with no parents '{}' added to entity type as a child", name);
     }
   }
 
   // Adding the new child to the parent
   for (definition_id parentID : parentIDs) {
-    DataStructures::Type* parent = m_Types.at(parentID).get();
+    DataStructures::TypeDecl* parent = m_TypeDeclarations.at(parentID).get();
     parent->children.push_back(typeID);
   }
 
@@ -124,7 +124,7 @@ void KasX::Compiler::Core::Scope::InitNewType(const std::string& name, const Kas
 
   // Add the new type to the types of the scope
   CLI_INFO("New type {} added to the scope: {}.", type->name, this->m_Name);
-  m_Types.push_back(std::move(type));
+  m_TypeDeclarations.push_back(std::move(type));
 }
 
 void KasX::Compiler::Core::Scope::InitNewEntity(const std::string& name, const KasX::Compiler::Trace::Range& range,
@@ -142,7 +142,7 @@ void KasX::Compiler::Core::Scope::InitNewEntity(const std::string& name, const K
     return;
   }
 
-  definition_id entityID = m_Entities.size();
+  definition_id entityID = m_EntityDeclarations.size();
 
   if (types.size() > 0) {
     // Typename declaration is correct (size wise), has exactly one type
@@ -152,18 +152,18 @@ void KasX::Compiler::Core::Scope::InitNewEntity(const std::string& name, const K
     definitionData->id = entityID;
     definitionData->type = DataStructures::ENTITY_DEFINITION;
 
-    auto entity = std::make_unique<DataStructures::Entity>();
+    auto entity = std::make_unique<DataStructures::EntityDecl>();
     entity->id = entityID;
     entity->name = name;
     entity->types = typesVec;
     entity->trace = range;
 
-    m_Entities.push_back(std::move(entity));
+    m_EntityDeclarations.push_back(std::move(entity));
 
     if (typesVec.size() > 0) {
       // Types are correct!
       for (definition_id typeID : typesVec) {
-        m_Types.at(typeID).get()->entities.push_back(entityID);
+        m_TypeDeclarations.at(typeID).get()->entities.push_back(entityID);
       }
     }
 
@@ -196,13 +196,13 @@ void KasX::Compiler::Core::Scope::InitNewFluent(const std::string& name, const K
     CLI_ERROR("Data type '{}' of the fluent '{}' exist, but not as a data type", dataType, name);
   }
 
-  definition_id fluentID = m_Fluents.size();
+  definition_id fluentID = m_FluentDeclarations.size();
 
   auto definitionData = std::make_unique<DefinitionData>();
   definitionData->id = fluentID;
   definitionData->type = DataStructures::FLUENT_DEFINITION;
 
-  auto fluent = std::make_unique<DataStructures::Fluent>();
+  auto fluent = std::make_unique<DataStructures::FluentDecl>();
   fluent->id = fluentID;
   fluent->trace = range;
   fluent->dataType = dataTypeDef->id;
@@ -275,7 +275,7 @@ void KasX::Compiler::Core::Scope::InitNewFluent(const std::string& name, const K
 
   AddDefinition(finalName, std::move(definitionData));
 
-  m_Fluents.push_back(std::move(fluent));
+  m_FluentDeclarations.push_back(std::move(fluent));
 
   CLI_INFO("Fluent declaration added: '{}' to the scope: {}", finalName, this->m_Name);
 }
