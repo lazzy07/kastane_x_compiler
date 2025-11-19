@@ -15,20 +15,20 @@ class ProgramVisitor : public KasXBaseVisitor {
   explicit ProgramVisitor(KasX::Compiler::Core::Domain* domain);
   ~ProgramVisitor() override;
 
-  // Visiting declarations
+  // ----- Visiting declarations
   std::any visitTypeDeclarationNoParents(KasXParser::TypeDeclarationNoParentsContext* ctx) override;
   std::any visitTypesList(KasXParser::TypesListContext* ctx) override;
   std::any visitTypeDeclarationWithParents(KasXParser::TypeDeclarationWithParentsContext* ctx) override;
   std::any visitEntityDeclaration(KasXParser::EntityDeclarationContext* ctx) override;
   std::any visitFluentDeclaration(KasXParser::FluentDeclarationContext* ctx) override;
 
-  // Visiting functions and fluent headers
+  // ------ Visiting functions and fluent headers
   std::any visitFunctionHeader(KasXParser::FunctionHeaderContext* ctx) override;
   std::any visitParamList(KasXParser::ParamListContext* ctx) override;
   std::any visitParamWithDataType(KasXParser::ParamWithDataTypeContext* ctx) override;
   std::any visitParamWithoutDataType(KasXParser::ParamWithoutDataTypeContext* ctx) override;
 
-  // Visiting expressions
+  // ----- Visiting expressions
 
   // Visiting variables
   std::any visitExprIdentifier(KasXParser::ExprIdentifierContext* ctx) override;
