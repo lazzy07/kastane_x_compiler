@@ -199,20 +199,20 @@ if_else_block
     ;
 
 binary_op
-  : SUBTRACTION_KEYWORD                   # substraction_op
-  | ADDITION_KEYWORD                      # addition_op
-  | DIVISION_KEYWORD                      # division_op
-  | MULTIPLICATION_KEYWORD                # multiplication_op
-  | LESS_THAN_KEYWORD                     # less_than_op
-  | GREATER_THAN_KEYWORD                  # greater_than_op
-  | LESS_THAN_OR_EQUAL_TO_KEYWORD         # less_than_eq_op
-  | GREATER_THAN_OR_EQUAL_TO_KEYWORD      # greater_than_eq_op
-  | NOT_EQUAL_TO_KEYWORD                  # not_equal_op
-  | EQUAL_TO_KEYWORD                      # equal_to_op
-  | ASSIGNMENT_KEYWORD                    # assignment_op
-  | DISJUNCTION_KEYWORD                   # disjunction_op
-  | CONJUNCTION_KEYWORD                   # conjunction_op
-  | COLON                                 # inheritance_op // Used to check inheritance
+  : SUBTRACTION_KEYWORD                   # SubstractionOp
+  | ADDITION_KEYWORD                      # AdditionOp
+  | DIVISION_KEYWORD                      # DivisionOp
+  | MULTIPLICATION_KEYWORD                # MultiplicationOp
+  | LESS_THAN_KEYWORD                     # LessThanOp
+  | GREATER_THAN_KEYWORD                  # GreaterThanOp
+  | LESS_THAN_OR_EQUAL_TO_KEYWORD         # LessThanEqOp
+  | GREATER_THAN_OR_EQUAL_TO_KEYWORD      # GreaterThanEqOp
+  | NOT_EQUAL_TO_KEYWORD                  # NotEqualOp
+  | EQUAL_TO_KEYWORD                      # EqualToOp
+  | ASSIGNMENT_KEYWORD                    # AssignmentOp
+  | DISJUNCTION_KEYWORD                   # DisjunctionOp
+  | CONJUNCTION_KEYWORD                   # ConjunctionOp
+  | COLON                                 # InheritanceOp // Used to check inheritance
   ;
 
 /*
