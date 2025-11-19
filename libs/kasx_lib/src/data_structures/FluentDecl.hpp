@@ -8,7 +8,7 @@
 #include "kasx/Types.hpp"
 
 namespace KasX::Compiler::DataStructures {
-struct Fluent : public Definition {
+struct FluentDecl : public Definition {
   definition_id dataType;
   std::vector<std::unique_ptr<Helpers::Parameter>> parameters;
 };

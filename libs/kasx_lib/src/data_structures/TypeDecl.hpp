@@ -6,7 +6,7 @@
 #include "kasx/Types.hpp"
 
 namespace KasX::Compiler::DataStructures {
-struct Type : public Definition {
+struct TypeDecl : public Definition {
   std::vector<definition_id> parents;
   std::vector<definition_id> children;
   std::vector<definition_id> entities;
