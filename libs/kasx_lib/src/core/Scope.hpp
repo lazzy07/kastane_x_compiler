@@ -6,10 +6,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../data_structures/DefinitionTypes.hpp"
-#include "../data_structures/EntityDecl.hpp"
-#include "../data_structures/FluentDecl.hpp"
-#include "../data_structures/TypeDecl.hpp"
+#include "../data_structures/declarations/DeclarationTypes.hpp"
+#include "../data_structures/declarations/EntityDecl.hpp"
+#include "../data_structures/declarations/FluentDecl.hpp"
+#include "../data_structures/declarations/TypeDecl.hpp"
 #include "../data_structures/helpers/Parameter.hpp"
 #include "../trace/Range.hpp"
 #include "kasx/Types.hpp"
@@ -19,7 +19,7 @@ using ParamList = std::vector<Param>;
 
 namespace KasX::Compiler::Core {
 struct DefinitionData {
-  KasX::Compiler::DataStructures::DEFINITION_TYPES type;
+  KasX::Compiler::DataStructures::DECLARATION_TYPES type;
   definition_id id;
 };
 

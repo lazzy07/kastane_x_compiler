@@ -59,7 +59,7 @@ std::vector<KasX::definition_id> KasX::Compiler::Core::Scope::GetParentIDs(const
       return {};
     }
 
-    if (parentDef->type != DataStructures::DEFINITION_TYPES::TYPE_DEFINITION) {
+    if (parentDef->type != DataStructures::DECLARATION_TYPES::TYPE_DEFINITION) {
       CLI_ERROR("Parent/Type '{}' for '{}' does not exist as a type", parent, name);
       return {};
     }
@@ -92,7 +92,7 @@ void KasX::Compiler::Core::Scope::InitNewType(const std::string& name, const Kas
   // Creating definition data for the type declaration
   auto definitionData = std::make_unique<DefinitionData>();
   definitionData->id = typeID;
-  definitionData->type = KasX::Compiler::DataStructures::DEFINITION_TYPES::TYPE_DEFINITION;
+  definitionData->type = KasX::Compiler::DataStructures::DECLARATION_TYPES::TYPE_DEFINITION;
 
   auto type = std::make_unique<KasX::Compiler::DataStructures::TypeDecl>();
 
@@ -192,7 +192,7 @@ void KasX::Compiler::Core::Scope::InitNewFluent(const std::string& name, const K
     return;
   }
 
-  if (dataTypeDef->type != DataStructures::DEFINITION_TYPES::TYPE_DEFINITION) {
+  if (dataTypeDef->type != DataStructures::DECLARATION_TYPES::TYPE_DEFINITION) {
     CLI_ERROR("Data type '{}' of the fluent '{}' exist, but not as a data type", dataType, name);
   }
 
@@ -227,8 +227,8 @@ void KasX::Compiler::Core::Scope::InitNewFluent(const std::string& name, const K
       auto* paramDataType = GetDefinition(param.second);
 
       if (paramDataType != nullptr) {
-        if (paramDataType->type == DataStructures::DEFINITION_TYPES::TYPE_DEFINITION) {
-          paramData->dataType = DataStructures::DEFINITION_TYPES::TYPE_DEFINITION;
+        if (paramDataType->type == DataStructures::DECLARATION_TYPES::TYPE_DEFINITION) {
+          paramData->dataType = DataStructures::DECLARATION_TYPES::TYPE_DEFINITION;
           paramData->index = paramDataType->id;
           finalName += std::to_string(paramDataType->id);
         } else {
@@ -244,8 +244,8 @@ void KasX::Compiler::Core::Scope::InitNewFluent(const std::string& name, const K
       auto* paramDataType = GetDefinition(param.first);
 
       if (paramDataType != nullptr) {
-        if (paramDataType->type == DataStructures::DEFINITION_TYPES::ENTITY_DEFINITION) {
-          paramData->dataType = DataStructures::DEFINITION_TYPES::ENTITY_DEFINITION;
+        if (paramDataType->type == DataStructures::DECLARATION_TYPES::ENTITY_DEFINITION) {
+          paramData->dataType = DataStructures::DECLARATION_TYPES::ENTITY_DEFINITION;
           paramData->index = paramDataType->id;
         } else {
           CLI_ERROR("Parameter '{}' of the fluent '{}' definition found: '{}' but it is not an entity", param.first, name,
