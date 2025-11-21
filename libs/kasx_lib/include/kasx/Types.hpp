@@ -23,7 +23,7 @@ enum COMPILER_OPTIONS {
  * @brief Datatype used to define id # of data-structure tables
  *
  */
-using definition_id = uint16_t;
+using declaration_id = uint16_t;
 
 using linetrace_data = size_t;
 

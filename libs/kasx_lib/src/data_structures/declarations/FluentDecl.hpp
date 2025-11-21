@@ -9,7 +9,7 @@
 
 namespace KasX::Compiler::DataStructures {
 struct FluentDecl : public Declaration {
-  definition_id dataType;
+  declaration_id dataType;
   std::vector<std::unique_ptr<Helpers::Parameter>> parameters;
 };
 }  // namespace KasX::Compiler::DataStructures

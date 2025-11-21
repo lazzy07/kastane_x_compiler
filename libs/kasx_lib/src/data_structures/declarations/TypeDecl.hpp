@@ -7,8 +7,8 @@
 
 namespace KasX::Compiler::DataStructures {
 struct TypeDecl : public Declaration {
-  std::vector<definition_id> parents;
-  std::vector<definition_id> children;
-  std::vector<definition_id> entities;
+  std::vector<declaration_id> parents;
+  std::vector<declaration_id> children;
+  std::vector<declaration_id> entities;
 };
 }  // namespace KasX::Compiler::DataStructures

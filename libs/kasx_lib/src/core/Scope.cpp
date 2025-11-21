@@ -45,9 +45,9 @@ void KasX::Compiler::Core::Scope::AddDefinition(const std::string& name, std::un
   CLI_TRACE("Adding definition {} completed", name);
 }
 
-std::vector<KasX::definition_id> KasX::Compiler::Core::Scope::GetParentIDs(const std::string& name,
-                                                                           const std::vector<std::string>& parents) {
-  std::vector<definition_id> parentIDs;
+std::vector<KasX::declaration_id> KasX::Compiler::Core::Scope::GetParentIDs(const std::string& name,
+                                                                            const std::vector<std::string>& parents) {
+  std::vector<declaration_id> parentIDs;
 
   for (std::string parent : parents) {
     // username - lazzy07 TODO: Handle the error
@@ -84,10 +84,10 @@ void KasX::Compiler::Core::Scope::InitNewType(const std::string& name, const Kas
     return;
   }
 
-  std::vector<KasX::definition_id> parentIDs = GetParentIDs(name, parents);
+  std::vector<KasX::declaration_id> parentIDs = GetParentIDs(name, parents);
 
   // If the function continues here, all the parents are found, no errors.
-  definition_id typeID = this->m_TypeDeclarations.size();
+  declaration_id typeID = this->m_TypeDeclarations.size();
 
   // Creating definition data for the type declaration
   auto definitionData = std::make_unique<DefinitionData>();
@@ -106,7 +106,7 @@ void KasX::Compiler::Core::Scope::InitNewType(const std::string& name, const Kas
     // No parent id, set the parent to 'entity', but only if it is not 'entity'
     if (name != "entity") {
       DefinitionData* entityDefinition = m_Definitions.find("entity")->second.get();
-      definition_id entityID = entityDefinition->id;
+      declaration_id entityID = entityDefinition->id;
 
       m_TypeDeclarations.at(entityID).get()->children.push_back(typeID);
       CLI_TRACE("Type definition with no parents '{}' added to entity type as a child", name);
@@ -114,7 +114,7 @@ void KasX::Compiler::Core::Scope::InitNewType(const std::string& name, const Kas
   }
 
   // Adding the new child to the parent
-  for (definition_id parentID : parentIDs) {
+  for (declaration_id parentID : parentIDs) {
     DataStructures::TypeDecl* parent = m_TypeDeclarations.at(parentID).get();
     parent->children.push_back(typeID);
   }
@@ -142,7 +142,7 @@ void KasX::Compiler::Core::Scope::InitNewEntity(const std::string& name, const K
     return;
   }
 
-  definition_id entityID = m_EntityDeclarations.size();
+  declaration_id entityID = m_EntityDeclarations.size();
 
   if (types.size() > 0) {
     // Typename declaration is correct (size wise), has exactly one type
@@ -162,7 +162,7 @@ void KasX::Compiler::Core::Scope::InitNewEntity(const std::string& name, const K
 
     if (typesVec.size() > 0) {
       // Types are correct!
-      for (definition_id typeID : typesVec) {
+      for (declaration_id typeID : typesVec) {
         m_TypeDeclarations.at(typeID).get()->entities.push_back(entityID);
       }
     }
@@ -196,7 +196,7 @@ void KasX::Compiler::Core::Scope::InitNewFluent(const std::string& name, const K
     CLI_ERROR("Data type '{}' of the fluent '{}' exist, but not as a data type", dataType, name);
   }
 
-  definition_id fluentID = m_FluentDeclarations.size();
+  declaration_id fluentID = m_FluentDeclarations.size();
 
   auto definitionData = std::make_unique<DefinitionData>();
   definitionData->id = fluentID;
@@ -210,7 +210,7 @@ void KasX::Compiler::Core::Scope::InitNewFluent(const std::string& name, const K
   std::string finalName = std::to_string(fluentID) + "(";
 
   // Adding fluent parameters
-  definition_id index = 0;
+  declaration_id index = 0;
   for (const Param& param : params) {
     auto paramData = std::make_unique<DataStructures::Helpers::Parameter>();
 

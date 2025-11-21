@@ -20,7 +20,7 @@ using ParamList = std::vector<Param>;
 namespace KasX::Compiler::Core {
 struct DefinitionData {
   KasX::Compiler::DataStructures::DECLARATION_TYPES type;
-  definition_id id;
+  declaration_id id;
 };
 
 enum SCOPE_TYPES : std::uint8_t { GLOBAL, BLOCK, ACTION, TRIGGER, UTILITY, PARAM_LIST };
@@ -58,6 +58,6 @@ class Scope {
   std::vector<std::unique_ptr<DataStructures::Helpers::Parameter>> m_Parameters;
 
   void AddDefinition(const std::string& name, std::unique_ptr<DefinitionData> data);
-  std::vector<KasX::definition_id> GetParentIDs(const std::string& name, const std::vector<std::string>& parents);
+  std::vector<KasX::declaration_id> GetParentIDs(const std::string& name, const std::vector<std::string>& parents);
 };
 }  // namespace KasX::Compiler::Core

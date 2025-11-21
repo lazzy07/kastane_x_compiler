@@ -7,7 +7,7 @@
 
 namespace KasX::Compiler::DataStructures {
 struct Declaration {
-  definition_id id;
+  declaration_id id;
   std::string name;
   KasX::Compiler::Trace::Range trace;
 };
