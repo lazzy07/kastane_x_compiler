@@ -2,7 +2,6 @@
 
 #include <filesystem>
 #include <fstream>
-#include <memory>
 
 namespace KasX {
 
