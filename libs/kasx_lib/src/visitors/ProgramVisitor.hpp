@@ -2,6 +2,7 @@
 
 #include <any>
 
+#include "../core/TraceableClass.hpp"
 #include "AntlrSafeBase.hpp"
 #include "KasXParser.h"
 
@@ -10,10 +11,14 @@ class Domain;
 }
 
 namespace KasX::Compiler::Visitor {
-class ProgramVisitor : public KasXBaseVisitor {
+class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
  public:
   explicit ProgramVisitor(KasX::Compiler::Core::Domain* domain);
   ~ProgramVisitor() override;
+
+  // ---- Printing messages (Trace)
+  static void PrintStartVisit(std::string_view type, std::string_view identifier);
+  static void PrintEndVisit(std::string_view type, std::string_view identifier);
 
   // ----- Visiting declarations
   std::any visitTypeDeclarationNoParents(KasXParser::TypeDeclarationNoParentsContext* ctx) override;

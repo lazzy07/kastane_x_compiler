@@ -12,21 +12,36 @@
 #include "../trace/Range.hpp"
 
 KasX::Compiler::Visitor::ProgramVisitor::ProgramVisitor(KasX::Compiler::Core::Domain* domain)
-    : KasXBaseVisitor(), m_Domain(domain) {
+    : Core::TraceableClass("Visitor"), KasXBaseVisitor(), m_Domain(domain) {
   CORE_TRACE("Program Visitor Initialized");
 }
 
 KasX::Compiler::Visitor::ProgramVisitor::~ProgramVisitor() { CORE_TRACE("Program Visitor Terminated"); }
 
+void KasX::Compiler::Visitor::ProgramVisitor::PrintStartVisit(std::string_view type, std::string_view identifier) {
+  if (identifier.empty()) {
+    CLI_TRACE("\n[Visitor] ----- Started visit - type: {}", type);
+    return;
+  }
+  CLI_TRACE("\n[Visitor] ----- Started visit - type: {}, id: '{}'", type, identifier);
+}
+
+void KasX::Compiler::Visitor::ProgramVisitor::PrintEndVisit(std::string_view type, std::string_view identifier) {
+  if (identifier.empty()) {
+    CLI_TRACE("[Visitor] ----- Ended visit - type: {}\n", type);
+    return;
+  }
+  CLI_TRACE("[Visitor] ----- Ended visit - type: {}, id: '{}'\n", type, identifier);
+}
+
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationNoParents(
     KasXParser::TypeDeclarationNoParentsContext* ctx) {
+  std::string typeIdentifier = ctx->IDENTIFIER()->toString();
+  PrintStartVisit("type-declaration (no parents)", typeIdentifier);
+
   antlr4::Token* token = ctx->IDENTIFIER()->getSymbol();
   linetrace_data line = token->getLine();
   linetrace_data column = token->getCharPositionInLine() + 1;
-
-  std::string typeIdentifier = ctx->IDENTIFIER()->toString();
-  CLI_TRACE("Visitor: Visiting type-declaration without parents: {}", typeIdentifier);
-
   linetrace_data end = column + typeIdentifier.length();
 
   KasX::Compiler::Trace::Range range;
@@ -36,6 +51,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationNoParents(
   range.end.character = end;
 
   m_Domain->GetCurrentScope()->InitNewType(typeIdentifier, range);
+  PrintEndVisit("type-declaration (no parents)", typeIdentifier);
   return nullptr;
 }
 
@@ -51,7 +67,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationWithParent
     KasXParser::TypeDeclarationWithParentsContext* ctx) {
   const std::string name = ctx->IDENTIFIER()->getText();
   auto parents = std::any_cast<std::vector<std::string>>(visit(ctx->types_list()));
-  CLI_TRACE("Visitor: Visiting type-declaration with parents: {}", name);
+  PrintStartVisit("type-declaration (with parents)", name);
 
   antlr4::Token* token = ctx->IDENTIFIER()->getSymbol();
   size_t line = token->getLine();
@@ -66,12 +82,13 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationWithParent
   range.end.character = end;
 
   m_Domain->GetCurrentScope()->InitNewType(name, range, parents);
+  PrintEndVisit("type-declaration (with parents)", name);
   return {};
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitEntityDeclaration(KasXParser::EntityDeclarationContext* ctx) {
   const std::string name = ctx->IDENTIFIER()->getText();
-  CLI_TRACE("Visitor: Visiting entity-declaration: {}", name);
+  PrintStartVisit("entity-declaration", name);
   auto parents = std::any_cast<std::vector<std::string>>(visit(ctx->types_list()));
 
   antlr4::Token* token = ctx->IDENTIFIER()->getSymbol();
@@ -88,28 +105,29 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitEntityDeclaration(KasXPar
 
   m_Domain->GetCurrentScope()->InitNewEntity(name, range, parents);
   // m_Domain->InitNewEntity(name, {line, column}, parents);
-
+  PrintEndVisit("entity-declaration", name);
   return {};
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitFluentDeclaration(KasXParser::FluentDeclarationContext* ctx) {
+  PrintStartVisit("fluent-declaration", "");
   auto funcHeader = std::any_cast<std::pair<std::string, ParamList>>(visit(ctx->function_header()));
 
   std::string name = funcHeader.first;
   ParamList params = funcHeader.second;
-
   const std::string dataType = ctx->data_type()->getText();
 
   KasX::Compiler::Trace::Range range;
 
   m_Domain->GetCurrentScope()->InitNewFluent(name, range, params, dataType);
+  PrintEndVisit("fluent-declaration", name);
   return {};
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamWithoutDataType(KasXParser::ParamWithoutDataTypeContext* ctx) {
   const std::string name = ctx->IDENTIFIER()->getText();
 
-  CLI_TRACE("Visitor: Visiting parameter '{}' without a datatype", name);
+  TracePrint("Visiting parameter '{}' without a datatype", name);
 
   return Param{name, ""};
 }
@@ -118,7 +136,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamWithDataType(KasXPar
   const std::string name = ctx->IDENTIFIER()->getText();
   const std::string dataType = ctx->data_type()->getText();
 
-  CLI_TRACE("Visitor: Visiting parameter '{}' with datatype: '{}'", name, dataType);
+  TracePrint("Visiting parameter '{}' with datatype: '{}'", name, dataType);
 
   return Param{name, dataType};
 }
@@ -126,7 +144,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamWithDataType(KasXPar
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamList(KasXParser::ParamListContext* ctx) {
   const auto noOfElems = ctx->param().size();
 
-  CLI_TRACE("Visitor: Visiting the parameter list with {} elements", noOfElems);
+  TracePrint("Visiting the parameter list with {} elements", noOfElems);
 
   ParamList out;
   out.reserve(noOfElems);
@@ -141,7 +159,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitParamList(KasXParser::Par
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitFunctionHeader(KasXParser::FunctionHeaderContext* ctx) {
   const std::string name = ctx->IDENTIFIER()->getText();
-  CLI_TRACE("Visitor: Visiting Function header: {}", name);
+  TracePrint("Visiting Function header: '{}'", name);
   ParamList params;
 
   if (auto* paramList = ctx->param_list()) {              // guard: list is optional
@@ -152,60 +170,76 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitFunctionHeader(KasXParser
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprIdentifier(KasXParser::ExprIdentifierContext* ctx) {
-  CLI_TRACE("Visitor: Visiting Identifier expression");
+  TracePrint("Visiting Identifier expression");
 
   return 0;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNumber(KasXParser::ExprNumberContext* ctx) {
-  CLI_TRACE("Visitor: Visiting Number expression");
+  TracePrint("Visiting Number expression");
 
   return 0;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprUnknown(KasXParser::ExprUnknownContext* ctx) {
-  CLI_TRACE("Visitor: Visiting Unknown expression");
+  TracePrint("Visiting Unknown expression");
 
   return 0;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNullClause(KasXParser::ExprNullClauseContext* ctx) {
-  CLI_TRACE("Visitor: Visiting Null clause expression");
+  TracePrint("Visiting Null clause expression");
 
   return 0;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNot(KasXParser::ExprNotContext* ctx) {
-  CLI_TRACE("Visitor: Visiting Not expression");
+  TracePrint("Visitor: Visiting Not expression");
 
   return 0;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNegation(KasXParser::ExprNegationContext* ctx) {
-  CLI_TRACE("Visitor: Visiting Negation expression");
+  TracePrint("Visitor: Visiting Negation expression");
   return 0;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprInheritance(KasXParser::ExprInheritanceContext* ctx) {
-  CLI_TRACE("Visitor: Visiting Inheritance expression");
+  TracePrint("Visitor: Visiting Inheritance expression");
 
   return 0;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitInitialStateDecl(KasXParser::InitialStateDeclContext* ctx) {
-  CLI_TRACE("Visitor: Visiting Initial State Declaration");
+  PrintStartVisit("initial-state", "");
   visit(ctx->arithmetic_expression());
+  PrintEndVisit("initial-state", "");
   return 0;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitFluentVal(KasXParser::FluentValContext* ctx) {
-  CLI_TRACE("Visitor: Visiting Fluent");
+  TracePrint("Visitor: Visiting Fluent");
+  auto fluent = ctx->IDENTIFIER()->getText();
   auto arguments = std::any_cast<std::vector<std::string>>(visit(ctx->argument_list()));
+
+  Core::Scope* scope = m_Domain->GetCurrentScope();
+
+  // Checking if the args mentioned in the fluent exists
+  for (auto argument : arguments) {
+    if (scope->GetDefinition(argument) == nullptr) {
+      // TODO (lazzy07): Username - @lazzy07 Error handling
+      CLI_ERROR("Fluent argument: '{}' is missing", argument);
+      return nullptr;
+    }
+
+    TracePrint("All the arguments of the fluent: '{}' found as definitions in the domain", fluent);
+  }
+
   return 0;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitArgumentList(KasXParser::ArgumentListContext* ctx) {
-  CLI_TRACE("Visitor: Visting Argument List (Identifiers)");
+  TracePrint("Visting Argument List (Identifiers)");
   std::vector<std::string> arguments;
 
   for (auto* identifier : ctx->IDENTIFIER()) {

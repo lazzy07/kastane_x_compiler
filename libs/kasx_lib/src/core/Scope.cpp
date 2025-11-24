@@ -9,26 +9,26 @@
 #include "kasx/Types.hpp"
 
 KasX::Compiler::Core::Scope::Scope(std::string name, SCOPE_TYPES type, std::unique_ptr<Scope> parent)
-    : m_Name(std::move(name)), m_Type(type), m_Parent(std::move(parent)) {
+    : TraceableClass("Scope: " + name), m_Name(std::move(name)), m_Type(type), m_Parent(std::move(parent)) {
   CORE_TRACE("Scope initialized {}", m_Name);
 }
 
 KasX::Compiler::Core::Scope::~Scope() { CORE_TRACE("Scope Destroyed {}", m_Name); }
 
-KasX::Compiler::Core::DefinitionData* KasX::Compiler::Core::Scope::GetDefinition(const std::string& name) {
-  CLI_TRACE("Checking if definition already exists: {}", name);
+KasX::Compiler::Core::DeclarationData* KasX::Compiler::Core::Scope::GetDefinition(const std::string& name) {
+  TracePrint("Checking if definition already exists: {}", name);
 
   auto dataPtr = m_Definitions.find(name);
   if (dataPtr == m_Definitions.end()) {
-    CLI_TRACE("Definition {} - does not exist", name);
+    TracePrint("Definition Exists Check {} - does not exist", name);
     return nullptr;
   }
 
-  CLI_TRACE("Definition: {} - already exists", name);
+  TracePrint("Definition Exists Check: {} - already exists", name);
   return dataPtr->second.get();
 }
 
-void KasX::Compiler::Core::Scope::AddDefinition(const std::string& name, std::unique_ptr<DefinitionData> data) {
+void KasX::Compiler::Core::Scope::AddDefinition(const std::string& name, std::unique_ptr<DeclarationData> data) {
   // username - lazzy07 TODO: Handle the error
   if (m_Type != SCOPE_TYPES::GLOBAL) {
     CLI_ERROR("Declarations must be inside the global scope");
@@ -42,7 +42,7 @@ void KasX::Compiler::Core::Scope::AddDefinition(const std::string& name, std::un
   }
 
   m_Definitions.emplace(name, std::move(data));
-  CLI_TRACE("Adding definition {} completed", name);
+  TracePrint("Adding definition {} completed", name);
 }
 
 std::vector<KasX::declaration_id> KasX::Compiler::Core::Scope::GetParentIDs(const std::string& name,
@@ -52,7 +52,7 @@ std::vector<KasX::declaration_id> KasX::Compiler::Core::Scope::GetParentIDs(cons
   for (std::string parent : parents) {
     // username - lazzy07 TODO: Handle the error
 
-    DefinitionData* parentDef = GetDefinition(parent);
+    DeclarationData* parentDef = GetDefinition(parent);
 
     if (parentDef == nullptr) {
       CORE_ERROR("For the type: {} parent {}, does not exist", name, parent);
@@ -77,7 +77,7 @@ void KasX::Compiler::Core::Scope::InitNewType(const std::string& name, const Kas
     return;
   }
 
-  CORE_TRACE("New type initialization started: {}", name);
+  TracePrint("New type initialization started: {}", name);
 
   if (GetDefinition(name) != nullptr) {
     CLI_ERROR("Type '{}' already exists as a definition", name);
@@ -90,7 +90,7 @@ void KasX::Compiler::Core::Scope::InitNewType(const std::string& name, const Kas
   declaration_id typeID = this->m_TypeDeclarations.size();
 
   // Creating definition data for the type declaration
-  auto definitionData = std::make_unique<DefinitionData>();
+  auto definitionData = std::make_unique<DeclarationData>();
   definitionData->id = typeID;
   definitionData->type = KasX::Compiler::DataStructures::DECLARATION_TYPES::TYPE_DEFINITION;
 
@@ -105,11 +105,11 @@ void KasX::Compiler::Core::Scope::InitNewType(const std::string& name, const Kas
   if (parentIDs.empty()) {
     // No parent id, set the parent to 'entity', but only if it is not 'entity'
     if (name != "entity") {
-      DefinitionData* entityDefinition = m_Definitions.find("entity")->second.get();
+      DeclarationData* entityDefinition = m_Definitions.find("entity")->second.get();
       declaration_id entityID = entityDefinition->id;
 
       m_TypeDeclarations.at(entityID).get()->children.push_back(typeID);
-      CLI_TRACE("Type definition with no parents '{}' added to entity type as a child", name);
+      TracePrint("Type definition with no parents '{}' added to entity type as a child", name);
     }
   }
 
@@ -123,13 +123,13 @@ void KasX::Compiler::Core::Scope::InitNewType(const std::string& name, const Kas
   AddDefinition(type->name, std::move(definitionData));
 
   // Add the new type to the types of the scope
-  CLI_INFO("New type {} added to the scope: {}.", type->name, this->m_Name);
+  TracePrint("New type {} added to the scope: {}.", type->name, this->m_Name);
   m_TypeDeclarations.push_back(std::move(type));
 }
 
 void KasX::Compiler::Core::Scope::InitNewEntity(const std::string& name, const KasX::Compiler::Trace::Range& range,
                                                 const std::vector<std::string>& types) {
-  CORE_TRACE("New entity initialization started: {}", name);
+  TracePrint("New entity initialization started: {}", name);
 
   if (m_Type != SCOPE_TYPES::GLOBAL) {
     CORE_ERROR("Entity declarations should be done only inside the global scope: {}", name);
@@ -148,7 +148,7 @@ void KasX::Compiler::Core::Scope::InitNewEntity(const std::string& name, const K
     // Typename declaration is correct (size wise), has exactly one type
     auto typesVec = GetParentIDs(name, types);
 
-    auto definitionData = std::make_unique<DefinitionData>();
+    auto definitionData = std::make_unique<DeclarationData>();
     definitionData->id = entityID;
     definitionData->type = DataStructures::ENTITY_DEFINITION;
 
@@ -169,7 +169,7 @@ void KasX::Compiler::Core::Scope::InitNewEntity(const std::string& name, const K
 
     AddDefinition(name, std::move(definitionData));
 
-    CLI_INFO("Entity '{}' added to the scope: {}", name, m_Name);
+    TracePrint("Entity '{}' added to the scope: {}", name, m_Name);
 
   } else {
     CLI_ERROR("Type is not declared for '{}'", name);
@@ -178,14 +178,14 @@ void KasX::Compiler::Core::Scope::InitNewEntity(const std::string& name, const K
 
 void KasX::Compiler::Core::Scope::InitNewFluent(const std::string& name, const KasX::Compiler::Trace::Range& range,
                                                 const ParamList& params, const std::string& dataType) {
-  CLI_TRACE("Started initializing a new fluent '{}' with data type: '{}'", name, dataType);
+  TracePrint("Started initializing a new fluent '{}' with data type: '{}'", name, dataType);
 
   if (m_Type != SCOPE_TYPES::GLOBAL) {
     CORE_ERROR("Fluent declarations should be done only inside the global scope: {}", name);
     return;
   }
 
-  DefinitionData* dataTypeDef = GetDefinition(dataType);
+  DeclarationData* dataTypeDef = GetDefinition(dataType);
 
   if (dataTypeDef == nullptr) {
     CLI_ERROR("Data type '{}' of the fluent '{}' does not exist", dataType, name);
@@ -198,7 +198,7 @@ void KasX::Compiler::Core::Scope::InitNewFluent(const std::string& name, const K
 
   declaration_id fluentID = m_FluentDeclarations.size();
 
-  auto definitionData = std::make_unique<DefinitionData>();
+  auto definitionData = std::make_unique<DeclarationData>();
   definitionData->id = fluentID;
   definitionData->type = DataStructures::FLUENT_DEFINITION;
 
@@ -257,7 +257,7 @@ void KasX::Compiler::Core::Scope::InitNewFluent(const std::string& name, const K
         return;
       }
     }
-    CLI_TRACE("Parameter '{}' added to the fluent '{}'", paramData->name, name);
+    TracePrint("Parameter '{}' added to the fluent '{}'", paramData->name, name);
     fluent->parameters.push_back(std::move(paramData));
     index++;
   }
@@ -277,5 +277,5 @@ void KasX::Compiler::Core::Scope::InitNewFluent(const std::string& name, const K
 
   m_FluentDeclarations.push_back(std::move(fluent));
 
-  CLI_INFO("Fluent declaration added: '{}' to the scope: {}", finalName, this->m_Name);
+  TracePrint("Fluent declaration added: '{}' to the scope: {}", finalName, this->m_Name);
 }
