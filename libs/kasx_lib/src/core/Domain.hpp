@@ -15,6 +15,7 @@ class Domain {
   void InitDefaultTypes();
 
   [[nodiscard]] KasX::Compiler::Core::Scope* GetCurrentScope() { return m_CurrentScope; };
+  [[nodiscard]] KasX::Compiler::Core::Scope* GetGlobalScope() { return &m_GlobalScope; };
 
  private:
   // Meta-Data that the domain initialized with
