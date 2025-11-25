@@ -207,7 +207,7 @@ void KasX::Compiler::Core::Scope::InitNewFluent(const std::string& name, const K
   fluent->trace = range;
   fluent->dataType = dataTypeDef->id;
 
-  std::string finalName = std::to_string(fluentID) + "(";
+  std::string finalName = name + "(";
 
   // Adding fluent parameters
   declaration_id index = 0;
