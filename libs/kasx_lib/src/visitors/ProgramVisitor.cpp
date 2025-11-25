@@ -194,19 +194,18 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNullClause(KasXParser
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNot(KasXParser::ExprNotContext* ctx) {
-  TracePrint("Visitor: Visiting Not expression");
+  TracePrint("Visiting Not expression");
 
   return 0;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNegation(KasXParser::ExprNegationContext* ctx) {
-  TracePrint("Visitor: Visiting Negation expression");
+  TracePrint("Visiting Negation expression");
   return 0;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprInheritance(KasXParser::ExprInheritanceContext* ctx) {
-  TracePrint("Visitor: Visiting Inheritance expression");
-
+  TracePrint("Visiting Inheritance expression");
   return 0;
 }
 
@@ -218,7 +217,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitInitialStateDecl(KasXPars
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitFluentVal(KasXParser::FluentValContext* ctx) {
-  TracePrint("Visitor: Visiting Fluent");
+  TracePrint("Visiting Fluent");
   auto fluent = ctx->IDENTIFIER()->getText();
   auto arguments = std::any_cast<std::vector<std::string>>(visit(ctx->argument_list()));
 
@@ -227,7 +226,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitFluentVal(KasXParser::Flu
   // Checking if the args mentioned in the fluent exists
   for (auto argument : arguments) {
     if (scope->GetDefinition(argument) == nullptr) {
-      // TODO (lazzy07): Username - @lazzy07 Error handling
+      // username - lazzy07 TODO: Handle the error
       CLI_ERROR("Fluent argument: '{}' is missing", argument);
       return nullptr;
     }
