@@ -1,6 +1,7 @@
 #include "ProgramVisitor.hpp"
 
 #include "../core/Domain.hpp"
+#include "../data_structures/expressions/Fluent.hpp"
 #include "KasXParser.h"
 // Fixer added
 #include <Log.hpp>
@@ -177,7 +178,9 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprIdentifier(KasXParser
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNumber(KasXParser::ExprNumberContext* ctx) {
   TracePrint("Visiting Number expression");
+  std::string numberStr = ctx->NUMBER()->getText();
 
+  TracePrint("Number value: '{}'", numberStr);
   return 0;
 }
 
@@ -218,21 +221,25 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitInitialStateDecl(KasXPars
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitFluentVal(KasXParser::FluentValContext* ctx) {
   TracePrint("Visiting Fluent");
-  auto fluent = ctx->IDENTIFIER()->getText();
+  auto fluentStr = ctx->IDENTIFIER()->getText();
   auto arguments = std::any_cast<std::vector<std::string>>(visit(ctx->argument_list()));
 
   Core::Scope* scope = m_Domain->GetCurrentScope();
 
   // Checking if the args mentioned in the fluent exists
   for (auto argument : arguments) {
-    if (scope->GetDefinition(argument) == nullptr) {
+    auto* parameter = scope->GetDefinition(argument);
+
+    if (parameter == nullptr) {
       // username - lazzy07 TODO: Handle the error
       CLI_ERROR("Fluent argument: '{}' is missing", argument);
       return nullptr;
     }
 
-    TracePrint("All the arguments of the fluent: '{}' found as definitions in the domain", fluent);
+    TracePrint("Fluent argument: '{}' id: '{}'", argument, parameter->id);
   }
+  TracePrint("All the arguments of the fluent: '{}' found as definitions in the domain", fluentStr);
+  KasX::Compiler::DataStructures::Fluent fluent;
 
   return 0;
 }
