@@ -26,6 +26,11 @@ using declaration_id = uint16_t;
 
 using linetrace_data = size_t;
 
+/*
+ * @brief number value data-type used in the planner
+ */
+using number_value = float;
+
 /**
  * Domain Data is passed into the compiler when the application is presented with a problem file
  */
