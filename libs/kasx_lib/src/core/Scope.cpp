@@ -206,8 +206,7 @@ void KasX::Compiler::Core::Scope::InitNewFluent(const std::string& name, const K
   fluent->id = fluentID;
   fluent->trace = range;
   fluent->dataType = dataTypeDef->id;
-
-  std::string finalName = name + "(";
+  fluent->name = name;
 
   // Adding fluent parameters
   declaration_id index = 0;
@@ -216,21 +215,15 @@ void KasX::Compiler::Core::Scope::InitNewFluent(const std::string& name, const K
 
     paramData->name = param.first;
 
-    if (index != 0) {
-      finalName += ",";
-    }
-
     paramData->id = index;
 
     if (!param.second.empty()) {
-      finalName += ":";
       auto* paramDataType = GetDefinition(param.second);
 
       if (paramDataType != nullptr) {
         if (paramDataType->type == DataStructures::DECLARATION_TYPES::TYPE_DEFINITION) {
           paramData->dataType = DataStructures::DECLARATION_TYPES::TYPE_DEFINITION;
           paramData->index = paramDataType->id;
-          finalName += std::to_string(paramDataType->id);
         } else {
           CLI_ERROR("Parameter '{}' of the fluent '{}' definition found: '{}' but it is not a type", param.first, name,
                     param.second);
@@ -262,20 +255,6 @@ void KasX::Compiler::Core::Scope::InitNewFluent(const std::string& name, const K
     index++;
   }
 
-  finalName += "):" + std::to_string(fluent->dataType);
-
-  // First check if the fluent already exists or not
-  if (GetDefinition(finalName) != nullptr) {
-    CLI_ERROR("Entity '{}' already exists as a definition", finalName);
-    return;
-  }
-
-  // Setting the fluent name.
-  fluent->name = finalName;
-
-  AddDefinition(finalName, std::move(definitionData));
-
-  m_FluentDeclarations.push_back(std::move(fluent));
-
-  TracePrint("Fluent declaration added: '{}' to the scope: {}", finalName, this->m_Name);
+  this->m_FluentDeclarations.push_back(std::move(fluent));
+  TracePrint("Fluent declaration '{}' added to the scope: {}", name, this->m_Name);
 }

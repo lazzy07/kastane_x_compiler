@@ -33,7 +33,7 @@ class Scope : TraceableClass {
   ~Scope() override;
 
   DeclarationData* GetDefinition(const std::string& name);  // Get definition by name
-
+  DataStructures::FluentDecl* GetFluentDeclarations(const std::string& name);
   void AddDefinition(const std::string& name, std::unique_ptr<DeclarationData> data);
 
   void InitNewType(const std::string& name, const KasX::Compiler::Trace::Range& range,
@@ -55,7 +55,8 @@ class Scope : TraceableClass {
   std::vector<std::unique_ptr<Scope>> m_Children;
 
   // Definition holders
-  std::unordered_map<std::string, std::unique_ptr<DeclarationData>> m_Definitions;  // All the definitions can be found here
+  std::unordered_map<std::string, std::unique_ptr<DeclarationData>>
+      m_Definitions;  // All the definitions can be found here except for fluent declarations
   std::vector<std::unique_ptr<KasX::Compiler::DataStructures::TypeDecl>> m_TypeDeclarations;      // Types definitions
   std::vector<std::unique_ptr<KasX::Compiler::DataStructures::EntityDecl>> m_EntityDeclarations;  // Entities definitions
   std::vector<std::unique_ptr<KasX::Compiler::DataStructures::FluentDecl>> m_FluentDeclarations;  // Fluent definitions
