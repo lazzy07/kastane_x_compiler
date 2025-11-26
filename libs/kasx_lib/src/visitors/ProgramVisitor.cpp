@@ -7,6 +7,8 @@
 #include <Log.hpp>
 #include <any>
 #include <kasx/Types.hpp>
+#include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -180,7 +182,20 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNumber(KasXParser::Ex
   TracePrint("Visiting Number expression");
   std::string numberStr = ctx->NUMBER()->getText();
 
-  TracePrint("Number value: '{}'", numberStr);
+  number_value number = 0.0F;
+  // Convert the string version of the number to number_value format
+  try {
+    number_value number = std::stof(numberStr);
+    TracePrint("Number '{}' succesfully converted into number_value format", number);
+  } catch (const std::invalid_argument& e) {
+    // username - lazzy07 TODO: Handle the error
+    CLI_ERROR("Invalid number argument: '{}'", numberStr);
+  } catch (const std::out_of_range& e) {
+    // username - lazzy07 TODO: Handle the error
+    CLI_ERROR("Value '{}' is out of range of the number type (number_value), please increase it and recompile", numberStr);
+  }
+
+  TracePrint("Number value: '{}'", number);
   return 0;
 }
 
