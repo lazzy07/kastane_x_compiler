@@ -1,7 +1,6 @@
 #include "ProgramVisitor.hpp"
 
 #include "../core/Domain.hpp"
-#include "../data_structures/expressions/Fluent.hpp"
 #include "KasXParser.h"
 // Fixer added
 #include <Log.hpp>
@@ -12,6 +11,10 @@
 #include <utility>
 #include <vector>
 
+#include "../data_structures/expressions/Fluent.hpp"
+#include "../data_structures/expressions/data_types/NullValue.hpp"
+#include "../data_structures/expressions/data_types/NumberValue.hpp"
+#include "../data_structures/expressions/data_types/UnknownValue.hpp"
 #include "../trace/Range.hpp"
 
 KasX::Compiler::Visitor::ProgramVisitor::ProgramVisitor(KasX::Compiler::Core::Domain* domain)
@@ -196,19 +199,26 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNumber(KasXParser::Ex
   }
 
   TracePrint("Number value: '{}'", number);
-  return 0;
+
+  DataStructures::NumberValue numberVal;
+  numberVal.value = number;
+  numberVal.expression_type = DataStructures::EXPRESSION_TYPES::NUMBER_VALUE;
+
+  return numberVal;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprUnknown(KasXParser::ExprUnknownContext* ctx) {
   TracePrint("Visiting Unknown expression");
-
-  return 0;
+  DataStructures::UnknownValue unknownVal;
+  TracePrint("Returning unknown value");
+  return unknownVal;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNullClause(KasXParser::ExprNullClauseContext* ctx) {
   TracePrint("Visiting Null clause expression");
-
-  return 0;
+  DataStructures::NullValue nullValue;
+  TracePrint("Returning unknown value");
+  return nullValue;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNot(KasXParser::ExprNotContext* ctx) {
