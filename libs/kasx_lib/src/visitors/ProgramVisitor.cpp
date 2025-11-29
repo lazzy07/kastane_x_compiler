@@ -202,7 +202,6 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNumber(KasXParser::Ex
 
   DataStructures::NumberValue numberVal;
   numberVal.value = number;
-  numberVal.expression_type = DataStructures::EXPRESSION_TYPES::NUMBER_VALUE;
 
   return numberVal;
 }
@@ -278,4 +277,18 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitArgumentList(KasXParser::
   }
 
   return arguments;
+}
+
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprBinaryOp(KasXParser::ExprBinaryOpContext* ctx) {
+  TracePrint("Visiting Binary Operation");
+  visit(ctx->binary_op());
+  // KasX::Compiler::DataStructures::BooleanExpression booleanExpression(booleanOpType);
+  return 0;
+}
+
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitBinary_op(KasXParser::Binary_opContext* ctx) {
+  TracePrint("Visiting binary operation type");
+  auto type = ctx->op->getType();
+
+  return 0;
 }

@@ -46,6 +46,10 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
   std::any visitExprNegation(KasXParser::ExprNegationContext* ctx) override;
   std::any visitExprInheritance(KasXParser::ExprInheritanceContext* ctx) override;
 
+  // Binary expressions
+  std::any visitExprBinaryOp(KasXParser::ExprBinaryOpContext* ctx) override;
+  std::any visitBinary_op(
+      KasXParser::Binary_opContext* ctx) override;  // This will visit the binary operation itself "+" "-" etc.
   // Visiting fluents
   std::any visitFluentVal(KasXParser::FluentValContext* ctx) override;
   std::any visitArgumentList(KasXParser::ArgumentListContext* ctx) override;
