@@ -156,6 +156,7 @@ arithmetic_expression
   | exists_clause                                                 # ExprExists
   | sum_function                                                  # ExprSum
   | forall_function                                               # ExprForAll
+  | boolean_data                                                  # ExprBoolean
   | IDENTIFIER                                                    # ExprIdentifier
   | NUMBER                                                        # ExprNumber
   | UNKNOWN_KEYWORD                                               # ExprUnknown
@@ -200,20 +201,27 @@ if_else_block
     ;
 
 binary_op
-  : SUBTRACTION_KEYWORD                   # SubstractionOp
-  | ADDITION_KEYWORD                      # AdditionOp
-  | DIVISION_KEYWORD                      # DivisionOp
-  | MULTIPLICATION_KEYWORD                # MultiplicationOp
-  | LESS_THAN_KEYWORD                     # LessThanOp
-  | GREATER_THAN_KEYWORD                  # GreaterThanOp
-  | LESS_THAN_OR_EQUAL_TO_KEYWORD         # LessThanEqOp
-  | GREATER_THAN_OR_EQUAL_TO_KEYWORD      # GreaterThanEqOp
-  | NOT_EQUAL_TO_KEYWORD                  # NotEqualOp
-  | EQUAL_TO_KEYWORD                      # EqualToOp
-  | ASSIGNMENT_KEYWORD                    # AssignmentOp
-  | DISJUNCTION_KEYWORD                   # DisjunctionOp
-  | CONJUNCTION_KEYWORD                   # ConjunctionOp
-  | COLON                                 # InheritanceOp // Used to check inheritance
+  : op = (
+    SUBTRACTION_KEYWORD                   
+  | ADDITION_KEYWORD                      
+  | DIVISION_KEYWORD                      
+  | MULTIPLICATION_KEYWORD                
+  | LESS_THAN_KEYWORD                     
+  | GREATER_THAN_KEYWORD                  
+  | LESS_THAN_OR_EQUAL_TO_KEYWORD         
+  | GREATER_THAN_OR_EQUAL_TO_KEYWORD      
+  | NOT_EQUAL_TO_KEYWORD                  
+  | EQUAL_TO_KEYWORD                      
+  | ASSIGNMENT_KEYWORD                    
+  | DISJUNCTION_KEYWORD                   
+  | CONJUNCTION_KEYWORD                   
+  | COLON                                 
+  )
+  ;
+
+boolean_data
+  : TRUE_KEYWORD                          # TrueValue
+  | FALSE_KEYWORD                         # FalseValue
   ;
 
 /*
