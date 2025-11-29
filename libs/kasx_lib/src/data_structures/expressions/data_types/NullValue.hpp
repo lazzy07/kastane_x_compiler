@@ -5,6 +5,9 @@
 
 namespace KasX::Compiler::DataStructures {
 struct NullValue : public Expression {
-  NullValue() : Expression(EXPRESSION_TYPES::NULL_VALUE) { name = "Default: Null"; }
+  NullValue() : Expression(EXPRESSION_TYPES::NULL_VALUE) {
+    name = "Default: Null";
+    isPrimitive = true;
+  }
 };
 }  // namespace KasX::Compiler::DataStructures
