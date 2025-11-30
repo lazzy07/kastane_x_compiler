@@ -11,6 +11,15 @@
       "visualParseTree": true
     },
     {
+      "name": "Run KasX: Debug",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/dist/linux/x86_64/Debug/kasx",
+      "args": ["tests/problems/aladdin.txt"],
+      "cwd": "${workspaceFolder}",
+      "stopOnEntry": false
+    },
+    {
       "name": "CMake: Debug active target (gdb)",
       "type": "cppdbg",
       "request": "launch",
