@@ -5,8 +5,11 @@
 #include "BinaryOperationTypes.hpp"
 
 namespace KasX::Compiler::DataStructures {
-struct BooleanExpression : Expression {
-  explicit BooleanExpression(std::string name) : Expression(EXPRESSION_TYPES::BINARY_OPERATION) { name = name; }
+struct BinaryOperation : Expression {
+  explicit BinaryOperation(BINARY_OPERATION_TYPES type) : Expression(EXPRESSION_TYPES::BINARY_OPERATION) {
+    name = binaryOperationToString(type);
+    operationType = type;
+  }
 
   std::unique_ptr<Expression> left;
   std::unique_ptr<Expression> right;
