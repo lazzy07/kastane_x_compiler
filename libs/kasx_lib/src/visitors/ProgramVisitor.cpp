@@ -6,6 +6,7 @@
 #include <Log.hpp>
 #include <any>
 #include <kasx/Types.hpp>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -15,6 +16,8 @@
 #include "../data_structures/expressions/data_types/NullValue.hpp"
 #include "../data_structures/expressions/data_types/NumberValue.hpp"
 #include "../data_structures/expressions/data_types/UnknownValue.hpp"
+#include "../data_structures/expressions/operations/BinaryOperation.hpp"
+#include "../data_structures/expressions/operations/BinaryOperationTypes.hpp"
 #include "../trace/Range.hpp"
 
 KasX::Compiler::Visitor::ProgramVisitor::ProgramVisitor(KasX::Compiler::Core::Domain* domain)
@@ -199,11 +202,9 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNumber(KasXParser::Ex
   }
 
   TracePrint("Number value: '{}'", number);
+  DataStructures::Expression* expression = new DataStructures::NumberValue(number);
 
-  DataStructures::NumberValue numberVal;
-  numberVal.value = number;
-
-  return numberVal;
+  return expression;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprUnknown(KasXParser::ExprUnknownContext* ctx) {
@@ -215,7 +216,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprUnknown(KasXParser::E
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNullClause(KasXParser::ExprNullClauseContext* ctx) {
   TracePrint("Visiting Null clause expression");
-  DataStructures::NullValue nullValue;
+  DataStructures::Expression* nullValue = new DataStructures::NullValue();
   TracePrint("Returning unknown value");
   return nullValue;
 }
@@ -250,6 +251,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitFluentVal(KasXParser::Flu
 
   Core::Scope* scope = m_Domain->GetCurrentScope();
 
+  DataStructures::Expression* fluent = new DataStructures::Fluent();
   // Checking if the args mentioned in the fluent exists
   for (auto argument : arguments) {
     auto* parameter = scope->GetDefinition(argument);
@@ -259,13 +261,15 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitFluentVal(KasXParser::Flu
       CLI_ERROR("Fluent argument: '{}' is missing", argument);
       return nullptr;
     }
+    // Since the parameter exists in the domain, add it to the paramenter list of the fluent.
+    static_cast<DataStructures::Fluent*>(fluent)->parameters.push_back(parameter->id);
 
     TracePrint("Fluent argument: '{}' id: '{}'", argument, parameter->id);
   }
   TracePrint("All the arguments of the fluent: '{}' found as definitions in the domain", fluentStr);
-  KasX::Compiler::DataStructures::Fluent fluent;
+  fluent->name = fluentStr;
 
-  return 0;
+  return fluent;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitArgumentList(KasXParser::ArgumentListContext* ctx) {
@@ -281,14 +285,67 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitArgumentList(KasXParser::
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprBinaryOp(KasXParser::ExprBinaryOpContext* ctx) {
   TracePrint("Visiting Binary Operation");
-  visit(ctx->binary_op());
-  // KasX::Compiler::DataStructures::BooleanExpression booleanExpression(booleanOpType);
-  return 0;
+  auto operationType = std::any_cast<DataStructures::BINARY_OPERATION_TYPES>(visit(ctx->binary_op()));
+
+  auto* binaryOperation = new DataStructures::BinaryOperation(operationType);
+
+  TracePrint("Binary operation type: {}", binaryOperation->name);
+
+  auto left = visit(ctx->arithmetic_expression(0));
+  auto* leftExpression = std::any_cast<DataStructures::Expression*>(left);
+  TracePrint("Visiting the left expression done: {}", leftExpression->name);
+
+  auto right = visit(ctx->arithmetic_expression(1));
+  auto* rightExpression = std::any_cast<DataStructures::Expression*>(right);
+  TracePrint("Visiting the right expression done: {}", rightExpression->name);
+
+  binaryOperation->left = std::unique_ptr<DataStructures::Expression>(leftExpression);
+  binaryOperation->right = std::unique_ptr<DataStructures::Expression>(rightExpression);
+
+  TracePrint("Binary operation created - {} {} {}", binaryOperation->left->name, binaryOperation->name,
+             binaryOperation->right->name);
+
+  return binaryOperation;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitBinary_op(KasXParser::Binary_opContext* ctx) {
   TracePrint("Visiting binary operation type");
   auto type = ctx->op->getType();
+
+  namespace DS = KasX::Compiler::DataStructures;
+
+  switch (type) {
+    case KasXParser::SUBTRACTION_KEYWORD:
+      return DS::SUBSTRACTION;
+    case KasXParser::ADDITION_KEYWORD:
+      return DS::ADDITION;
+    case KasXParser::DIVISION_KEYWORD:
+      return DS::DIVISION;
+    case KasXParser::MULTIPLICATION_KEYWORD:
+      return DS::MULTIPLICATION;
+    case KasXParser::LESS_THAN_KEYWORD:
+      return DS::LESS_THAN;
+    case KasXParser::GREATER_THAN_KEYWORD:
+      return DS::GREATER_THAN;
+    case KasXParser::LESS_THAN_OR_EQUAL_TO_KEYWORD:
+      return DS::LESS_THAN_OR_EQUAL;
+    case KasXParser::GREATER_THAN_OR_EQUAL_TO_KEYWORD:
+      return DS::GREATER_THAN_OR_EQUAL;
+    case KasXParser::NOT_EQUAL_TO_KEYWORD:
+      return DS::NOT_EQUAL;
+    case KasXParser::EQUAL_TO_KEYWORD:
+      return DS::EQUAL_TO;
+    case KasXParser::ASSIGNMENT_KEYWORD:
+      return DS::ASSIGNMENT;
+    case KasXParser::DISJUNCTION_KEYWORD:
+      return DS::DISJUNCTION;
+    case KasXParser::CONJUNCTION_KEYWORD:
+      return DS::CONJUNCTION;
+    case KasXParser::COLON:
+      return DS::INHERITANCE;
+    default:
+      CLI_ERROR("Unknown binary operator token type");
+  }
 
   return 0;
 }
