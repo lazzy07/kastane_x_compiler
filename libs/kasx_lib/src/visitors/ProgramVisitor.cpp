@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "../data_structures/expressions/Fluent.hpp"
+#include "../data_structures/expressions/data_types/IdentifierPointer.hpp"
 #include "../data_structures/expressions/data_types/NullValue.hpp"
 #include "../data_structures/expressions/data_types/NumberValue.hpp"
 #include "../data_structures/expressions/data_types/UnknownValue.hpp"
@@ -180,8 +181,19 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitFunctionHeader(KasXParser
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprIdentifier(KasXParser::ExprIdentifierContext* ctx) {
   TracePrint("Visiting Identifier expression");
+  auto identifierStr = ctx->IDENTIFIER()->getText();
+  auto* identifierDeclaration = this->m_Domain->GetCurrentScope()->GetDefinition(identifierStr);
 
-  return 0;
+  if (identifierDeclaration == nullptr) {
+    // username - lazzy07 TODO: Handle the error
+    CLI_ERROR("Declaration: {} could not be found!", identifierStr);
+    return nullptr;
+  }
+  TracePrint("Identifier: {} found", identifierStr);
+
+  DataStructures::Expression* identifierPointer = new DataStructures::IdentifierPointer(identifierDeclaration->id);
+
+  return identifierPointer;
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprNumber(KasXParser::ExprNumberContext* ctx) {
