@@ -17,8 +17,8 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
   ~ProgramVisitor() override;
 
   // ---- Printing messages (Trace)
-  static void PrintStartVisit(std::string_view type, std::string_view identifier);
-  static void PrintEndVisit(std::string_view type, std::string_view identifier);
+  static void printStartVisit(std::string_view type, std::string_view identifier);
+  static void printEndVisit(std::string_view type, std::string_view identifier);
 
   // ----- Visiting declarations
   std::any visitTypeDeclarationNoParents(KasXParser::TypeDeclarationNoParentsContext* ctx) override;
@@ -56,6 +56,9 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
 
   // ---- Visiting initial state declarations
   std::any visitInitialStateDecl(KasXParser::InitialStateDeclContext* ctx) override;
+
+  // ----- Visiting the function
+  std::any visitActionDecl(KasXParser::ActionDeclContext* ctx) override;
 
  private:
   KasX::Compiler::Core::Domain* m_Domain;

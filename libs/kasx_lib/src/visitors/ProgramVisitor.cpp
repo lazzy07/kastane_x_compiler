@@ -28,7 +28,7 @@ KasX::Compiler::Visitor::ProgramVisitor::ProgramVisitor(KasX::Compiler::Core::Do
 
 KasX::Compiler::Visitor::ProgramVisitor::~ProgramVisitor() { CORE_TRACE("Program Visitor Terminated"); }
 
-void KasX::Compiler::Visitor::ProgramVisitor::PrintStartVisit(std::string_view type, std::string_view identifier) {
+void KasX::Compiler::Visitor::ProgramVisitor::printStartVisit(std::string_view type, std::string_view identifier) {
   if (identifier.empty()) {
     CLI_TRACE("\n[Visitor] ----- Started visit - type: {}", type);
     return;
@@ -36,7 +36,7 @@ void KasX::Compiler::Visitor::ProgramVisitor::PrintStartVisit(std::string_view t
   CLI_TRACE("\n[Visitor] ----- Started visit - type: {}, id: '{}'", type, identifier);
 }
 
-void KasX::Compiler::Visitor::ProgramVisitor::PrintEndVisit(std::string_view type, std::string_view identifier) {
+void KasX::Compiler::Visitor::ProgramVisitor::printEndVisit(std::string_view type, std::string_view identifier) {
   if (identifier.empty()) {
     CLI_TRACE("[Visitor] ----- Ended visit - type: {}\n", type);
     return;
@@ -47,7 +47,7 @@ void KasX::Compiler::Visitor::ProgramVisitor::PrintEndVisit(std::string_view typ
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationNoParents(
     KasXParser::TypeDeclarationNoParentsContext* ctx) {
   std::string typeIdentifier = ctx->IDENTIFIER()->toString();
-  PrintStartVisit("type-declaration (no parents)", typeIdentifier);
+  printStartVisit("type-declaration (no parents)", typeIdentifier);
 
   antlr4::Token* token = ctx->IDENTIFIER()->getSymbol();
   linetrace_data line = token->getLine();
@@ -61,7 +61,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationNoParents(
   range.end.character = end;
 
   m_Domain->getGlobalScope()->initNewType(typeIdentifier, range);
-  PrintEndVisit("type-declaration (no parents)", typeIdentifier);
+  printEndVisit("type-declaration (no parents)", typeIdentifier);
   return nullptr;
 }
 
@@ -77,7 +77,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationWithParent
     KasXParser::TypeDeclarationWithParentsContext* ctx) {
   const std::string name = ctx->IDENTIFIER()->getText();
   auto parents = std::any_cast<std::vector<std::string>>(visit(ctx->types_list()));
-  PrintStartVisit("type-declaration (with parents)", name);
+  printStartVisit("type-declaration (with parents)", name);
 
   antlr4::Token* token = ctx->IDENTIFIER()->getSymbol();
   size_t line = token->getLine();
@@ -92,13 +92,13 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationWithParent
   range.end.character = end;
 
   m_Domain->getGlobalScope()->initNewType(name, range, parents);
-  PrintEndVisit("type-declaration (with parents)", name);
+  printEndVisit("type-declaration (with parents)", name);
   return {};
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitEntityDeclaration(KasXParser::EntityDeclarationContext* ctx) {
   const std::string name = ctx->IDENTIFIER()->getText();
-  PrintStartVisit("entity-declaration", name);
+  printStartVisit("entity-declaration", name);
   auto parents = std::any_cast<std::vector<std::string>>(visit(ctx->types_list()));
 
   antlr4::Token* token = ctx->IDENTIFIER()->getSymbol();
@@ -115,12 +115,12 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitEntityDeclaration(KasXPar
 
   m_Domain->getCurrentScope()->initNewEntity(name, range, parents);
   // m_Domain->InitNewEntity(name, {line, column}, parents);
-  PrintEndVisit("entity-declaration", name);
+  printEndVisit("entity-declaration", name);
   return {};
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitFluentDeclaration(KasXParser::FluentDeclarationContext* ctx) {
-  PrintStartVisit("fluent-declaration", "");
+  printStartVisit("fluent-declaration", "");
   auto funcHeader = std::any_cast<std::pair<std::string, ParamList>>(visit(ctx->function_header()));
 
   std::string name = funcHeader.first;
@@ -130,7 +130,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitFluentDeclaration(KasXPar
   KasX::Compiler::Trace::Range range;
 
   m_Domain->getGlobalScope()->initNewFluent(name, range, params, dataType);
-  PrintEndVisit("fluent-declaration", name);
+  printEndVisit("fluent-declaration", name);
   return {};
 }
 
@@ -250,9 +250,9 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprInheritance(KasXParse
 }
 
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitInitialStateDecl(KasXParser::InitialStateDeclContext* ctx) {
-  PrintStartVisit("initial-state", "");
+  printStartVisit("initial-state", "");
   visit(ctx->arithmetic_expression());
-  PrintEndVisit("initial-state", "");
+  printEndVisit("initial-state", "");
   return 0;
 }
 
@@ -358,6 +358,19 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitBinary_op(KasXParser::Bin
     default:
       CLI_ERROR("Unknown binary operator token type");
   }
+
+  return 0;
+}
+
+std::any KasX::Compiler::Visitor::ProgramVisitor::visitActionDecl(KasXParser::ActionDeclContext* ctx) {
+  printStartVisit("action-declaration", "");
+
+  auto funcHeader = std::any_cast<std::pair<std::string, ParamList>>(visit(ctx->function_header()));
+  auto actionName = funcHeader.first;
+
+  m_Domain->createActionScope(actionName);
+
+  printEndVisit("action-declaration", actionName);
 
   return 0;
 }
