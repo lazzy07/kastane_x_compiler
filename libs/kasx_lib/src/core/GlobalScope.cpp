@@ -3,7 +3,7 @@
 #include "Log.hpp"
 #include "Scope.hpp"
 
-KasX::Compiler::Core::GlobalScope::GlobalScope() : Scope("Scope: Global", SCOPE_TYPES::GLOBAL) {
+KasX::Compiler::Core::GlobalScope::GlobalScope() : Scope("Global", SCOPE_TYPES::GLOBAL) {
   CORE_TRACE("Scope: Global Initialized");
 }
 
