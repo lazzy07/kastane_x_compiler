@@ -6,6 +6,6 @@ class ArgsParser {
  public:
   ArgsParser();
   ~ArgsParser();
-  CompiledArgument ParseArguments(int argc, char *argv[]);
+  CompiledArgument parseArguments(int argc, char* argv[]);
 };
 }  // namespace KasX::App::CLI

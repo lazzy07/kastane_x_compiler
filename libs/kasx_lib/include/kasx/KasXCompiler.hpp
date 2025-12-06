@@ -13,7 +13,7 @@ class KasXCompiler {
   /**
    * Compile a file read by the application.
    */
-  void Compile(DomainData data, COMPILER_OPTIONS options);
+  void compile(DomainData data, COMPILER_OPTIONS options);
 
   /**
    * This function will initialize the logger functionality required to run the kasx_compiler
@@ -21,7 +21,6 @@ class KasXCompiler {
   static void InitLogger();
 
  private:
-  inline static std::unique_ptr<LazLogger::LoggerManager> s_Logger =
-      nullptr;  // Reference to the LIB logger
+  inline static std::unique_ptr<LazLogger::LoggerManager> s_Logger = nullptr;  // Reference to the LIB logger
 };
 }  // namespace KasX::Compiler

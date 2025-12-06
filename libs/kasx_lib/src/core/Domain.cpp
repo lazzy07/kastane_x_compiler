@@ -3,10 +3,8 @@
 #include <Log.hpp>
 
 #include "KasXLexer.h"
-#include "Scope.hpp"
 
-KasX::Compiler::Core::Domain::Domain(DomainData &data)
-    : m_GlobalScope("global", SCOPE_TYPES::GLOBAL) {
+KasX::Compiler::Core::Domain::Domain(DomainData& data) {
   CORE_TRACE("Domain Initialized");
 
   m_DomainData = std::move(data);
@@ -18,7 +16,7 @@ KasX::Compiler::Core::Domain::Domain(DomainData &data)
 
 KasX::Compiler::Core::Domain::~Domain() { CORE_TRACE("Domain Terminated"); }
 
-void KasX::Compiler::Core::Domain::InitVisitor() {
+void KasX::Compiler::Core::Domain::initVisitor() {
   CORE_TRACE("Visitor Started");
 
   antlr4::ANTLRInputStream input(m_DomainData.fileStream);
@@ -26,21 +24,21 @@ void KasX::Compiler::Core::Domain::InitVisitor() {
   antlr4::CommonTokenStream tokens(&lexer);
   KasXParser parser(&tokens);
 
-  antlr4::tree::ParseTree *tree = parser.prog();
+  antlr4::tree::ParseTree* tree = parser.prog();
 
   CLI_INFO("Parse tree completed: {}", m_DomainData.domainName);
 
   CLI_INFO("Visiting parse tree of {}", m_DomainData.domainName);
-  this->InitDefaultTypes();
+  this->initDefaultTypes();
   m_ProgramVisitor->visit(tree);
 }
 
-void KasX::Compiler::Core::Domain::InitDefaultTypes() {
+void KasX::Compiler::Core::Domain::initDefaultTypes() {
   CLI_TRACE("Initial types added: number, boolean, entity, character");
 
   // Initializing default types of Sabre domains.
-  this->m_GlobalScope.InitNewType("entity", {});
-  this->m_GlobalScope.InitNewType("character", {});
-  this->m_GlobalScope.InitNewType("number", {});
-  this->m_GlobalScope.InitNewType("boolean", {});
+  this->m_GlobalScope.initNewType("entity", {});
+  this->m_GlobalScope.initNewType("character", {});
+  this->m_GlobalScope.initNewType("number", {});
+  this->m_GlobalScope.initNewType("boolean", {});
 }

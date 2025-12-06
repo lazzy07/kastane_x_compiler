@@ -9,7 +9,7 @@ class ApplicationManager {
   explicit ApplicationManager(KasX::App::CLI::CompiledArgument arguments);
   ~ApplicationManager();
 
-  void Execute();
+  void execute();
 
  private:
   KasX::App::CLI::CompiledArgument m_Arguments;

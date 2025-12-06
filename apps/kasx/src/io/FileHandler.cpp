@@ -1,13 +1,13 @@
 #include "FileHandler.hpp"
 
-#include <filesystem>
 #include <Log.hpp>
+#include <filesystem>
 
 KasX::App::IO::FileHandler::FileHandler() { CORE_TRACE("FileHandler Initialized"); }
 
 KasX::App::IO::FileHandler::~FileHandler() { CORE_TRACE("FileHandle Terminated"); }
 
-KasX::DomainData KasX::App::IO::FileHandler::OpenProblemFile(const KasX::Path &filePath) {
+KasX::DomainData KasX::App::IO::FileHandler::openProblemFile(const KasX::Path& filePath) {
   std::ifstream file(filePath);
 
   if (!file.is_open()) {
@@ -25,7 +25,7 @@ KasX::DomainData KasX::App::IO::FileHandler::OpenProblemFile(const KasX::Path &f
   return {std::move(domainName), std::move(file), filePath};
 }
 
-std::filesystem::path KasX::App::IO::FileHandler::ExecutableDir() {
+std::filesystem::path KasX::App::IO::FileHandler::executableDir() {
 #if defined(_WIN32)
   wchar_t buf[MAX_PATH];
   DWORD len = GetModuleFileNameW(nullptr, buf, MAX_PATH);

@@ -8,7 +8,7 @@ class FileHandler {
   FileHandler();
   ~FileHandler();
 
-  DomainData OpenProblemFile(const KasX::Path &filePath);
-  KasX::Path ExecutableDir();
+  DomainData openProblemFile(const KasX::Path& filePath);
+  KasX::Path executableDir();
 };
 }  // namespace KasX::App::IO

@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "../visitors/ProgramVisitor.hpp"
+#include "GlobalScope.hpp"
 #include "Scope.hpp"
 
 namespace KasX::Compiler::Core {
@@ -11,11 +12,11 @@ class Domain {
   explicit Domain(DomainData& data);
   ~Domain();
 
-  void InitVisitor();
-  void InitDefaultTypes();
+  void initVisitor();
+  void initDefaultTypes();
 
-  [[nodiscard]] KasX::Compiler::Core::Scope* GetCurrentScope() { return m_CurrentScope; };
-  [[nodiscard]] KasX::Compiler::Core::Scope* GetGlobalScope() { return &m_GlobalScope; };
+  [[nodiscard]] KasX::Compiler::Core::Scope* getCurrentScope() { return m_CurrentScope; };
+  [[nodiscard]] KasX::Compiler::Core::GlobalScope* getGlobalScope() { return &m_GlobalScope; };
 
  private:
   // Meta-Data that the domain initialized with
@@ -24,7 +25,7 @@ class Domain {
   std::unique_ptr<KasX::Compiler::Visitor::ProgramVisitor> m_ProgramVisitor;
 
   // Global Scope
-  KasX::Compiler::Core::Scope m_GlobalScope;
+  KasX::Compiler::Core::GlobalScope m_GlobalScope;
   KasX::Compiler::Core::Scope* m_CurrentScope;  // Yes, this is not an error! Im using raw pointers here.
 };
 }  // namespace KasX::Compiler::Core

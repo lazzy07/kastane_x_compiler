@@ -60,7 +60,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationNoParents(
   range.start.character = column;
   range.end.character = end;
 
-  m_Domain->GetCurrentScope()->InitNewType(typeIdentifier, range);
+  m_Domain->getGlobalScope()->initNewType(typeIdentifier, range);
   PrintEndVisit("type-declaration (no parents)", typeIdentifier);
   return nullptr;
 }
@@ -91,7 +91,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitTypeDeclarationWithParent
   range.start.character = column;
   range.end.character = end;
 
-  m_Domain->GetCurrentScope()->InitNewType(name, range, parents);
+  m_Domain->getGlobalScope()->initNewType(name, range, parents);
   PrintEndVisit("type-declaration (with parents)", name);
   return {};
 }
@@ -113,7 +113,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitEntityDeclaration(KasXPar
   range.start.character = column;
   range.end.character = end;
 
-  m_Domain->GetCurrentScope()->InitNewEntity(name, range, parents);
+  m_Domain->getCurrentScope()->initNewEntity(name, range, parents);
   // m_Domain->InitNewEntity(name, {line, column}, parents);
   PrintEndVisit("entity-declaration", name);
   return {};
@@ -129,7 +129,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitFluentDeclaration(KasXPar
 
   KasX::Compiler::Trace::Range range;
 
-  m_Domain->GetCurrentScope()->InitNewFluent(name, range, params, dataType);
+  m_Domain->getGlobalScope()->initNewFluent(name, range, params, dataType);
   PrintEndVisit("fluent-declaration", name);
   return {};
 }
@@ -182,7 +182,7 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitFunctionHeader(KasXParser
 std::any KasX::Compiler::Visitor::ProgramVisitor::visitExprIdentifier(KasXParser::ExprIdentifierContext* ctx) {
   TracePrint("Visiting Identifier expression");
   auto identifierStr = ctx->IDENTIFIER()->getText();
-  auto* identifierDeclaration = this->m_Domain->GetCurrentScope()->GetDefinition(identifierStr);
+  auto* identifierDeclaration = this->m_Domain->getCurrentScope()->getDefinition(identifierStr);
 
   if (identifierDeclaration == nullptr) {
     // username - lazzy07 TODO: Handle the error
@@ -261,12 +261,12 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitFluentVal(KasXParser::Flu
   auto fluentStr = ctx->IDENTIFIER()->getText();
   auto arguments = std::any_cast<std::vector<std::string>>(visit(ctx->argument_list()));
 
-  Core::Scope* scope = m_Domain->GetCurrentScope();
+  Core::Scope* scope = m_Domain->getCurrentScope();
 
   DataStructures::Expression* fluent = new DataStructures::Fluent();
   // Checking if the args mentioned in the fluent exists
   for (auto argument : arguments) {
-    auto* parameter = scope->GetDefinition(argument);
+    auto* parameter = scope->getDefinition(argument);
 
     if (parameter == nullptr) {
       // username - lazzy07 TODO: Handle the error

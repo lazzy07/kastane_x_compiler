@@ -8,10 +8,6 @@
 
 #include "../data_structures/declarations/DeclarationTypes.hpp"
 #include "../data_structures/declarations/EntityDecl.hpp"
-#include "../data_structures/declarations/FluentDecl.hpp"
-#include "../data_structures/declarations/TypeDecl.hpp"
-#include "../data_structures/expressions/Expression.hpp"
-#include "../data_structures/helpers/Parameter.hpp"
 #include "../trace/Range.hpp"
 #include "TraceableClass.hpp"
 #include "kasx/Types.hpp"
@@ -27,43 +23,34 @@ struct DeclarationData {
 
 enum SCOPE_TYPES : std::uint8_t { GLOBAL, BLOCK, ACTION, TRIGGER, UTILITY, PARAM_LIST };
 
-class Scope : TraceableClass {
+class GlobalScope;
+
+class Scope : public TraceableClass {
  public:
-  Scope(std::string name, SCOPE_TYPES type, std::unique_ptr<Scope> parent = nullptr);
+  Scope(std::string name, SCOPE_TYPES type);
   ~Scope() override;
 
-  DeclarationData* GetDefinition(const std::string& name);  // Get definition by name
-  DataStructures::FluentDecl* GetFluentDeclarations(const std::string& name);
-  void AddDefinition(const std::string& name, std::unique_ptr<DeclarationData> data);
+  // Getters
+  SCOPE_TYPES getScopeType() { return m_Type; };
+  std::string_view getScopeName() { return m_Name; };
+  std::unordered_map<std::string, std::unique_ptr<DeclarationData>>* getDefinitions() { return &m_Definitions; };
 
-  void InitNewType(const std::string& name, const KasX::Compiler::Trace::Range& range,
-                   const std::vector<std::string>& parents = {});
-  void InitNewEntity(const std::string& name, const KasX::Compiler::Trace::Range& range,
+  DeclarationData* getDefinition(const std::string& name);  // Get definition by name
+  void addDefinition(const std::string& name, std::unique_ptr<DeclarationData> data);
+
+  void initNewEntity(const std::string& name, const KasX::Compiler::Trace::Range& range,
                      const std::vector<std::string>& type = {});
 
-  void InitNewFluent(const std::string& name, const KasX::Compiler::Trace::Range& range, const ParamList& params,
-                     const std::string& dataType);
-
-  SCOPE_TYPES GetScopeType() { return m_Type; };
-
-  void AddExpressionToInitialState(const KasX::Compiler::DataStructures::Expression* expression);
+  std::vector<KasX::declaration_id> getParentIDs(const std::string& name, const std::vector<std::string>& parents);
+  virtual GlobalScope* getGlobalScope() = 0;
 
  private:
   std::string m_Name;
   SCOPE_TYPES m_Type;
-  std::unique_ptr<Scope> m_Parent;
-  std::vector<std::unique_ptr<Scope>> m_Children;
 
   // Definition holders
   std::unordered_map<std::string, std::unique_ptr<DeclarationData>>
       m_Definitions;  // All the definitions can be found here except for fluent declarations
-  std::vector<std::unique_ptr<KasX::Compiler::DataStructures::TypeDecl>> m_TypeDeclarations;      // Types definitions
   std::vector<std::unique_ptr<KasX::Compiler::DataStructures::EntityDecl>> m_EntityDeclarations;  // Entities definitions
-  std::vector<std::unique_ptr<KasX::Compiler::DataStructures::FluentDecl>> m_FluentDeclarations;  // Fluent definitions
-  std::vector<std::unique_ptr<KasX::Compiler::DataStructures::Helpers::Parameter>> m_Parameters;
-  std::vector<KasX::Compiler::DataStructures::Expression> m_InitialState;  // Initial state of the domain
-
-  void AddDeclaration(const std::string& name, std::unique_ptr<DeclarationData> data);
-  std::vector<KasX::declaration_id> GetParentIDs(const std::string& name, const std::vector<std::string>& parents);
 };
 }  // namespace KasX::Compiler::Core

@@ -15,11 +15,9 @@ KasX::App::Core::ApplicationManager::ApplicationManager(KasX::App::CLI::Compiled
   KasX::Compiler::KasXCompiler::InitLogger();
 }
 
-KasX::App::Core::ApplicationManager::~ApplicationManager() {
-  CORE_TRACE("Application Manager Terminated");
-}
+KasX::App::Core::ApplicationManager::~ApplicationManager() { CORE_TRACE("Application Manager Terminated"); }
 
-void KasX::App::Core::ApplicationManager::Execute() {
+void KasX::App::Core::ApplicationManager::execute() {
   int type = m_Arguments.execution_type;
 
   if (type & static_cast<int>(KasX::App::Core::EXECUTION_TYPE::PRINT_VERSION)) {
@@ -30,13 +28,13 @@ void KasX::App::Core::ApplicationManager::Execute() {
       CORE_TRACE("Executing File Parsing");
       std::string filePath = m_Arguments.filePath;
 
-      auto *fileHandler = new KasX::App::IO::FileHandler();
+      auto* fileHandler = new KasX::App::IO::FileHandler();
 
-      KasX::DomainData domainData = fileHandler->OpenProblemFile(filePath);
+      KasX::DomainData domainData = fileHandler->openProblemFile(filePath);
 
-      auto *compiler = new KasX::Compiler::KasXCompiler();
+      auto* compiler = new KasX::Compiler::KasXCompiler();
 
-      compiler->Compile(std::move(domainData), {});
+      compiler->compile(std::move(domainData), {});
 
       delete compiler;
       delete fileHandler;

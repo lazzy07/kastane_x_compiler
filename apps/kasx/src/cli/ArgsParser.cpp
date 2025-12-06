@@ -1,15 +1,15 @@
 #include "ArgsParser.hpp"
 
-#include "../core/Execution.hpp"
 #include <Log.hpp>
 #include <string>
+
+#include "../core/Execution.hpp"
 
 KasX::App::CLI::ArgsParser::ArgsParser() { CORE_TRACE("Argument Parser Initialized"); }
 
 KasX::App::CLI::ArgsParser::~ArgsParser() { CORE_TRACE("Argument Parser Terminated"); }
 
-KasX::App::CLI::CompiledArgument KasX::App::CLI::ArgsParser::ParseArguments(int argc,
-                                                                            char *argv[]) {
+KasX::App::CLI::CompiledArgument KasX::App::CLI::ArgsParser::parseArguments(int argc, char* argv[]) {
   // Return type that the ArgsHandler interpreted.
   CompiledArgument ret;
 
