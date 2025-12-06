@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "../visitors/ProgramVisitor.hpp"
+#include "ActionScope.hpp"
 #include "GlobalScope.hpp"
 #include "Scope.hpp"
 
@@ -17,6 +18,7 @@ class Domain {
 
   [[nodiscard]] KasX::Compiler::Core::Scope* getCurrentScope() { return m_CurrentScope; };
   [[nodiscard]] KasX::Compiler::Core::GlobalScope* getGlobalScope() { return &m_GlobalScope; };
+  ActionScope* createActionScope(std::string name);
 
  private:
   // Meta-Data that the domain initialized with

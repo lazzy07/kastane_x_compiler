@@ -2,6 +2,7 @@
 
 #include <Log.hpp>
 
+#include "ActionScope.hpp"
 #include "KasXLexer.h"
 
 KasX::Compiler::Core::Domain::Domain(DomainData& data) {
@@ -41,4 +42,12 @@ void KasX::Compiler::Core::Domain::initDefaultTypes() {
   this->m_GlobalScope.initNewType("character", {});
   this->m_GlobalScope.initNewType("number", {});
   this->m_GlobalScope.initNewType("boolean", {});
+}
+
+KasX::Compiler::Core::ActionScope* KasX::Compiler::Core::Domain::createActionScope(std::string name) {
+  ActionScope* currentScope = this->getGlobalScope()->createActionScope(name);
+  CLI_TRACE("Current scope changed to : {}", name);
+  m_CurrentScope = currentScope;
+
+  return currentScope;
 }
