@@ -76,7 +76,7 @@ param
   Action interpretation
 */
 action_definition
-  : ACTION_DEFINITION_KEYWORD function_header START_CUR_BRACES action_body END_CUR_BRACES DEFINITION_SEPARATOR
+  : ACTION_DEFINITION_KEYWORD function_header START_CUR_BRACES action_body END_CUR_BRACES DEFINITION_SEPARATOR        # ActionDecl
   ;
 
 /* 
