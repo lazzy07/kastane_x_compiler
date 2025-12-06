@@ -1,5 +1,8 @@
 #include "GlobalScope.hpp"
 
+#include <memory>
+
+#include "ActionScope.hpp"
 #include "Log.hpp"
 #include "Scope.hpp"
 
@@ -147,4 +150,16 @@ void KasX::Compiler::Core::GlobalScope::initNewFluent(const std::string& name, c
 
   this->m_FluentDeclarations.push_back(std::move(fluent));
   TracePrint("Fluent declaration '{}' added to the scope: {}", name, this->getScopeName());
+}
+
+KasX::Compiler::Core::ActionScope* KasX::Compiler::Core::GlobalScope::createActionScope(std::string name) {
+  TracePrint("Creating an action scope: {}", name);
+
+  std::unique_ptr<ActionScope> newActionScope = std::make_unique<ActionScope>(name, this);
+
+  auto* actionScopePtr = newActionScope.get();
+
+  m_ActionScopes.push_back(std::move(newActionScope));
+
+  return actionScopePtr;
 }

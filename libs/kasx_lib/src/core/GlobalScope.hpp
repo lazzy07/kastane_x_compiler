@@ -6,6 +6,7 @@
 #include "../data_structures/declarations/FluentDecl.hpp"
 #include "../data_structures/declarations/TypeDecl.hpp"
 #include "../data_structures/expressions/Expression.hpp"
+#include "ActionScope.hpp"
 #include "Scope.hpp"
 
 namespace KasX::Compiler::Core {
@@ -39,8 +40,10 @@ class GlobalScope : public Scope {
   DataStructures::FluentDecl* getFluentDeclarations(const std::string& name);
   std::vector<std::unique_ptr<DataStructures::TypeDecl>>* getTypeDeclarations() { return &m_TypeDeclarations; };
   GlobalScope* getGlobalScope() override { return this; }
+  ActionScope* createActionScope(std::string name);
 
  private:
+  std::vector<std::unique_ptr<ActionScope>> m_ActionScopes;
   std::vector<std::unique_ptr<Scope>> m_Children;  ///< Children of this scope
   Scope* m_Parent;  ///< Parents of this scope, currently the global scope with current design of Sabre language
   std::vector<std::unique_ptr<KasX::Compiler::DataStructures::TypeDecl>>
