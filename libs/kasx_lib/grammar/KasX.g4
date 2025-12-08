@@ -135,7 +135,7 @@ identifiers_list
 
 conditions_list
   : arithmetic_expression
-  | fluent;
+  ;
 
 belives_expression
   : KEYWORD_BELIEVES OPEN_BRACKET IDENTIFIER COMMA arithmetic_expression CLOSE_BRACKET
