@@ -368,8 +368,11 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitActionDecl(KasXParser::Ac
   auto funcHeader = std::any_cast<std::pair<std::string, ParamList>>(visit(ctx->function_header()));
   auto actionName = funcHeader.first;
 
-  m_Domain->createActionScope(actionName);
+  Core::ActionScope* actionScope = m_Domain->createActionScope(actionName);
 
+  // Now the code is inside the action scope.
+
+  m_Domain->resetScope();
   printEndVisit("action-declaration", actionName);
 
   return 0;
