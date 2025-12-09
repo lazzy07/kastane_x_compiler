@@ -51,3 +51,8 @@ KasX::Compiler::Core::ActionScope* KasX::Compiler::Core::Domain::createActionSco
 
   return currentScope;
 }
+
+void KasX::Compiler::Core::Domain::resetScope() {
+  m_CurrentScope = this->getGlobalScope();
+  CLI_TRACE("Current scope changed back to the global scope");
+}
