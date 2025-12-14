@@ -1,3 +1,12 @@
+/*
+* File name: VersionPrinter.cpp
+* Project: KasX Compiler
+* Author: Lasantha M Senanayake
+* Date created: 2025-11-15 19:55:29
+// Date modified: 2025-12-14 13:09:24
+* ------
+*/
+
 #include "VersionPrinter.hpp"
 
 #include <Log.hpp>

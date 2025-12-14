@@ -1,3 +1,12 @@
+/*
+* File name: ApplicationManager.cpp
+* Project: KasX Compiler
+* Author: Lasantha M Senanayake
+* Date created: 2025-12-14 13:11:49
+// Date modified: 2025-12-14 13:13:40
+* ------
+*/
+
 #include "ApplicationManager.hpp"
 
 #include <Log.hpp>
