@@ -1,5 +1,13 @@
 grammar KasX;
 
+/*
+* File name: KasX.g4
+* Project: KasX Compiler
+* Author: Lasantha M Senanayake
+* Date created: 2025-12-14 01:49:32
+* ------
+*/
+
 prog
   : definition* EOF                # Program
 ;       

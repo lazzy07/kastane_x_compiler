@@ -1,11 +1,14 @@
-/**
- * @file TraceableClass.hpp
- * @brief Base class for classes that want to trace logging during domain compilation.
- *
- * For more infirmation, see the Scope.hpp
- */
+/*
+* File name: TraceableClass.hpp
+* Project: KasX Compiler
+* Author: Lasantha M Senanayake
+* Date created: 2025-12-14 13:31:10
+// Date modified: 2025-12-14 13:31:35
+* ------
+*/
 
 #pragma once
+
 #include <fmt/format.h>
 
 #include <string>
@@ -14,6 +17,13 @@
 
 namespace KasX::Compiler::Core {
 
+/**
+ * @class TraceableClass
+ * @brief Base class for classes that want to trace logging during domain compilation.
+ *
+ * For more information, see Scope.hpp
+ *
+ */
 class TraceableClass {
  public:
   TraceableClass() = default;

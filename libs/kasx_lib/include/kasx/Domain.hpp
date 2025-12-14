@@ -1,3 +1,12 @@
+/*
+* File name: Domain.hpp
+* Project: KasX Compiler
+* Author: Lasantha M Senanayake
+* Date created: 2025-12-14 01:49:32
+// Date modified: 2025-12-14 13:29:10
+* ------
+*/
+
 #pragma once
 
 #include "kasx/Types.hpp"

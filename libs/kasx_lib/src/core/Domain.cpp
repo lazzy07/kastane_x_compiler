@@ -1,3 +1,12 @@
+/*
+* File name: Domain.cpp
+* Project: KasX Compiler
+* Author: Lasantha M Senanayake
+* Date created: 2025-12-14 01:51:31
+// Date modified: 2025-12-14 13:31:51
+* ------
+*/
+
 #include <Log.hpp>
 #include <kasx/Domain.hpp>
 

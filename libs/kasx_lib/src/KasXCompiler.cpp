@@ -1,3 +1,12 @@
+/*
+* File name: KasXCompiler.cpp
+* Project: KasX Compiler
+* Author: Lasantha M Senanayake
+* Date created: 2025-12-14 01:45:16
+// Date modified: 2025-12-14 13:27:20
+* ------
+*/
+
 #include <kasx/Domain.hpp>
 #include <kasx/KasXCompiler.hpp>
 #include <lazlogger/LoggerManager.hpp>
