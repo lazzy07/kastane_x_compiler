@@ -38,8 +38,8 @@ void KasX::Compiler::Core::Domain::initDefaultTypes() {
   CLI_TRACE("Initial types added: number, boolean, entity, character");
 
   // Initializing default types of Sabre domains.
-  this->m_GlobalScope.initNewType("entity", {}, {}, true);
-  this->m_GlobalScope.initNewType("character", {}, {}, true);
+  this->m_GlobalScope.initNewType("entity", {});
+  this->m_GlobalScope.initNewType("character", {});
   this->m_GlobalScope.initNewType("number", {});
   this->m_GlobalScope.initNewType("boolean", {});
 }

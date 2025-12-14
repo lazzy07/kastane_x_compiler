@@ -25,7 +25,7 @@ class GlobalScope : public Scope {
   void initNewFluent(const std::string& name, const KasX::Compiler::Trace::Range& range, const ParamList& params,
                      const std::string& dataType);
   void initNewType(const std::string& name, const KasX::Compiler::Trace::Range& range,
-                   const std::vector<std::string>& parents = {}, bool isMutable = false);
+                   const std::vector<std::string>& parents = {});
 
   /**
    * @brief Returns fluent declarations

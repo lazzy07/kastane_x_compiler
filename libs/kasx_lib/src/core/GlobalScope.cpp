@@ -15,7 +15,7 @@ KasX::Compiler::Core::GlobalScope::GlobalScope() : Scope("Global", SCOPE_TYPES::
 KasX::Compiler::Core::GlobalScope::~GlobalScope() { CORE_TRACE("Scope: Global Terminated"); }
 
 void KasX::Compiler::Core::GlobalScope::initNewType(const std::string& name, const KasX::Compiler::Trace::Range& range,
-                                                    const std::vector<std::string>& parents, bool isMutable) {
+                                                    const std::vector<std::string>& parents) {
   if (getScopeType() != SCOPE_TYPES::GLOBAL) {
     CORE_ERROR("Type declarations should be done only inside the global scope: {}", name);
     return;
@@ -23,11 +23,9 @@ void KasX::Compiler::Core::GlobalScope::initNewType(const std::string& name, con
 
   TracePrint("New type initialization started: {}", name);
 
-  if (name != "character") {
-    if (getDefinition(name) != nullptr) {
-      CLI_ERROR("Type '{}' already exists as a definition", name);
-      return;
-    }
+  if (getDefinition(name) != nullptr) {
+    CLI_ERROR("Type '{}' already exists as a definition", name);
+    return;
   }
 
   std::vector<KasX::declaration_id> parentIDs = getParentIDs(name, parents);
