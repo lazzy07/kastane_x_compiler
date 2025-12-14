@@ -46,7 +46,6 @@ void KasX::Compiler::Core::GlobalScope::initNewType(const std::string& name, con
   type->parents = parentIDs;
   type->trace = range;
   type->name = name;
-  type->isMutable = isMutable;
 
   // If there are no parents defined, the parent should be 'entity'
   if (parentIDs.empty()) {
