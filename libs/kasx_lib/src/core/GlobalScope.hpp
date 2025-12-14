@@ -8,6 +8,7 @@
 #include "../data_structures/expressions/Expression.hpp"
 #include "ActionScope.hpp"
 #include "Scope.hpp"
+#include "kasx/Types.hpp"
 
 namespace KasX::Compiler::Core {
 class GlobalScope : public Scope {
@@ -24,7 +25,7 @@ class GlobalScope : public Scope {
   void initNewFluent(const std::string& name, const KasX::Compiler::Trace::Range& range, const ParamList& params,
                      const std::string& dataType);
   void initNewType(const std::string& name, const KasX::Compiler::Trace::Range& range,
-                   const std::vector<std::string>& parents = {});
+                   const std::vector<std::string>& parents = {}, bool isMutable = false);
 
   /**
    * @brief Returns fluent declarations
@@ -41,15 +42,28 @@ class GlobalScope : public Scope {
   std::vector<std::unique_ptr<DataStructures::TypeDecl>>* getTypeDeclarations() { return &m_TypeDeclarations; };
   GlobalScope* getGlobalScope() override { return this; }
   ActionScope* createActionScope(std::string name);
+  /**
+   * @brief This function will generate all the grounded fluents from a FluentDecl (Fluent declaration)
+   *
+   * @param fluent Fluent declartation that needs to genenrate all the grounded fluents
+   */
+  void generateGroundedFluent(DataStructures::FluentDecl* fluent);
+  void getEntitesFromType(KasX::Compiler::DataStructures::TypeDecl* typeDecl, std::vector<KasX::declaration_id>* declrationIDs);
 
  private:
-  std::vector<std::unique_ptr<ActionScope>> m_ActionScopes;
-  std::vector<std::unique_ptr<Scope>> m_Children;  ///< Children of this scope
+  std::vector<std::unique_ptr<ActionScope>> m_ActionScopes;  ///< All the action scopes in the domain are available here
+  std::vector<std::unique_ptr<Scope>> m_Children;            ///< Children of this scope
   Scope* m_Parent;  ///< Parents of this scope, currently the global scope with current design of Sabre language
   std::vector<std::unique_ptr<KasX::Compiler::DataStructures::TypeDecl>>
       m_TypeDeclarations;  ///< Types definitions (Types can be defined only inside the GlobalScope)
   std::vector<std::unique_ptr<KasX::Compiler::DataStructures::FluentDecl>>
       m_FluentDeclarations;  ///< Fluent definitions (Fluents can be declared only inside the GlobalScope)
   std::vector<KasX::Compiler::DataStructures::Expression> m_InitialState;  ///< Initial state of the domain
+
+  std::vector<KasX::declaration_id> generateFluentParamEntity(
+      std::unique_ptr<KasX::Compiler::DataStructures::Helpers::Parameter> const* parameter);
+
+  std::vector<KasX::declaration_id> generateFluentParamType(
+      std::unique_ptr<KasX::Compiler::DataStructures::Helpers::Parameter> const* parameter);
 };
 }  // namespace KasX::Compiler::Core

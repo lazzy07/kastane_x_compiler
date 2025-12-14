@@ -7,6 +7,7 @@
 
 namespace KasX::Compiler::DataStructures {
 struct TypeDecl : public Declaration {
+  bool isMutable = false;
   std::vector<declaration_id> parents;
   std::vector<declaration_id> children;
   std::vector<declaration_id> entities;

@@ -324,37 +324,35 @@ std::any KasX::Compiler::Visitor::ProgramVisitor::visitBinary_op(KasXParser::Bin
   TracePrint("Visiting binary operation type");
   auto type = ctx->op->getType();
 
-  namespace DS = KasX::Compiler::DataStructures;
-
   switch (type) {
     case KasXParser::SUBTRACTION_KEYWORD:
-      return DS::SUBSTRACTION;
+      return DataStructures::BINARY_OPERATION_TYPES::SUBSTRACTION;
     case KasXParser::ADDITION_KEYWORD:
-      return DS::ADDITION;
+      return DataStructures::BINARY_OPERATION_TYPES::ADDITION;
     case KasXParser::DIVISION_KEYWORD:
-      return DS::DIVISION;
+      return DataStructures::BINARY_OPERATION_TYPES::DIVISION;
     case KasXParser::MULTIPLICATION_KEYWORD:
-      return DS::MULTIPLICATION;
+      return DataStructures::BINARY_OPERATION_TYPES::MULTIPLICATION;
     case KasXParser::LESS_THAN_KEYWORD:
-      return DS::LESS_THAN;
+      return DataStructures::BINARY_OPERATION_TYPES::LESS_THAN;
     case KasXParser::GREATER_THAN_KEYWORD:
-      return DS::GREATER_THAN;
+      return DataStructures::BINARY_OPERATION_TYPES::GREATER_THAN;
     case KasXParser::LESS_THAN_OR_EQUAL_TO_KEYWORD:
-      return DS::LESS_THAN_OR_EQUAL;
+      return DataStructures::BINARY_OPERATION_TYPES::LESS_THAN_OR_EQUAL;
     case KasXParser::GREATER_THAN_OR_EQUAL_TO_KEYWORD:
-      return DS::GREATER_THAN_OR_EQUAL;
+      return DataStructures::BINARY_OPERATION_TYPES::GREATER_THAN_OR_EQUAL;
     case KasXParser::NOT_EQUAL_TO_KEYWORD:
-      return DS::NOT_EQUAL;
+      return DataStructures::BINARY_OPERATION_TYPES::NOT_EQUAL;
     case KasXParser::EQUAL_TO_KEYWORD:
-      return DS::EQUAL_TO;
+      return DataStructures::BINARY_OPERATION_TYPES::EQUAL_TO;
     case KasXParser::ASSIGNMENT_KEYWORD:
-      return DS::ASSIGNMENT;
+      return DataStructures::BINARY_OPERATION_TYPES::ASSIGNMENT;
     case KasXParser::DISJUNCTION_KEYWORD:
-      return DS::DISJUNCTION;
+      return DataStructures::BINARY_OPERATION_TYPES::DISJUNCTION;
     case KasXParser::CONJUNCTION_KEYWORD:
-      return DS::CONJUNCTION;
+      return DataStructures::BINARY_OPERATION_TYPES::CONJUNCTION;
     case KasXParser::COLON:
-      return DS::INHERITANCE;
+      return DataStructures::BINARY_OPERATION_TYPES::INHERITANCE;
     default:
       CLI_ERROR("Unknown binary operator token type");
   }

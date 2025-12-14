@@ -1,6 +1,8 @@
 #include "GlobalScope.hpp"
 
 #include <memory>
+#include <string_view>
+#include <vector>
 
 #include "ActionScope.hpp"
 #include "Log.hpp"
@@ -13,7 +15,7 @@ KasX::Compiler::Core::GlobalScope::GlobalScope() : Scope("Global", SCOPE_TYPES::
 KasX::Compiler::Core::GlobalScope::~GlobalScope() { CORE_TRACE("Scope: Global Terminated"); }
 
 void KasX::Compiler::Core::GlobalScope::initNewType(const std::string& name, const KasX::Compiler::Trace::Range& range,
-                                                    const std::vector<std::string>& parents) {
+                                                    const std::vector<std::string>& parents, bool isMutable) {
   if (getScopeType() != SCOPE_TYPES::GLOBAL) {
     CORE_ERROR("Type declarations should be done only inside the global scope: {}", name);
     return;
@@ -21,9 +23,11 @@ void KasX::Compiler::Core::GlobalScope::initNewType(const std::string& name, con
 
   TracePrint("New type initialization started: {}", name);
 
-  if (getDefinition(name) != nullptr) {
-    CLI_ERROR("Type '{}' already exists as a definition", name);
-    return;
+  if (name != "character") {
+    if (getDefinition(name) != nullptr) {
+      CLI_ERROR("Type '{}' already exists as a definition", name);
+      return;
+    }
   }
 
   std::vector<KasX::declaration_id> parentIDs = getParentIDs(name, parents);
@@ -42,6 +46,7 @@ void KasX::Compiler::Core::GlobalScope::initNewType(const std::string& name, con
   type->parents = parentIDs;
   type->trace = range;
   type->name = name;
+  type->isMutable = isMutable;
 
   // If there are no parents defined, the parent should be 'entity'
   if (parentIDs.empty()) {
@@ -93,7 +98,7 @@ void KasX::Compiler::Core::GlobalScope::initNewFluent(const std::string& name, c
 
   auto definitionData = std::make_unique<DeclarationData>();
   definitionData->id = fluentID;
-  definitionData->type = DataStructures::FLUENT_DEFINITION;
+  definitionData->type = DataStructures::DECLARATION_TYPES::FLUENT_DEFINITION;
 
   auto fluent = std::make_unique<DataStructures::FluentDecl>();
   fluent->id = fluentID;
@@ -148,8 +153,9 @@ void KasX::Compiler::Core::GlobalScope::initNewFluent(const std::string& name, c
     index++;
   }
 
-  this->m_FluentDeclarations.push_back(std::move(fluent));
+  this->generateGroundedFluent(fluent.get());
   TracePrint("Fluent declaration '{}' added to the scope: {}", name, this->getScopeName());
+  this->m_FluentDeclarations.push_back(std::move(fluent));
 }
 
 KasX::Compiler::Core::ActionScope* KasX::Compiler::Core::GlobalScope::createActionScope(std::string name) {
@@ -162,4 +168,70 @@ KasX::Compiler::Core::ActionScope* KasX::Compiler::Core::GlobalScope::createActi
   m_ActionScopes.push_back(std::move(newActionScope));
 
   return actionScopePtr;
+}
+
+void KasX::Compiler::Core::GlobalScope::generateGroundedFluent(KasX::Compiler::DataStructures::FluentDecl* fluentDecl) {
+  // Get the name of the fluent first
+  std::string_view name = fluentDecl->name;
+  TracePrint("Gathering data to ground the fluent: {}", name);
+  // A vector to keep all the parameter options
+  std::vector<declaration_id> paramPointers;
+
+  // Get all the parameters of the fluent and iterate over them,
+  for (const auto& param : fluentDecl->parameters) {
+    TracePrint("Parameter: {} is processing of the fluent: {}", param->name, name);
+    // Paramenter can have different data types, a reference to a type or an entity, so need to handle them separately
+    // First handle the entity type
+    if (param->dataType == DataStructures::DECLARATION_TYPES::ENTITY_DEFINITION) {
+      TracePrint("Parameter: {} is an entity", param->name);
+      auto pram = generateFluentParamEntity(&param);
+    }
+
+    if (param->dataType == DataStructures::DECLARATION_TYPES::TYPE_DEFINITION) {
+      TracePrint("Paramter: {} is a type", param->name);
+      generateFluentParamType(&param);
+    }
+  }
+}
+
+std::vector<KasX::declaration_id> KasX::Compiler::Core::GlobalScope::generateFluentParamEntity(
+    std::unique_ptr<KasX::Compiler::DataStructures::Helpers::Parameter> const* parameter) {
+  TracePrint("Handing entity paramter: {}", parameter->get()->name);
+  std::vector<declaration_id> ptrs;
+  ptrs.push_back(parameter->get()->id);
+  return ptrs;
+}
+
+std::vector<KasX::declaration_id> KasX::Compiler::Core::GlobalScope::generateFluentParamType(
+    std::unique_ptr<KasX::Compiler::DataStructures::Helpers::Parameter> const* parameter) {
+  TracePrint("Handling type parameter: {}", parameter->get()->name);
+
+  std::vector<declaration_id> ptrs;
+
+  const auto typeID = parameter->get()->id;
+
+  auto* typeDeclaration = this->m_TypeDeclarations.at(typeID).get();
+  this->getEntitesFromType(typeDeclaration, &ptrs);
+  TracePrint("{} entities found for paramter: {}", ptrs.size(), parameter->get()->name);
+
+  if (ptrs.size() == 0) {
+    CLI_ERROR("No entities found for paramter: {}", parameter->get()->name);
+  }
+
+  return ptrs;
+}
+
+void KasX::Compiler::Core::GlobalScope::getEntitesFromType(KasX::Compiler::DataStructures::TypeDecl* typeDecl,
+                                                           std::vector<KasX::declaration_id>* declrationIDs) {
+  const auto entities = typeDecl->entities;
+
+  for (auto entity : entities) {
+    declrationIDs->push_back(entity);
+  }
+
+  // Get the children of the type declaration and recursively find all the entities
+  for (auto childTypeDeclID : typeDecl->children) {
+    auto* childTypeDecl = this->m_TypeDeclarations.at(childTypeDeclID).get();
+    getEntitesFromType(childTypeDecl, declrationIDs);
+  }
 }

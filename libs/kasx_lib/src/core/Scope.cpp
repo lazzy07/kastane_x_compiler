@@ -37,7 +37,7 @@ void KasX::Compiler::Core::Scope::addDefinition(const std::string& name, std::un
   }
 
   // username - lazzy07 TODO: Handle the error
-  if (getDefinition(name) != nullptr) {
+  if (getDefinition(name) != nullptr && name != "character") {
     CLI_ERROR("Definition with the same name already exists: {}", name);
     return;
   }
@@ -94,7 +94,7 @@ void KasX::Compiler::Core::Scope::initNewEntity(const std::string& name, const K
 
     auto definitionData = std::make_unique<DeclarationData>();
     definitionData->id = entityID;
-    definitionData->type = DataStructures::ENTITY_DEFINITION;
+    definitionData->type = DataStructures::DECLARATION_TYPES::ENTITY_DEFINITION;
 
     auto entity = std::make_unique<DataStructures::EntityDecl>();
     entity->id = entityID;

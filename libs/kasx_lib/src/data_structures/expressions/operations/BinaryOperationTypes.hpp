@@ -3,7 +3,7 @@
 #include <cstdint>
 
 namespace KasX::Compiler::DataStructures {
-enum BINARY_OPERATION_TYPES : std::uint8_t {
+enum class BINARY_OPERATION_TYPES : std::uint8_t {
   SUBSTRACTION,
   ADDITION,
   DIVISION,
@@ -22,33 +22,33 @@ enum BINARY_OPERATION_TYPES : std::uint8_t {
 
 constexpr const char* binaryOperationToString(BINARY_OPERATION_TYPES operation) {
   switch (operation) {
-    case SUBSTRACTION:
+    case BINARY_OPERATION_TYPES::SUBSTRACTION:
       return "SUBSTRACTION";
-    case ADDITION:
+    case BINARY_OPERATION_TYPES::ADDITION:
       return "ADDITION";
-    case DIVISION:
+    case BINARY_OPERATION_TYPES::DIVISION:
       return "DIVISION";
-    case MULTIPLICATION:
+    case BINARY_OPERATION_TYPES::MULTIPLICATION:
       return "MULTIPLICATION";
-    case LESS_THAN:
+    case BINARY_OPERATION_TYPES::LESS_THAN:
       return "LESS_THAN";
-    case GREATER_THAN:
+    case BINARY_OPERATION_TYPES::GREATER_THAN:
       return "GREATER_THAN";
-    case LESS_THAN_OR_EQUAL:
+    case BINARY_OPERATION_TYPES::LESS_THAN_OR_EQUAL:
       return "LESS_THAN_OR_EQUAL";
-    case GREATER_THAN_OR_EQUAL:
+    case BINARY_OPERATION_TYPES::GREATER_THAN_OR_EQUAL:
       return "GREATER_THAN_OR_EQUAL";
-    case NOT_EQUAL:
+    case BINARY_OPERATION_TYPES::NOT_EQUAL:
       return "NOT_EQUAL";
-    case EQUAL_TO:
+    case BINARY_OPERATION_TYPES::EQUAL_TO:
       return "EQUAL_TO";
-    case ASSIGNMENT:
+    case BINARY_OPERATION_TYPES::ASSIGNMENT:
       return "ASSIGNMENT";
-    case DISJUNCTION:
+    case BINARY_OPERATION_TYPES::DISJUNCTION:
       return "DISJUNCTION";
-    case CONJUNCTION:
+    case BINARY_OPERATION_TYPES::CONJUNCTION:
       return "CONJUNCTION";
-    case INHERITANCE:
+    case BINARY_OPERATION_TYPES::INHERITANCE:
       return "INHERITANCE";
   }
   return "<UNKNOWN_BINARY_OP>";
