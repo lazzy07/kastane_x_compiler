@@ -1,13 +1,13 @@
+#include <kasx/Domain.hpp>
 #include <kasx/KasXCompiler.hpp>
 #include <lazlogger/LoggerManager.hpp>
 
-#include "./core/Domain.hpp"
+namespace KasX::Compiler {
+KasXCompiler::KasXCompiler() { CORE_TRACE("Compiler Initialized"); }
 
-KasX::Compiler::KasXCompiler::KasXCompiler() { CORE_TRACE("Compiler Initialized"); }
+KasXCompiler::~KasXCompiler() { CORE_TRACE("Compiler Terminated"); }
 
-KasX::Compiler::KasXCompiler::~KasXCompiler() { CORE_TRACE("Compiler Terminated"); }
-
-void KasX::Compiler::KasXCompiler::compile(DomainData data, COMPILER_OPTIONS options) {
+void KasXCompiler::compile(DomainData data, COMPILER_OPTIONS options) {
   if (data.domainName.empty()) {
     CLI_ERROR("Cannot compile undefined domain");
     return;
@@ -19,7 +19,7 @@ void KasX::Compiler::KasXCompiler::compile(DomainData data, COMPILER_OPTIONS opt
   domain.initVisitor();
 }
 
-void KasX::Compiler::KasXCompiler::InitLogger() {
+void KasXCompiler::InitLogger() {
   if (s_Logger) {
     CORE_ERROR("Logger already being initialized");
   }
@@ -29,3 +29,4 @@ void KasX::Compiler::KasXCompiler::InitLogger() {
   s_Logger->Initialize({.core = {.name = CORE_LOGGER_NAME, .file = "log/core/kasx_compiler_lib.txt"},
                         .cli = {.name = CLI_LOGGER_NAME, .file = "log/cli/kasx_log_lib.txt"}});
 }
+}  // namespace KasX::Compiler
