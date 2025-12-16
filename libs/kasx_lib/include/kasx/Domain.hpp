@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-14 01:49:32
-// Date modified: 2025-12-14 13:29:10
+// Date modified: 2025-12-15 22:23:02
 * ------
 */
 
@@ -18,6 +18,11 @@ namespace KasX::Compiler::Core {
  */
 class Domain {
  public:
+  /**
+   * @brief Domain constructor
+   *
+   * @param data DomainData required to initialize the Domain.
+   */
   explicit Domain(DomainData& data);
   ~Domain();
   /**
