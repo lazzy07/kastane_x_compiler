@@ -36,14 +36,12 @@ git tag -a v1.0.0 -m "Version 1.0.0"
 
 ## Compiling and running the project
 
-This project uses CMake. To build the project,
+This project uses `CMake`. To build the project, Also, there is `dev.sh` shell script available, if you want to use that to compile the project.
 
 ```bash
 cd debug
 cmake -DCMAKE_BUILD_TYPE=Debug ..
 cmake --build build -j
 ```
-```
-```
-```
 
+To generate the documentation, `docxygen` is required. (Check the dev.sh to see the command to generate the docs).
