@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-14 12:45:58
-// Date modified: 2025-12-14 13:13:51
+// Date modified: 2025-12-15 21:54:10
 * ------
 */
 
@@ -20,7 +20,7 @@ namespace KasX::App::CLI {
  *
  */
 struct CompiledArgument {
-  int execution_type;
-  std::string filePath;
+  int execution_type;    ///< Current execution type (print version, compile file etc.).
+  std::string filePath;  ///< Filepath of the domain(problem) file.
 };
 }  // namespace KasX::App::CLI

@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-14 13:11:52
-// Date modified: 2025-12-14 13:11:55
+// Date modified: 2025-12-15 22:22:16
 * ------
 */
 
@@ -21,6 +21,11 @@ namespace KasX::App::Core {
  */
 class ApplicationManager {
  public:
+  /**
+   * @brief ApplicationManager constructor function.
+   *
+   * @param arguments Arguments passed in as CLI arguments.
+   */
   explicit ApplicationManager(KasX::App::CLI::CompiledArgument arguments);
   ~ApplicationManager();
 
