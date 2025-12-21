@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-15 12:34:31
-// Date modified: 2025-12-15 22:30:44
+// Date modified: 2025-12-21 14:09:48
 * ------
 */
 #pragma once
@@ -15,9 +15,9 @@
 
 namespace KasX::Compiler::DataStructures::Declarations {
 struct TypeDeclaration : public Declaration {
-  TypeDeclaration* parent;                   ///< Parent type declaration of the current type.
-  std::vector<TypeDeclaration*> children;    ///< Children types of this type.
-  std::vector<EntityDeclaration*> entities;  ///< Entities created using this type.
+  TypeDeclaration* parent;                  ///< Parent type declaration of the current type.
+  std::vector<TypeDeclaration> children;    ///< Children types of this type.
+  std::vector<EntityDeclaration> entities;  ///< Entities created using this type.
 
   /**
    * @brief Constructor function of the TypeDeclaration
@@ -31,7 +31,7 @@ struct TypeDeclaration : public Declaration {
    *
    * @param entity Entity with the current type.
    */
-  void addNewEntityDeclaration(EntityDeclaration* entity);
+  void addNewEntityDeclaration(const EntityDeclaration& entity);
 
   /**
    * @brief Add a parent that this type is inherited from.
@@ -45,6 +45,6 @@ struct TypeDeclaration : public Declaration {
    *
    * @param child Child type of this current type.
    */
-  void addChildType(TypeDeclaration child);
+  void addChildType(const TypeDeclaration& child);
 };
 }  // namespace KasX::Compiler::DataStructures::Declarations
