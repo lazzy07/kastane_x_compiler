@@ -3,13 +3,13 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-14 19:46:10
-// Date modified: 2025-12-14 19:53:17
+// Date modified: 2025-12-27 13:50:08
 * ------
 */
 
 #include <cstdint>
 
-namespace KasX::Compiler::Core::Scope {
+namespace KasX::Compiler::Core::Scopes {
 enum class SCOPE_TYPES : std::uint8_t { DEFAULT, GLOBAL, ACTION, TRIGGER, UTILITY };
 
 /**
@@ -21,7 +21,13 @@ enum class SCOPE_TYPES : std::uint8_t { DEFAULT, GLOBAL, ACTION, TRIGGER, UTILIT
  */
 class Scope {
  public:
+  /**
+   * @brief Scope constructor.
+   */
   Scope();
+  /**
+   * @brief Scope destructor.
+   */
   ~Scope();
 };
-}  // namespace KasX::Compiler::Core::Scope
+}  // namespace KasX::Compiler::Core::Scopes
