@@ -28,9 +28,9 @@ definition
     type character : location;
 */ 
 type_declaration
-  : TYPE_DEFINITION_KEYWORD IDENTIFIER DEFINITION_SEPARATOR                     # TypeDeclarationNoParents
-  | TYPE_DEFINITION_KEYWORD IDENTIFIER COLON types_list DEFINITION_SEPARATOR    # TypeDeclarationWithParents
+  : TYPE_DEFINITION_KEYWORD IDENTIFIER (COLON types_list)? DEFINITION_SEPARATOR # TypeDeclaration
   ;
+
 
 type_name
   : IDENTIFIER
