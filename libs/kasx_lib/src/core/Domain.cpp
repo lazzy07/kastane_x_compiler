@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-14 01:51:31
-// Date modified: 2025-12-21 15:17:44
+// Date modified: 2025-12-28 12:30:30
 * ------
 */
 
@@ -22,7 +22,7 @@ Domain::Domain(DomainData& data) : m_DomainData(std::move(data)) {
   CORE_TRACE("Domain initialized");
 };
 
-Domain::~Domain() { CORE_TRACE("Domain deleted"); };
+Domain::~Domain() { CORE_TRACE("Domain Terminated"); };
 
 void Domain::initVisitor() {
   CORE_TRACE("Visitor Started");
