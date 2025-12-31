@@ -3,13 +3,13 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 14:20:04
-// Date modified: 2025-12-28 13:27:54
+// Date modified: 2025-12-30 22:02:16
 * ------
 */
 #pragma once
 #include <any>
+#include <kasx/core/logging/TraceableClass.hpp>
 
-#include "../core/logging/TraceableClass.hpp"
 #include "AntlrSafeBase.hpp"
 #include "KasXParser.h"
 #include "kasx/Domain.hpp"
@@ -35,6 +35,13 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
    * @param ctx Type Declaration context
    */
   std::any visitTypeDeclaration(KasXParser::TypeDeclarationContext* ctx) override;
+
+  /**
+   * @brief Visitor function for types list (Eg: location, character)
+   *
+   * @param ctx Types list context
+   */
+  std::any visitTypesList(KasXParser::TypesListContext* ctx) override;
 
  private:
   Core::Domain* m_Domain;
