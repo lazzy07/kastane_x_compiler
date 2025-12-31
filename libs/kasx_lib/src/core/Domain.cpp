@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-14 01:51:31
-// Date modified: 2025-12-28 12:30:30
+// Date modified: 2025-12-30 22:06:41
 * ------
 */
 
@@ -11,10 +11,10 @@
 #include <kasx/Domain.hpp>
 #include <memory>
 
-#include "../visitors/AntlrSafeBase.hpp"
 #include "../visitors/AntlrSafeRuntime.hpp"
-#include "../visitors/ProgramVisitor.hpp"
 #include "kasx/Types.hpp"
+#include "kasx/visitors/AntlrSafeBase.hpp"
+#include "kasx/visitors/ProgramVisitor.hpp"
 
 namespace KasX::Compiler::Core {
 Domain::Domain(DomainData& data) : m_DomainData(std::move(data)) {
