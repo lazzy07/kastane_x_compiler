@@ -3,11 +3,13 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-14 01:49:32
-// Date modified: 2025-12-30 22:04:48
+// Date modified: 2026-01-01 10:11:55
 * ------
 */
 
 #pragma once
+
+#include <kasx/core/scopes/GlobalScope.hpp>
 
 #include "kasx/Types.hpp"
 
@@ -35,9 +37,20 @@ class Domain {
    */
   void initVisitor();
 
+  /**
+   * @brief Initializes default types number, boolean, entity and character types in the global scope.
+   */
   void initDefaultTypes();
 
+  /**
+   * @brief Getter for the global scope.
+   *
+   * @return Global scope.
+   */
+  const Scopes::GlobalScope* getGlobalScope() const { return &m_GlobalScope; };
+
  private:
+  Scopes::GlobalScope m_GlobalScope;
   DomainData m_DomainData;
   std::unique_ptr<Compiler::Visitors::ProgramVisitor> m_ProgramVisitor;
 };

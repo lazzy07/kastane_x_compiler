@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-14 01:51:31
-// Date modified: 2025-12-30 22:06:41
+// Date modified: 2026-01-01 13:46:04
 * ------
 */
 
@@ -13,6 +13,7 @@
 
 #include "../visitors/AntlrSafeRuntime.hpp"
 #include "kasx/Types.hpp"
+#include "kasx/debug/DomainFileTrace.hpp"
 #include "kasx/visitors/AntlrSafeBase.hpp"
 #include "kasx/visitors/ProgramVisitor.hpp"
 
@@ -41,5 +42,14 @@ void Domain::initVisitor() {
   m_ProgramVisitor->visit(tree);
 }
 
-void Domain::initDefaultTypes() {}
+void Domain::initDefaultTypes() {
+  CLI_TRACE("Default types initialization started");
+
+  m_GlobalScope.createTypeDeclaration("number", {}, Debug::DomainFileTrace::GetDefaultFileTrace());
+  m_GlobalScope.createTypeDeclaration("boolean", {}, Debug::DomainFileTrace::GetDefaultFileTrace());
+  m_GlobalScope.createTypeDeclaration("entity", {}, Debug::DomainFileTrace::GetDefaultFileTrace());
+  m_GlobalScope.createTypeDeclaration("character", {"entity"}, Debug::DomainFileTrace::GetDefaultFileTrace());
+
+  CLI_TRACE("Default types initialization finished");
+}
 }  // namespace KasX::Compiler::Core
