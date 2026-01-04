@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-27 14:55:27
-// Date modified: 2025-12-30 22:09:34
+// Date modified: 2026-01-01 10:01:18
 * ------
 */
 #pragma once
@@ -40,7 +40,15 @@ struct DomainFileTrace {
   TraceData start;  ///< Start of the debug trace.
   TraceData end;    ///< End of the debug trace.
 
+  /**
+   * @brief Trace data related to the domain file, where information exists etc.
+   *
+   * @param start Start of the trace.
+   * @param end End of the trace.
+   */
   DomainFileTrace(TraceData start, TraceData end) : start(start), end(end) {}
+
+  static DomainFileTrace GetDefaultFileTrace() { return DomainFileTrace({0, 0}, {0, 0}); }
 
   /**
    * @brief toString function returns information about the problem file position of the declaration
