@@ -47,6 +47,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# cmake helper files, (This needs to be run after the project is being set)
+include(Doxygen)              # Generating documentation uisng doxygen 
+
 log_status("General configs: FINISHED")
 
 # ########### Output folder configs #####################

@@ -1,5 +1,13 @@
 grammar KasX;
 
+/*
+* File name: KasX.g4
+* Project: KasX Compiler
+* Author: Lasantha M Senanayake
+* Date created: 2025-12-14 01:49:32
+* ------
+*/
+
 prog
   : definition* EOF                # Program
 ;       
@@ -20,9 +28,9 @@ definition
     type character : location;
 */ 
 type_declaration
-  : TYPE_DEFINITION_KEYWORD IDENTIFIER DEFINITION_SEPARATOR                     # TypeDeclarationNoParents
-  | TYPE_DEFINITION_KEYWORD IDENTIFIER COLON types_list DEFINITION_SEPARATOR    # TypeDeclarationWithParents
+  : TYPE_DEFINITION_KEYWORD IDENTIFIER (COLON types_list)? DEFINITION_SEPARATOR # TypeDeclaration
   ;
+
 
 type_name
   : IDENTIFIER

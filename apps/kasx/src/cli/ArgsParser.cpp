@@ -1,3 +1,12 @@
+/*
+* File name: ArgsParser.cpp
+* Project: KasX Compiler
+* Author: Lasantha M Senanayake
+* Date created: 2025-12-05 22:36:58
+// Date modified: 2025-12-14 13:16:11
+* ------
+*/
+
 #include "ArgsParser.hpp"
 
 #include <Log.hpp>

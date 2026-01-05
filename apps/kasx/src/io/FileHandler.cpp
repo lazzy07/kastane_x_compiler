@@ -1,3 +1,12 @@
+/*
+* File name: FileHandler.cpp
+* Project: KasX Compiler
+* Author: Lasantha M Senanayake
+* Date created: 2025-12-05 22:36:58
+// Date modified: 2025-12-14 12:58:07
+* ------
+*/
+
 #include "FileHandler.hpp"
 
 #include <Log.hpp>

@@ -1,9 +1,9 @@
 /*
-* File name: AntlrSafeRuntime.hpp
+* File name: AntlrSafeBase.hpp
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
-* Date created: 2025-12-21 14:17:54
-// Date modified: 2025-12-21 14:18:14
+* Date created: 2025-12-21 14:17:39
+// Date modified: 2025-12-21 14:17:45
 * ------
 */
 
@@ -20,9 +20,7 @@
 #define __KASX_EOF_PUSHED 1
 #endif
 
-#include <KasXLexer.h>
-#include <KasXParser.h>
-#include <antlr4-runtime.h>
+#include <KasXBaseVisitor.h>  // generated ANTLR header (pulls antlr4-common.h)
 
 #ifdef __KASX_EOF_PUSHED
 #pragma pop_macro("EOF")  // restore the macro exactly as it was

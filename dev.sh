@@ -34,6 +34,11 @@ run)
   "$EXECUTABLE" "$@"
   ;;
 
+docs)
+  echo "[dev] Building the Docs"
+  cmake --build "$BUILD_DIR" --target docs
+  ;;
+
 all)
   # configure + build + run
   echo "[dev] Configure + build + run…"
@@ -50,6 +55,7 @@ Commands:
   configure      Run CMake configure step (no clean).
   reconfigure    Delete \$BUILD_DIR and run CMake from scratch.
   build          Build the project.
+  docs           Generate the documentation.
   run [args...]  Run the built program with optional args.
   all            Configure, build, and run (no args to program).
 

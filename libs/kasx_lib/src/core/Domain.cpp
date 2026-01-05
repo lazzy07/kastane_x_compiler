@@ -1,23 +1,31 @@
-#include "Domain.hpp"
+/*
+* File name: Domain.cpp
+* Project: KasX Compiler
+* Author: Lasantha M Senanayake
+* Date created: 2025-12-14 01:51:31
+// Date modified: 2026-01-03 22:13:21
+* ------
+*/
 
 #include <Log.hpp>
+#include <kasx/Domain.hpp>
+#include <memory>
 
-#include "ActionScope.hpp"
-#include "KasXLexer.h"
+#include "../visitors/AntlrSafeRuntime.hpp"
+#include "kasx/Types.hpp"
+#include "kasx/debug/DomainFileTrace.hpp"
+#include "kasx/visitors/AntlrSafeBase.hpp"
+#include "kasx/visitors/ProgramVisitor.hpp"
 
-KasX::Compiler::Core::Domain::Domain(DomainData& data) {
-  CORE_TRACE("Domain Initialized");
+namespace KasX::Compiler::Core {
+Domain::Domain(DomainData& data) : m_DomainData(std::move(data)) {
+  m_ProgramVisitor = std::make_unique<Visitors::ProgramVisitor>(this);
+  CORE_TRACE("Domain initialized");
+};
 
-  m_DomainData = std::move(data);
-  m_ProgramVisitor = std::make_unique<Visitor::ProgramVisitor>(this);
+Domain::~Domain() { CORE_TRACE("Domain Terminated"); };
 
-  // Making the global scope the current scope at the begining
-  m_CurrentScope = &m_GlobalScope;
-}
-
-KasX::Compiler::Core::Domain::~Domain() { CORE_TRACE("Domain Terminated"); }
-
-void KasX::Compiler::Core::Domain::initVisitor() {
+void Domain::initVisitor() {
   CORE_TRACE("Visitor Started");
 
   antlr4::ANTLRInputStream input(m_DomainData.fileStream);
@@ -34,25 +42,15 @@ void KasX::Compiler::Core::Domain::initVisitor() {
   m_ProgramVisitor->visit(tree);
 }
 
-void KasX::Compiler::Core::Domain::initDefaultTypes() {
-  CLI_TRACE("Initial types added: number, boolean, entity, character");
+void Domain::initDefaultTypes() {
+  CLI_TRACE("Default types initialization started");
 
-  // Initializing default types of Sabre domains.
-  this->m_GlobalScope.initNewType("entity", {});
-  this->m_GlobalScope.initNewType("character", {});
-  this->m_GlobalScope.initNewType("number", {});
-  this->m_GlobalScope.initNewType("boolean", {});
+  m_GlobalScope.createTypeDeclaration("number", {}, Debug::DomainFileTrace::GetDefaultFileTrace());
+  m_GlobalScope.createTypeDeclaration("boolean", {}, Debug::DomainFileTrace::GetDefaultFileTrace());
+  m_GlobalScope.createTypeDeclaration("entity", {}, Debug::DomainFileTrace::GetDefaultFileTrace());
+  m_GlobalScope.createTypeDeclaration("character", {"entity"}, Debug::DomainFileTrace::GetDefaultFileTrace(),
+                                      DataStructures::Declarations::Declaration::MUTABILITY::MUTABLE);
+
+  CLI_TRACE("Default types initialization finished");
 }
-
-KasX::Compiler::Core::ActionScope* KasX::Compiler::Core::Domain::createActionScope(std::string name) {
-  ActionScope* currentScope = this->getGlobalScope()->createActionScope(name);
-  CLI_TRACE("Current scope changed to : {}", name);
-  m_CurrentScope = currentScope;
-
-  return currentScope;
-}
-
-void KasX::Compiler::Core::Domain::resetScope() {
-  m_CurrentScope = this->getGlobalScope();
-  CLI_TRACE("Current scope changed back to the global scope");
-}
+}  // namespace KasX::Compiler::Core
