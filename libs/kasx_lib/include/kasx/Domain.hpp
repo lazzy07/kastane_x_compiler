@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-14 01:49:32
-// Date modified: 2026-01-01 10:11:55
+// Date modified: 2026-01-04 22:26:28
 * ------
 */
 
@@ -47,7 +47,7 @@ class Domain {
    *
    * @return Global scope.
    */
-  const Scopes::GlobalScope* getGlobalScope() const { return &m_GlobalScope; };
+  Scopes::GlobalScope* getGlobalScope() { return &m_GlobalScope; };
 
  private:
   Scopes::GlobalScope m_GlobalScope;

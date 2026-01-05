@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 14:20:04
-// Date modified: 2025-12-30 22:02:16
+// Date modified: 2026-01-05 00:51:46
 * ------
 */
 #pragma once
@@ -13,6 +13,7 @@
 #include "AntlrSafeBase.hpp"
 #include "KasXParser.h"
 #include "kasx/Domain.hpp"
+#include "kasx/debug/DomainFileTrace.hpp"
 
 namespace KasX::Compiler::Visitors {
 /**
@@ -43,12 +44,23 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
    */
   std::any visitTypesList(KasXParser::TypesListContext* ctx) override;
 
+  /**
+   * @brief Visitor function for entity declaration.
+   *
+   * @param ctx Entity declaration context.
+   */
+  std::any visitEntityDeclaration(KasXParser::EntityDeclarationContext* ctx) override;
+
  private:
   Core::Domain* m_Domain;
 
   // ---- Printing messages (Trace)
-  static void printStartVisit(std::string_view type, std::string_view identifier);
+  static void PrintStartVisit(std::string_view type, std::string_view identifier);
 
-  static void printEndVisit(std::string_view type, std::string_view identifier);
+  static void PrintEndVisit(std::string_view type, std::string_view identifier);
+
+  static void EditParentsData(const std::string& typeDeclarationName, std::vector<std::string>& parents);
+
+  static Debug::DomainFileTrace getTraceData(antlr4::Token* startToken, antlr4::Token* endToken);
 };
 }  // namespace KasX::Compiler::Visitors

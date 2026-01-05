@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-14 01:51:31
-// Date modified: 2026-01-01 13:46:04
+// Date modified: 2026-01-03 22:13:21
 * ------
 */
 
@@ -48,7 +48,8 @@ void Domain::initDefaultTypes() {
   m_GlobalScope.createTypeDeclaration("number", {}, Debug::DomainFileTrace::GetDefaultFileTrace());
   m_GlobalScope.createTypeDeclaration("boolean", {}, Debug::DomainFileTrace::GetDefaultFileTrace());
   m_GlobalScope.createTypeDeclaration("entity", {}, Debug::DomainFileTrace::GetDefaultFileTrace());
-  m_GlobalScope.createTypeDeclaration("character", {"entity"}, Debug::DomainFileTrace::GetDefaultFileTrace());
+  m_GlobalScope.createTypeDeclaration("character", {"entity"}, Debug::DomainFileTrace::GetDefaultFileTrace(),
+                                      DataStructures::Declarations::Declaration::MUTABILITY::MUTABLE);
 
   CLI_TRACE("Default types initialization finished");
 }

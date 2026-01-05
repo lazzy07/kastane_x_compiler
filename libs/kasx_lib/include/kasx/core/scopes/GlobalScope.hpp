@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-27 11:39:34
-// Date modified: 2026-01-01 13:42:59
+// Date modified: 2026-01-05 01:52:39
 * ------
 */
 
@@ -11,6 +11,7 @@
 #include <kasx/debug/DomainFileTrace.hpp>
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 #include "Scope.hpp"
 #include "kasx/data_structures/declarations/EntityDeclaration.hpp"
@@ -41,7 +42,9 @@ class GlobalScope : public Scope {
    * @param trace File trace that keeps track of where the type exists in the domain file.
    */
   void createTypeDeclaration(const std::string& name, const std::vector<std::string>& parents,
-                             const Debug::DomainFileTrace& trace);
+                             const Debug::DomainFileTrace& trace,
+                             DataStructures::Declarations::TypeDeclaration::MUTABILITY mutablity =
+                                 DataStructures::Declarations::Declaration::MUTABILITY::IMMUTABLE);
 
   /**
    * @brief Move a type declaration, can be used when, parent changes
@@ -64,7 +67,7 @@ class GlobalScope : public Scope {
    * @param name name of the type delclaration.
    * @return DataStructures::Declarations::TypeDeclaration or nullptr
    */
-  const DataStructures::Declarations::TypeDeclaration* getTypeDeclaration(const std::string& name) const {
+  DataStructures::Declarations::TypeDeclaration* getTypeDeclaration(const std::string& name) const {
     auto iter = m_TypeDeclarations.find(name);
     if (iter == m_TypeDeclarations.end()) return nullptr;
     return iter->second.get();
@@ -76,16 +79,30 @@ class GlobalScope : public Scope {
    * @param name Name of the requested entity declaration.
    * @return DataStructures::Declarations::EntityDeclaration if found or nullptr
    */
-  const DataStructures::Declarations::EntityDeclaration* getEntityDeclaration(const std::string& name) const {
+  DataStructures::Declarations::EntityDeclaration* getEntityDeclaration(const std::string& name) const {
     auto iter = m_EntityDeclarations.find(name);
     if (iter == m_EntityDeclarations.end()) return nullptr;
     return iter->second.get();
   }
+
+  /**
+   * @brief Create a new entity declaration in global scope
+   *
+   * @param name Name of the entity
+   * @param types Type of the entity
+   * @param trace Debug file trace data to keep track of the domain file.
+   */
+  void createEntityDeclaration(const std::string& name, const std::vector<std::string>& types,
+                               const Debug::DomainFileTrace& trace);
 
  private:
   std::vector<std::unique_ptr<Scope>> m_ChildrenScopes;
 
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::TypeDeclaration>> m_TypeDeclarations;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::EntityDeclaration>> m_EntityDeclarations;
+
+  bool allParentTypesExists(const std::vector<std::string>& parents) const;
+  std::vector<DataStructures::Declarations::TypeDeclaration*> getAllParentDeclarations(
+      const std::vector<std::string>& parentNames) const;
 };
 }  // namespace KasX::Compiler::Core::Scopes

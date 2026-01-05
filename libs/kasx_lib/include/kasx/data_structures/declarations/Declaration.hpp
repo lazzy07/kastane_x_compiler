@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-15 12:37:24
-// Date modified: 2026-01-03 21:53:22
+// Date modified: 2026-01-03 22:47:43
 * ------
 */
 #pragma once
@@ -21,10 +21,11 @@ namespace KasX::Compiler::DataStructures::Declarations {
  *
  */
 struct Declaration {
+  enum class MUTABILITY : bool { IMMUTABLE, MUTABLE };
   std::string name;                   ///< Name of the declaration.
   DECLARATION_TYPES declarationType;  ///< Type of the declaration, check #DECLARATION_TYPES for more details.
   Debug::DomainFileTrace fileTrace;   ///< Debug information about where this declaration is at in the domain file.
-  bool isMutable;
+  MUTABILITY mutability;
 
   /**
    * @brief Declaration contructor function.
@@ -32,6 +33,9 @@ struct Declaration {
    * @param name Name of the declaration.
    * @param declarationType Type of the declaration, options are included in #DECLARATION_TYPES
    */
-  Declaration(std::string name, DECLARATION_TYPES declarationType, Debug::DomainFileTrace fileTrace, bool isMutable = false);
+  Declaration(std::string name, DECLARATION_TYPES declarationType, Debug::DomainFileTrace fileTrace,
+              MUTABILITY mutability = MUTABILITY::IMMUTABLE);
+
+  ~Declaration();
 };
 }  // namespace KasX::Compiler::DataStructures::Declarations

@@ -3,9 +3,11 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 15:12:03
-// Date modified: 2025-12-30 22:07:11
+// Date modified: 2026-01-05 01:02:45
 * ------
 */
+
+#include <fmt/base.h>
 
 #include <kasx/debug/DomainFileTrace.hpp>
 #include <kasx/visitors/ProgramVisitor.hpp>
@@ -17,6 +19,8 @@
 #include "kasx/Domain.hpp"
 
 namespace KasX::Compiler::Visitors {
+using std::string;
+
 ProgramVisitor::ProgramVisitor(Core::Domain* domain) : m_Domain(domain) { CORE_TRACE("ProgramVisitor Initialized"); }
 
 ProgramVisitor::~ProgramVisitor() { CORE_TRACE("ProgramVisitor Terminated"); }
@@ -24,11 +28,24 @@ ProgramVisitor::~ProgramVisitor() { CORE_TRACE("ProgramVisitor Terminated"); }
 std::any ProgramVisitor::visitTypeDeclaration(KasXParser::TypeDeclarationContext* ctx) {
   std::string typeDeclarationName = ctx->IDENTIFIER()->getText();
 
-  ProgramVisitor::printStartVisit("Type-Declaration", typeDeclarationName);
+  ProgramVisitor::PrintStartVisit("Type-Declaration", typeDeclarationName);
   // Setting trace data
-  antlr4::Token* startToken = ctx->getStart();
-  antlr4::Token* endToken = ctx->getStop();
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
 
+  CLI_TRACE("File trace: {}", trace.toString());
+  auto* tlContext = ctx->types_list();
+  auto parents =
+      (tlContext != nullptr) ? std::any_cast<std::vector<std::string>>(visit(tlContext)) : std::vector<std::string>{"entity"};
+
+  // When function arrives here, there is at least one parent associated to the type (entity type or other user-defined type)
+  this->m_Domain->getGlobalScope()->createTypeDeclaration(typeDeclarationName, parents, trace);
+
+  ProgramVisitor::PrintEndVisit("Type-Declaration", typeDeclarationName);
+
+  return 0;
+}
+
+Debug::DomainFileTrace ProgramVisitor::getTraceData(antlr4::Token* startToken, antlr4::Token* endToken) {
   Debug::DomainFileTrace::TraceData start{startToken->getLine(), startToken->getCharPositionInLine()};
 
   Debug::DomainFileTrace::TraceData end{endToken->getLine(),
@@ -37,22 +54,7 @@ std::any ProgramVisitor::visitTypeDeclaration(KasXParser::TypeDeclarationContext
   // Debug Trace created to trace bugs with the domain file.
   Debug::DomainFileTrace trace{start, end};
 
-  CLI_TRACE("File trace: {}", trace.toString());
-  auto* tlContext = ctx->types_list();
-  auto parents = (tlContext != nullptr) ? std::any_cast<std::vector<std::string>>(visit(tlContext)) : std::vector<std::string>{};
-
-  if (parents.size() > 0) {
-    CLI_TRACE("Type-Declaration '{}' has parents defined", typeDeclarationName);
-  } else {
-    parents.emplace_back("entity");  // Add 'entity' as a parent since there is no parent.
-    CLI_TRACE("Type-Declaration '{}' does not have any parents defined, defaults to 'entity' type", typeDeclarationName);
-  }
-
-  // When function arrives here there is at least one parent associated to the type (entity or user-defined)
-
-  ProgramVisitor::printEndVisit("Type-Declaration", typeDeclarationName);
-
-  return 0;
+  return trace;
 }
 
 std::any ProgramVisitor::visitTypesList(KasXParser::TypesListContext* ctx) {
@@ -68,7 +70,7 @@ std::any ProgramVisitor::visitTypesList(KasXParser::TypesListContext* ctx) {
   return out;
 }
 
-void ProgramVisitor::printStartVisit(std::string_view type, std::string_view identifier) {
+void ProgramVisitor::PrintStartVisit(std::string_view type, std::string_view identifier) {
   if (identifier.empty()) {
     CLI_TRACE("\n[Visitor] ----- Started visit - type: {}", type);
     return;
@@ -76,11 +78,40 @@ void ProgramVisitor::printStartVisit(std::string_view type, std::string_view ide
   CLI_TRACE("\n[Visitor] ----- Started visit - type: {}, id: '{}'", type, identifier);
 }
 
-void ProgramVisitor::printEndVisit(std::string_view type, std::string_view identifier) {
+void ProgramVisitor::PrintEndVisit(std::string_view type, std::string_view identifier) {
   if (identifier.empty()) {
     CLI_TRACE("[Visitor] ----- Ended visit - type: {}\n", type);
     return;
   }
   CLI_TRACE("[Visitor] ----- Ended visit - type: {}, id: '{}'\n", type, identifier);
 }
+
+void ProgramVisitor::EditParentsData(const string& typeDeclarationName, std::vector<std::string>& parents) {
+  if (parents.size() > 0) {
+    CLI_TRACE("Type-Declaration '{}' has parents defined", typeDeclarationName);
+  } else {
+    parents.emplace_back("entity");  // Add 'entity' as a parent since there is no parent.
+    CLI_TRACE("Type-Declaration '{}' does not have any parents defined, defaults to 'entity' type", typeDeclarationName);
+  }
+}
+
+std::any ProgramVisitor::visitEntityDeclaration(KasXParser::EntityDeclarationContext* ctx) {
+  const std::string& entityName = ctx->IDENTIFIER()->toString();
+
+  PrintStartVisit("Entity-Declaration", entityName);
+
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+
+  auto* tlContext = ctx->types_list();
+  auto types =
+      (tlContext != nullptr) ? std::any_cast<std::vector<std::string>>(visit(tlContext)) : std::vector<std::string>{"entity"};
+
+  m_Domain->getGlobalScope()->createEntityDeclaration(entityName, types, trace);
+
+  CLI_TRACE("File trace: {}", trace.toString());
+  PrintEndVisit("Entity-Declaration", entityName);
+
+  return 0;
+}
+
 }  // namespace KasX::Compiler::Visitors
