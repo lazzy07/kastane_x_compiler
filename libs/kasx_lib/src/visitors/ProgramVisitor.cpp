@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 15:12:03
-// Date modified: 2026-01-05 01:02:45
+// Date modified: 2026-01-10 00:15:52
 * ------
 */
 
@@ -110,6 +110,14 @@ std::any ProgramVisitor::visitEntityDeclaration(KasXParser::EntityDeclarationCon
 
   CLI_TRACE("File trace: {}", trace.toString());
   PrintEndVisit("Entity-Declaration", entityName);
+
+  return 0;
+}
+
+std::any ProgramVisitor::visitFluentDeclaration(KasXParser::FluentDeclarationContext* ctx) {
+  PrintStartVisit("Fluent-Declaration", fluentName);
+
+  PrintEndVisit("Fluent-Declaration", fluentName);
 
   return 0;
 }

@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 14:20:04
-// Date modified: 2026-01-05 00:51:46
+// Date modified: 2026-01-09 23:03:53
 * ------
 */
 #pragma once
@@ -50,6 +50,13 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
    * @param ctx Entity declaration context.
    */
   std::any visitEntityDeclaration(KasXParser::EntityDeclarationContext* ctx) override;
+
+  /**
+   * @brief Visitor function for a fluent declaration
+   *
+   * @param ctx Fluent declaration context
+   */
+  std::any visitFluentDeclaration(KasXParser::FluentDeclarationContext* ctx) override;
 
  private:
   Core::Domain* m_Domain;
