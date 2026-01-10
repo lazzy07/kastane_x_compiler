@@ -3,12 +3,11 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 13:52:44
-// Date modified: 2026-01-04 19:43:26
+// Date modified: 2026-01-09 23:04:07
 * ------
 */
 
 #include <kasx/data_structures/declarations/TypeDeclaration.hpp>
-#include <utility>
 #include <vector>
 
 #include "Log.hpp"
@@ -20,9 +19,6 @@ TypeDeclaration::TypeDeclaration(const std::string& name, const std::vector<Type
                                  Debug::DomainFileTrace trace, Declaration::MUTABILITY mutability)
     : Declaration(name, DECLARATION_TYPES::TYPE_DECL, trace, mutability), parents(parents) {
   CLI_TRACE("Type declaration added: {}", this->name);
-  for (TypeDeclaration* parentDecl : this->parents) {
-    parentDecl->addChildType(this);
-  }
 }
 
 void TypeDeclaration::addNewEntityDeclaration(EntityDeclaration* entity) {
