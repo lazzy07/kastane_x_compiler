@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-27 12:32:41
-// Date modified: 2026-03-20 15:41:14
+// Date modified: 2026-03-20 17:44:36
 * ------
 */
 
@@ -13,7 +13,9 @@
 
 #include "Log.hpp"
 #include "kasx/data_structures/declarations/Declaration.hpp"
+#include "kasx/data_structures/declarations/EntityDeclaration.hpp"
 #include "kasx/data_structures/declarations/TypeDeclaration.hpp"
+#include "kasx/data_structures/grounded/GroundedFluent.hpp"
 #include "kasx/debug/DomainFileTrace.hpp"
 
 namespace KasX::Compiler::Core::Scopes {
@@ -135,5 +137,62 @@ void GlobalScope::createFluentDeclaration(const std::string& name,
 
   m_FluentDeclarations.emplace(name,
                                std::make_unique<DataStructures::Declarations::FluentDeclaration>(name, header, type, trace));
+
+  this->groundFluentDeclaration(m_FluentDeclarations.find(name)->second.get());
+}
+
+void GlobalScope::groundFluentDeclaration(DataStructures::Declarations::FluentDeclaration* fluentDeclaration) {
+  auto params = fluentDeclaration->functionHeader.parameters;
+  std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>> entities;
+  entities.resize(params.size());
+  int index = 0;
+  for (auto& param : params) {
+    if (!param.isTypeDeclaration) {
+      entities.at(index).emplace_back(param.entityType);
+    } else {
+      auto& currPos = entities.at(index);
+      auto entitiesForParam = getAllEntitiesFromType(param.dataType);
+      currPos.insert(currPos.end(), entitiesForParam.begin(), entitiesForParam.end());
+    }
+    index++;
+  }
+  groundEntityVector(fluentDeclaration, entities);
+}
+
+std::vector<DataStructures::Declarations::EntityDeclaration*> GlobalScope::getAllEntitiesFromType(
+    DataStructures::Declarations::TypeDeclaration* type) {
+  std::vector<DataStructures::Declarations::EntityDeclaration*> entities;
+  entities.insert(entities.end(), type->entities.begin(), type->entities.end());
+  for (auto& child : type->children) {
+    auto childEntities = getAllEntitiesFromType(child);
+    entities.insert(entities.end(), childEntities.begin(), childEntities.end());
+  }
+  return entities;
+}
+
+void GlobalScope::groundEntityVector(
+    DataStructures::Declarations::FluentDeclaration* fluentDeclaration,
+    const std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>>& fluentVec) {
+  std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>> combinations = {{}};
+  for (const auto& paramVec : fluentVec) {
+    std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>> next;
+    for (const auto& current : combinations) {
+      for (auto* entity : paramVec) {
+        auto combo = current;
+        combo.push_back(entity);
+        next.push_back(std::move(combo));
+      }
+    }
+    combinations = std::move(next);
+  }
+  for (const auto& combo : combinations) {
+    createGroundedFluent(fluentDeclaration, combo);
+  }
+}
+
+void GlobalScope::createGroundedFluent(DataStructures::Declarations::FluentDeclaration* fluentDeclaration,
+                                       const std::vector<DataStructures::Declarations::EntityDeclaration*>& combo) {
+  auto groundedFluent = std::make_unique<DataStructures::Grounded::GroundedFluent>(fluentDeclaration, combo);
+  m_GroundedFluents.emplace(groundedFluent->name, std::move(groundedFluent));
 }
 }  // namespace KasX::Compiler::Core::Scopes
