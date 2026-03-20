@@ -3,12 +3,15 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 15:12:03
-// Date modified: 2026-01-10 00:15:52
+// Date modified: 2026-03-20 15:17:14
 * ------
 */
 
 #include <fmt/base.h>
 
+#include <any>
+#include <kasx/data_structures/declarations/FluentDeclaration.hpp>
+#include <kasx/data_structures/declarations/helpers/Parameter.hpp>
 #include <kasx/debug/DomainFileTrace.hpp>
 #include <kasx/visitors/ProgramVisitor.hpp>
 #include <vector>
@@ -115,11 +118,95 @@ std::any ProgramVisitor::visitEntityDeclaration(KasXParser::EntityDeclarationCon
 }
 
 std::any ProgramVisitor::visitFluentDeclaration(KasXParser::FluentDeclarationContext* ctx) {
-  PrintStartVisit("Fluent-Declaration", fluentName);
+  PrintStartVisit("Fluent-Declaration", "");
+  auto functionHeader = std::any_cast<DataStructures::Declarations::Helpers::FunctionHeader>(visit(ctx->function_header()));
+  const std::string& fluentName = functionHeader.name;
+  CLI_TRACE("Fluent name identified : {}", fluentName);
+
+  const std::string& dataTypeStr = ctx->data_type()->getText();
+
+  auto* dataType = m_Domain->getGlobalScope()->getTypeDeclaration(dataTypeStr);
+
+  if (dataType == nullptr) {
+    // TODO: lazzy07 - Handle error
+    CLI_ERROR("Could not find the fluent data type: {} for fluent: {}", dataTypeStr, fluentName);
+    return 0;
+  }
+
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+
+  auto fluent = DataStructures::Declarations::FluentDeclaration(fluentName, functionHeader, dataType, trace);
 
   PrintEndVisit("Fluent-Declaration", fluentName);
-
   return 0;
 }
 
+std::any ProgramVisitor::visitFunctionHeader(KasXParser::FunctionHeaderContext* ctx) {
+  const std::string& functionName = ctx->IDENTIFIER()->toString();
+
+  CLI_TRACE("Accessing function header: {}", functionName);
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto functionHeader = DataStructures::Declarations::Helpers::FunctionHeader(functionName, trace);
+  functionHeader.parameters =
+      std::any_cast<std::vector<DataStructures::Declarations::Helpers::Parameter>>(visit(ctx->param_list()));
+  CLI_TRACE("Accessing function header done");
+
+  return functionHeader;
+}
+
+std::any ProgramVisitor::visitParamList(KasXParser::ParamListContext* ctx) {
+  CLI_TRACE("Accessing param list");
+  std::vector<DataStructures::Declarations::Helpers::Parameter> out;
+  std::vector<KasXParser::ParamContext*> items = ctx->param();
+  out.reserve(items.size());
+
+  for (KasXParser::ParamContext* item : items) {
+    auto param = std::any_cast<DataStructures::Declarations::Helpers::Parameter>(visit(item));
+    out.push_back(param);
+  }
+
+  CLI_TRACE("Param list access done");
+
+  return out;
+}
+
+std::any ProgramVisitor::visitParam(KasXParser::ParamContext* ctx) {
+  const std::string& paramName = ctx->IDENTIFIER()->toString();
+  CLI_TRACE("Visiting param: {}", paramName);
+
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto param = DataStructures::Declarations::Helpers::Parameter(paramName, trace);
+
+  auto* const paramType = ctx->data_type();
+
+  if (paramType == nullptr) {
+    param.isTypeDeclaration = false;
+    CLI_TRACE("Param {} has been identified as an entity", paramName);
+    auto* entityType = m_Domain->getGlobalScope()->getEntityDeclaration(paramName);
+
+    if (entityType == nullptr) {
+      // TODO: lazzy07 - Handle error
+      CLI_ERROR("Entity type: {} not declared in the global scope", paramName);
+    } else {
+      param.entityType = entityType;
+      CLI_TRACE("Entity type found in the global scope: {} and added to the param: {}", entityType->name, param.name);
+    }
+  } else {
+    param.isTypeDeclaration = true;
+    const std::string& dataTypeStr = paramType->getText();
+    auto* dataType = m_Domain->getGlobalScope()->getTypeDeclaration(dataTypeStr);
+
+    if (dataType == nullptr) {
+      // TODO: lazzy07 - Handle error
+      CLI_ERROR("Could not find the data type: {} in the global scope for param: {}", dataTypeStr, param.name);
+    } else {
+      param.dataType = dataType;
+      CLI_TRACE("Param {} has been identified as data type: {}", param.name, param.dataType->name);
+    }
+  }
+
+  CLI_TRACE("Visiting param: {} done", param.name);
+
+  return param;
+}
 }  // namespace KasX::Compiler::Visitors

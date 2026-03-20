@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 14:20:04
-// Date modified: 2026-01-09 23:03:53
+// Date modified: 2026-03-19 18:08:47
 * ------
 */
 #pragma once
@@ -57,6 +57,27 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
    * @param ctx Fluent declaration context
    */
   std::any visitFluentDeclaration(KasXParser::FluentDeclarationContext* ctx) override;
+
+  /**
+   * @brief Visitor function for a function header
+   *
+   * @param ctx Function header context
+   */
+  std::any visitFunctionHeader(KasXParser::FunctionHeaderContext* ctx) override;
+
+  /**
+   * @brief Visitor function for parameter list
+   *
+   * @param ctx Parameter list context
+   */
+  std::any visitParamList(KasXParser::ParamListContext* ctx) override;
+
+  /**
+   * @brief Visitor function for the parameter
+   *
+   * @param ctx Parameter context
+   */
+  std::any visitParam(KasXParser::ParamContext* ctx) override;
 
  private:
   Core::Domain* m_Domain;
