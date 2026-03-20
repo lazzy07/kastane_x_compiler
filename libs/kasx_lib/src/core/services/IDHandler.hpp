@@ -3,9 +3,12 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2026-03-19 12:26:46
-// Date modified: 2026-03-19 12:39:07
+// Date modified: 2026-03-20 16:03:33
 * ------
 */
+
+#pragma once
+
 #include <kasx/Types.hpp>
 
 namespace KasX::Compiler::Core::Services {
