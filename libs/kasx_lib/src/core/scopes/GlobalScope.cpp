@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-27 12:32:41
-// Date modified: 2026-01-10 00:12:40
+// Date modified: 2026-03-20 15:41:14
 * ------
 */
 
@@ -122,4 +122,18 @@ void GlobalScope::createEntityDeclaration(const std::string& name, const std::ve
   }
 }
 
+void GlobalScope::createFluentDeclaration(const std::string& name,
+                                          const DataStructures::Declarations::Helpers::FunctionHeader& header,
+                                          const std::string& dataType, const Debug::DomainFileTrace& trace) {
+  auto* type = this->getTypeDeclaration(dataType);
+
+  if (type == nullptr) {
+    // TODO: lazzy07 - Handle error
+    CLI_ERROR("Data type: {} of the fluent: {} not found in global scope", dataType, name);
+    return;
+  }
+
+  m_FluentDeclarations.emplace(name,
+                               std::make_unique<DataStructures::Declarations::FluentDeclaration>(name, header, type, trace));
+}
 }  // namespace KasX::Compiler::Core::Scopes

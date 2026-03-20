@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 15:12:03
-// Date modified: 2026-03-20 15:17:14
+// Date modified: 2026-03-20 15:41:32
 * ------
 */
 
@@ -125,17 +125,9 @@ std::any ProgramVisitor::visitFluentDeclaration(KasXParser::FluentDeclarationCon
 
   const std::string& dataTypeStr = ctx->data_type()->getText();
 
-  auto* dataType = m_Domain->getGlobalScope()->getTypeDeclaration(dataTypeStr);
-
-  if (dataType == nullptr) {
-    // TODO: lazzy07 - Handle error
-    CLI_ERROR("Could not find the fluent data type: {} for fluent: {}", dataTypeStr, fluentName);
-    return 0;
-  }
-
   auto trace = getTraceData(ctx->getStart(), ctx->getStop());
 
-  auto fluent = DataStructures::Declarations::FluentDeclaration(fluentName, functionHeader, dataType, trace);
+  m_Domain->getGlobalScope()->createFluentDeclaration(fluentName, functionHeader, dataTypeStr, trace);
 
   PrintEndVisit("Fluent-Declaration", fluentName);
   return 0;
