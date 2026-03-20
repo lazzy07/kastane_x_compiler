@@ -3,9 +3,10 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-15 17:47:04
-// Date modified: 2026-03-20 15:14:57
+// Date modified: 2026-03-20 15:44:23
 * ------
 */
+#pragma once
 
 #include <utility>
 

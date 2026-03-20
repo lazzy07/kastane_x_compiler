@@ -3,9 +3,10 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2026-03-20 12:33:43
-// Date modified: 2026-03-20 12:52:28
+// Date modified: 2026-03-20 15:43:44
 * ------
 */
+#pragma once
 
 #include <kasx/debug/DomainFileTrace.hpp>
 
