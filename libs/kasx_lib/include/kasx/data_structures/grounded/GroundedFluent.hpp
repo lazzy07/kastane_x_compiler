@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2026-03-20 15:45:45
-// Date modified: 2026-03-20 18:53:11
+// Date modified: 2026-03-20 18:59:56
 * ------
 */
 
@@ -15,6 +15,7 @@
 #include "kasx/data_structures/declarations/EntityDeclaration.hpp"
 #include "kasx/data_structures/declarations/FluentDeclaration.hpp"
 #include "kasx/data_structures/declarations/TypeDeclaration.hpp"
+
 namespace KasX::Compiler::DataStructures::Grounded {
 /**
  * @class GroundedFluent
@@ -22,8 +23,8 @@ namespace KasX::Compiler::DataStructures::Grounded {
  *
  */
 struct GroundedFluent {
-  declaration_id id;
-  std::string name;                                        ///< Name of the grounded fluent, path(Castle, Mountain)
+  declaration_id id;                                       ///< ID for the fluent
+  std::string name;                                        ///< Name of the grounded fluent, path(Castle,Mountain)
   std::vector<Declarations::EntityDeclaration*> entities;  ///< Entities in the fluent
   Declarations::TypeDeclaration* type;                     ///< Type of the fluent
   Declarations::FluentDeclaration* parent;                 ///< Parent declaration of the grounded fluent
