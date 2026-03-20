@@ -3,18 +3,19 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-27 11:39:34
-// Date modified: 2026-01-05 01:52:39
+// Date modified: 2026-03-20 15:22:44
 * ------
 */
 
-#include <kasx/data_structures/declarations/TypeDeclaration.hpp>
-#include <kasx/debug/DomainFileTrace.hpp>
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
 #include "Scope.hpp"
 #include "kasx/data_structures/declarations/EntityDeclaration.hpp"
+#include "kasx/data_structures/declarations/FluentDeclaration.hpp"
+#include "kasx/data_structures/declarations/TypeDeclaration.hpp"
+#include "kasx/debug/DomainFileTrace.hpp"
 
 namespace KasX::Compiler::Core::Scopes {
 /**
@@ -100,6 +101,7 @@ class GlobalScope : public Scope {
 
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::TypeDeclaration>> m_TypeDeclarations;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::EntityDeclaration>> m_EntityDeclarations;
+  std::unordered_map<std::string, DataStructures::Declarations::FluentDeclaration> m_FluentDeclarations;
 
   bool allParentTypesExists(const std::vector<std::string>& parents) const;
   std::vector<DataStructures::Declarations::TypeDeclaration*> getAllParentDeclarations(

@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-14 01:51:31
-// Date modified: 2026-01-03 22:13:21
+// Date modified: 2026-03-20 14:20:29
 * ------
 */
 
@@ -44,7 +44,7 @@ void Domain::initVisitor() {
 
 void Domain::initDefaultTypes() {
   CLI_TRACE("Default types initialization started");
-
+  m_GlobalScope.createTypeDeclaration("?", {}, Debug::DomainFileTrace::GetDefaultFileTrace());
   m_GlobalScope.createTypeDeclaration("number", {}, Debug::DomainFileTrace::GetDefaultFileTrace());
   m_GlobalScope.createTypeDeclaration("boolean", {}, Debug::DomainFileTrace::GetDefaultFileTrace());
   m_GlobalScope.createTypeDeclaration("entity", {}, Debug::DomainFileTrace::GetDefaultFileTrace());

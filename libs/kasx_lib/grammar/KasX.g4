@@ -76,8 +76,7 @@ param_list
     to : place
 */
 param
-  : IDENTIFIER COLON data_type                                                     # ParamWithDataType
-  | IDENTIFIER                                                                     # ParamWithoutDataType
+  : IDENTIFIER (COLON data_type)?
   ;
 
 /* 

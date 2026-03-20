@@ -3,13 +3,16 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-15 17:47:04
-// Date modified: 2025-12-15 22:29:30
+// Date modified: 2026-03-20 15:14:57
 * ------
 */
 
-#include "./helpers/Parameter.hpp"
+#include <utility>
+
 #include "Declaration.hpp"
 #include "TypeDeclaration.hpp"
+#include "helpers/FunctionHeader.hpp"
+#include "kasx/debug/DomainFileTrace.hpp"
 
 namespace KasX::Compiler::DataStructures::Declarations {
 /**
@@ -18,7 +21,12 @@ namespace KasX::Compiler::DataStructures::Declarations {
  *
  */
 struct FluentDeclaration : public Declaration {
-  std::vector<Helpers::Parameter> parameters;  ///< Parameter data of the fluent
-  TypeDeclaration* dataType;                   ///< Datatype of the fluent eg: fluent(): dataType
+  Helpers::FunctionHeader functionHeader;  ///< Data related to function header, params & name
+  TypeDeclaration* dataType;               ///< Datatype of the fluent eg: fluent(): dataType
+
+  FluentDeclaration(std::string name, Helpers::FunctionHeader header, TypeDeclaration* dataType, Debug::DomainFileTrace trace)
+      : Declaration(std::move(name), DECLARATION_TYPES::FLUENT_DECL, trace),
+        functionHeader(std::move(header)),
+        dataType(dataType) {}
 };
 }  // namespace KasX::Compiler::DataStructures::Declarations
