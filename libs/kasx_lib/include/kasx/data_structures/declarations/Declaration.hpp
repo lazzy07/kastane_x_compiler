@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-15 12:37:24
-// Date modified: 2026-03-20 16:01:50
+// Date modified: 2026-03-20 23:44:17
 * ------
 */
 #pragma once
@@ -21,11 +21,11 @@ namespace KasX::Compiler::DataStructures::Declarations {
  *
  */
 struct Declaration : public Traceable {
-  declaration_id id;
   enum class MUTABILITY : bool { IMMUTABLE, MUTABLE };
-  std::string name;                   ///< Name of the declaration.
+  MUTABILITY mutability;              /// The declaration is mutable or not
   DECLARATION_TYPES declarationType;  ///< Type of the declaration, check #DECLARATION_TYPES for more details.
-  MUTABILITY mutability;
+  declaration_id id;                  ///< id of the declaration
+  std::string name;                   ///< Name of the declaration.
 
   /**
    * @brief Declaration contructor function.

@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-15 18:25:58
-// Date modified: 2026-03-20 12:48:22
+// Date modified: 2026-03-20 23:49:16
 * ------
 */
 
@@ -20,12 +20,18 @@ namespace KasX::Compiler::DataStructures::Declarations::Helpers {
  *
  */
 struct Parameter : public Traceable {
-  std::string name;  ///< Name of the parameter, coming from the domain file.
+  bool isTypeDeclaration;  ///< This will be true if the parameter type is an entity.
   TypeDeclaration*
       dataType;  ///< Type of the parameter, this will be null if the parameter type is just an entity instead of a type.
   EntityDeclaration* entityType;  ///< If the parameter is an entity, it will be pointed here.
-  bool isTypeDeclaration;         ///< This will be true if the parameter type is an entity.
+  std::string name;               ///< Name of the parameter, coming from the domain file.
 
+  /**
+   * @brief Structure for the parameter of a function
+   *
+   * @param name name of the parameter
+   * @param trace Debug file trace
+   */
   Parameter(std::string name, Debug::DomainFileTrace trace);
 };
 }  // namespace KasX::Compiler::DataStructures::Declarations::Helpers
