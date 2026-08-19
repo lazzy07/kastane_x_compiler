@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 14:20:04
-// Date modified: 2026-08-14 10:21:55
+// Date modified: 2026-08-19 00:27:50
 * ------
 */
 #pragma once
@@ -85,6 +85,13 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
    * @param ctx Initial State Declaration state
    */
   std::any visitInitialStateDecl(KasXParser::InitialStateDeclContext* ctx) override;
+
+  /**
+   * @brief Not expression visitor function
+   *
+   * @param ctx Not Expression context
+   */
+  std::any visitExprNot(KasXParser::ExprNotContext* ctx) override;
 
  private:
   Core::Domain* m_Domain;

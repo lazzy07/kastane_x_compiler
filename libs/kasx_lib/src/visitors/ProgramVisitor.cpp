@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 15:12:03
-// Date modified: 2026-03-20 15:41:32
+// Date modified: 2026-08-19 00:28:58
 * ------
 */
 
@@ -201,4 +201,15 @@ std::any ProgramVisitor::visitParam(KasXParser::ParamContext* ctx) {
 
   return param;
 }
+
+std::any ProgramVisitor::visitInitialStateDecl(KasXParser::InitialStateDeclContext* ctx) {
+  PrintStartVisit("InitialState-Declaration", "");
+
+  PrintEndVisit("InitialState-Declaration", "");
+
+  return nullptr;
+}
+
+std::any ProgramVisitor::visitExprNot(KasXParser::ExprNotContext* ctx) {}
+
 }  // namespace KasX::Compiler::Visitors
