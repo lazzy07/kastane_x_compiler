@@ -3,11 +3,11 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2026-04-10 15:04:38
-// Date modified: 2026-08-19 00:59:48
+// Date modified: 2026-08-19 14:21:50
 * ------
 */
 
 #include <cstdint>
 namespace KasX::Compiler::DataStructures::Expressions {
-enum class UNARY_OPERATION_TYPES : std::uint8_t { UNARY_NOT };
+enum class UNARY_OPERATION_TYPES : std::uint8_t { UNARY_NOT, UNARY_NEGATION };
 }
