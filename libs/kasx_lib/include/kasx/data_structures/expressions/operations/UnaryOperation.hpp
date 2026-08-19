@@ -3,13 +3,11 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2026-08-18 23:40:48
-// Date modified: 2026-08-18 23:51:59
+// Date modified: 2026-08-19 01:09:28
 * ------
 */
 
 #pragma once
-
-#include <memory>
 
 #include "UnaryOperationTypes.hpp"
 #include "kasx/Domain.hpp"
@@ -21,7 +19,7 @@ namespace KasX::Compiler::DataStructures::Expressions {
  *
  */
 struct UnaryOpearation : public Expression {
-  std::unique_ptr<Expression> left;
+  Expression left;
   UNARY_OPERATION_TYPES operationType;
 };
 }  // namespace KasX::Compiler::DataStructures::Expressions

@@ -3,21 +3,19 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2026-08-18 23:37:04
-// Date modified: 2026-08-18 23:41:55
+// Date modified: 2026-08-19 01:09:52
 * ------
 */
 
 #pragma once
-
-#include <memory>
 
 #include "BinaryOperationTypes.hpp"
 #include "kasx/Domain.hpp"
 
 namespace KasX::Compiler::DataStructures::Expressions {
 struct BinaryOperation : public Expression {
-  std::unique_ptr<Expression> left;
-  std::unique_ptr<Expression> right;
+  Expression left;
+  Expression right;
 
   BINARY_OPERATION_TYPES operationType;
 };
