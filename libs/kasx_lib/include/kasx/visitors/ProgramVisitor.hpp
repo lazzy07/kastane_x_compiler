@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 14:20:04
-// Date modified: 2026-08-19 00:27:50
+// Date modified: 2026-08-19 14:28:27
 * ------
 */
 #pragma once
@@ -92,6 +92,27 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
    * @param ctx Not Expression context
    */
   std::any visitExprNot(KasXParser::ExprNotContext* ctx) override;
+
+  /**
+   * @brief Negation expression
+   *
+   * @param ctx Negation expression context
+   */
+  std::any visitExprNegation(KasXParser::ExprNegationContext* ctx) override;
+
+  /**
+   * @brief Expression in a bracket (just returns whatever inside the brackets as an expression)
+   *
+   * @param ctx Expression in a bracket context
+   */
+  std::any visitExprInBracket(KasXParser::ExprInBracketContext* ctx) override;
+
+  /**
+   * @brief Binary operation visitor function returns the operation and its operands as Expression
+   *
+   * @param ctx Binary operation context
+   */
+  std::any visitExprBinaryOp(KasXParser::ExprBinaryOpContext* ctx) override;
 
  private:
   Core::Domain* m_Domain;

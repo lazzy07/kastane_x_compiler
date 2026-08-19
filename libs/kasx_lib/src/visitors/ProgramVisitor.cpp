@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 15:12:03
-// Date modified: 2026-08-19 01:09:09
+// Date modified: 2026-08-19 14:56:59
 * ------
 */
 
@@ -20,6 +20,7 @@
 #include "Log.hpp"
 #include "Token.h"
 #include "kasx/Domain.hpp"
+#include "kasx/data_structures/declarations/Declaration.hpp"
 #include "kasx/data_structures/expressions/operations/UnaryOperation.hpp"
 
 namespace KasX::Compiler::Visitors {
@@ -210,9 +211,85 @@ std::any ProgramVisitor::visitInitialStateDecl(KasXParser::InitialStateDeclConte
 }
 
 std::any ProgramVisitor::visitExprNot(KasXParser::ExprNotContext* ctx) {
-  DataStructures::Expressions::UnaryOpearation expression;
-  expression.left =
-      std::any_cast<DataStructures::Expressions::Expression>(visit(ctx->unary_not_expression()->arithmetic_expression()));
-  return expression;
+  auto anyResult = visit(ctx->unary_not_expression()->arithmetic_expression());
+  auto* expression = std::any_cast<DataStructures::Expressions::Expression>(&anyResult);
+
+  if (expression == nullptr) {
+    // TODO: lazzy07 - Handle error
+    CLI_ERROR("Expression to '!' operator cannot be null");
+    return nullptr;
+  }
+
+  if (expression->expressionType != DataStructures::Expressions::EXPRESSION_TYPES::BINARY_OPERATION) {
+    // TODO: lazzy07 - Handle error
+    CLI_ERROR("Expression '!' only acccepts boolean values");
+    return nullptr;
+  }
+
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  DataStructures::Expressions::UnaryOpearation operation(DataStructures::Expressions::UNARY_OPERATION_TYPES::UNARY_NOT,
+                                                         "Unary Not", *expression, trace);
+  return operation;
+}
+
+std::any ProgramVisitor::visitExprNegation(KasXParser::ExprNegationContext* ctx) {
+  auto anyResult = visit(ctx->negation_expression()->arithmetic_expression());
+  auto* expression = std::any_cast<DataStructures::Expressions::Expression>(&anyResult);
+
+  if (expression == nullptr) {
+    // TODO: lazzy07 - Handle error
+    CLI_ERROR("Expression to '-' operator cannot be null");
+    return nullptr;
+  }
+
+  if (expression->expressionType != DataStructures::Expressions::EXPRESSION_TYPES::NUMBER_OPERATION) {
+    // TODO: lazzy07 - Handle error
+    CLI_ERROR("Expression '-' only acccepts number values");
+    return nullptr;
+  }
+
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  DataStructures::Expressions::UnaryOpearation operation(DataStructures::Expressions::UNARY_OPERATION_TYPES::UNARY_NEGATION,
+                                                         "Unary Negation", *expression, trace);
+  return operation;
+}
+
+std::any ProgramVisitor::visitExprInBracket(KasXParser::ExprInBracketContext* ctx) {
+  auto anyResult = visit(ctx->arithmetic_expression());
+  auto* expression = std::any_cast<DataStructures::Expressions::Expression>(&anyResult);
+
+  if (expression == nullptr) {
+    // TODO: lazzy07 - Handle error
+    CLI_ERROR("Expression inside brackets cannot be null");
+    return nullptr;
+  }
+
+  return *expression;
+}
+
+std::any ProgramVisitor::visitExprBinaryOp(KasXParser::ExprBinaryOpContext* ctx) {
+  auto leftResult = visit(ctx->arithmetic_expression(0));
+  auto rightResult = visit(ctx->arithmetic_expression(1));
+
+  auto* leftExpression = std::any_cast<DataStructures::Expressions::Expression>(&leftResult);
+  auto* rightExpression = std::any_cast<DataStructures::Expressions::Expression>(&rightResult);
+
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+
+  if (leftExpression == nullptr) {
+    // TODO: lazzy07 - Handle error
+    CLI_ERROR("Left side of a binary operation cannot be null");
+    return nullptr;
+  }
+
+  if (rightExpression == nullptr) {
+    // If the right side of the operation is null, and if the left side is a fluent, that means it must be set to be true
+    if (leftExpression->expressionType == DataStructures::Expressions::EXPRESSION_TYPES::FLUENT) {
+    }
+
+    // TODO: lazzy07 - Handle error
+    CLI_ERROR("Left side of the binary operation is not a fluent, so right side cannot be null");
+    return nullptr;
+  }
 }
 }  // namespace KasX::Compiler::Visitors
