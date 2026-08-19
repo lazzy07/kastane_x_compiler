@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 15:12:03
-// Date modified: 2026-08-19 00:28:58
+// Date modified: 2026-08-19 01:09:09
 * ------
 */
 
@@ -20,6 +20,7 @@
 #include "Log.hpp"
 #include "Token.h"
 #include "kasx/Domain.hpp"
+#include "kasx/data_structures/expressions/operations/UnaryOperation.hpp"
 
 namespace KasX::Compiler::Visitors {
 using std::string;
@@ -204,12 +205,14 @@ std::any ProgramVisitor::visitParam(KasXParser::ParamContext* ctx) {
 
 std::any ProgramVisitor::visitInitialStateDecl(KasXParser::InitialStateDeclContext* ctx) {
   PrintStartVisit("InitialState-Declaration", "");
-
   PrintEndVisit("InitialState-Declaration", "");
-
   return nullptr;
 }
 
-std::any ProgramVisitor::visitExprNot(KasXParser::ExprNotContext* ctx) {}
-
+std::any ProgramVisitor::visitExprNot(KasXParser::ExprNotContext* ctx) {
+  DataStructures::Expressions::UnaryOpearation expression;
+  expression.left =
+      std::any_cast<DataStructures::Expressions::Expression>(visit(ctx->unary_not_expression()->arithmetic_expression()));
+  return expression;
+}
 }  // namespace KasX::Compiler::Visitors
