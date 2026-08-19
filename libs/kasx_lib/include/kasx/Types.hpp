@@ -3,12 +3,14 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-14 12:57:38
-// Date modified: 2025-12-14 12:57:50
+// Date modified: 2026-08-18 00:17:11
 * ------
 */
 
 #pragma once
 
+#include <cmath>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 
@@ -49,4 +51,8 @@ struct DomainData {
   std::ifstream fileStream;  ///<  Content of the problem file as a filestream
   Path path;                 ///<  Path of the problem file
 };
+
+// Integer size used in the compiler
+using kasx_number = std::float_t;
+
 }  // namespace KasX
