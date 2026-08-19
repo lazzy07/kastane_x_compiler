@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-27 11:39:34
-// Date modified: 2026-03-20 17:39:54
+// Date modified: 2026-08-17 23:38:09
 * ------
 */
 
@@ -15,6 +15,7 @@
 #include "kasx/data_structures/declarations/EntityDeclaration.hpp"
 #include "kasx/data_structures/declarations/FluentDeclaration.hpp"
 #include "kasx/data_structures/declarations/TypeDeclaration.hpp"
+#include "kasx/data_structures/expressions/Expression.hpp"
 #include "kasx/data_structures/grounded/GroundedFluent.hpp"
 #include "kasx/debug/DomainFileTrace.hpp"
 
@@ -123,6 +124,8 @@ class GlobalScope : public Scope {
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::FluentDeclaration>> m_FluentDeclarations;
 
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Grounded::GroundedFluent>> m_GroundedFluents;
+
+  std::vector<KasX::Compiler::DataStructures::Expressions::Expression> m_InitialState;  ///< Values of the fluents at this state.
 
   bool allParentTypesExists(const std::vector<std::string>& parents) const;
 
