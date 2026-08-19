@@ -3,14 +3,17 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2026-08-18 23:40:48
-// Date modified: 2026-08-19 01:09:28
+// Date modified: 2026-08-19 14:18:43
 * ------
 */
 
 #pragma once
 
+#include <utility>
+
 #include "UnaryOperationTypes.hpp"
 #include "kasx/Domain.hpp"
+#include "kasx/debug/DomainFileTrace.hpp"
 
 namespace KasX::Compiler::DataStructures::Expressions {
 /**
@@ -19,7 +22,11 @@ namespace KasX::Compiler::DataStructures::Expressions {
  *
  */
 struct UnaryOpearation : public Expression {
-  Expression left;
+  Expression expression;
   UNARY_OPERATION_TYPES operationType;
+
+  UnaryOpearation(UNARY_OPERATION_TYPES operationType, const std::string& name, Expression expression,
+                  Debug::DomainFileTrace trace)
+      : Expression(false, EXPRESSION_TYPES::UNARY_OPERATION, name, trace), expression(std::move(expression)) {}
 };
 }  // namespace KasX::Compiler::DataStructures::Expressions
