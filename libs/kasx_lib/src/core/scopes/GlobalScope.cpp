@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-27 12:32:41
-// Date modified: 2026-03-20 17:44:36
+// Date modified: 2026-08-20 13:40:56
 * ------
 */
 
@@ -47,6 +47,7 @@ void GlobalScope::createTypeDeclaration(const std::string& name, const std::vect
 
   if (!parentTypesExists) {
     CLI_ERROR("Unrecoverable error!, one or more parent types not found to declare the new type '{}'", name);
+    return;
   }
 
   // All the parent types exists by this line.
@@ -194,5 +195,20 @@ void GlobalScope::createGroundedFluent(DataStructures::Declarations::FluentDecla
                                        const std::vector<DataStructures::Declarations::EntityDeclaration*>& combo) {
   auto groundedFluent = std::make_unique<DataStructures::Grounded::GroundedFluent>(fluentDeclaration, combo);
   m_GroundedFluents.emplace(groundedFluent->name, std::move(groundedFluent));
+}
+
+void GlobalScope::addInitialStateExpression(DataStructures::Expressions::ExpressionPtr expression) {
+  CLI_TRACE("Adding initial state expression: {}", expression->name);
+  m_InitialState.emplace_back(std::move(expression));
+}
+
+DataStructures::Grounded::GroundedFluent* GlobalScope::getGroundedFluentByName(const std::string& name) {
+  auto itr = m_GroundedFluents.find(name);
+
+  if (itr == nullptr) {
+    return nullptr;
+  }
+
+  return itr->second.get();
 }
 }  // namespace KasX::Compiler::Core::Scopes

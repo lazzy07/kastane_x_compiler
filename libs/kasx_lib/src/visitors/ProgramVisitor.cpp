@@ -3,17 +3,16 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 15:12:03
-// Date modified: 2026-08-19 15:20:03
+// Date modified: 2026-08-20 14:47:49
 * ------
 */
-
-#include <fmt/base.h>
 
 #include <any>
 #include <kasx/data_structures/declarations/FluentDeclaration.hpp>
 #include <kasx/data_structures/declarations/helpers/Parameter.hpp>
 #include <kasx/debug/DomainFileTrace.hpp>
 #include <kasx/visitors/ProgramVisitor.hpp>
+#include <string>
 #include <vector>
 
 #include "KasXParser.h"
@@ -21,6 +20,10 @@
 #include "Token.h"
 #include "kasx/Domain.hpp"
 #include "kasx/data_structures/declarations/Declaration.hpp"
+#include "kasx/data_structures/expressions/Believes.hpp"
+#include "kasx/data_structures/expressions/Fluent.hpp"
+#include "kasx/data_structures/expressions/data_types/Number.hpp"
+#include "kasx/data_structures/expressions/operations/BinaryOperation.hpp"
 #include "kasx/data_structures/expressions/operations/UnaryOperation.hpp"
 
 namespace KasX::Compiler::Visitors {
@@ -206,90 +209,287 @@ std::any ProgramVisitor::visitParam(KasXParser::ParamContext* ctx) {
 
 std::any ProgramVisitor::visitInitialStateDecl(KasXParser::InitialStateDeclContext* ctx) {
   PrintStartVisit("InitialState-Declaration", "");
-  PrintEndVisit("InitialState-Declaration", "");
+
+  auto anyResult = visit(ctx->arithmetic_expression());
+  auto* expression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&anyResult);
+
+  if (expression == nullptr || *expression == nullptr) {
+    // TODO: lazzy07 - Handle error
+    CLI_ERROR("Initial-State expression could not be resolved");
+    PrintEndVisit("InitialState-Declaration", "");
+    return nullptr;
+  }
+
+  m_Domain->getGlobalScope()->addInitialStateExpression(*expression);
+
+  PrintEndVisit("InitialState-Declaration", (*expression)->name);
   return nullptr;
 }
 
 std::any ProgramVisitor::visitExprNot(KasXParser::ExprNotContext* ctx) {
   auto anyResult = visit(ctx->unary_not_expression()->arithmetic_expression());
-  auto* expression = std::any_cast<DataStructures::Expressions::Expression>(&anyResult);
+  auto* expression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&anyResult);
 
-  if (expression == nullptr) {
+  if (expression == nullptr || *expression == nullptr) {
     // TODO: lazzy07 - Handle error
     CLI_ERROR("Expression to '!' operator cannot be null");
-    return nullptr;
+    return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
 
-  if (expression->expressionType != DataStructures::Expressions::EXPRESSION_TYPES::BINARY_OPERATION) {
+  // Anything that isn't inherently a number or a bare identifier can be a boolean value: a fluent (eg: !alive(Aladdin)), a
+  // binary operation's result (eg: !(a == b)), another negation, or a belief about one of those (eg: !believes(Nazis,
+  // dangerous(Ark))).
+  auto negatedType = (*expression)->expressionType;
+  if (negatedType == DataStructures::Expressions::EXPRESSION_TYPES::NUMBER_OPERATION ||
+      negatedType == DataStructures::Expressions::EXPRESSION_TYPES::IDENTIFIER) {
     // TODO: lazzy07 - Handle error
     CLI_ERROR("Expression '!' only acccepts boolean values");
-    return nullptr;
+    return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
 
   auto trace = getTraceData(ctx->getStart(), ctx->getStop());
-  DataStructures::Expressions::UnaryOpearation operation(DataStructures::Expressions::UNARY_OPERATION_TYPES::UNARY_NOT,
-                                                         "Unary Not", *expression, trace);
-  return operation;
+  auto operation = std::make_shared<DataStructures::Expressions::UnaryOpearation>(
+      DataStructures::Expressions::UNARY_OPERATION_TYPES::UNARY_NOT, "Unary Not", *expression, trace);
+  return DataStructures::Expressions::ExpressionPtr(operation);
 }
 
 std::any ProgramVisitor::visitExprNegation(KasXParser::ExprNegationContext* ctx) {
   auto anyResult = visit(ctx->negation_expression()->arithmetic_expression());
-  auto* expression = std::any_cast<DataStructures::Expressions::Expression>(&anyResult);
+  auto* expression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&anyResult);
 
-  if (expression == nullptr) {
+  if (expression == nullptr || *expression == nullptr) {
     // TODO: lazzy07 - Handle error
     CLI_ERROR("Expression to '-' operator cannot be null");
-    return nullptr;
+    return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
 
-  if (expression->expressionType != DataStructures::Expressions::EXPRESSION_TYPES::NUMBER_OPERATION) {
+  if ((*expression)->expressionType != DataStructures::Expressions::EXPRESSION_TYPES::NUMBER_OPERATION) {
     // TODO: lazzy07 - Handle error
     CLI_ERROR("Expression '-' only acccepts number values");
-    return nullptr;
+    return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
 
   auto trace = getTraceData(ctx->getStart(), ctx->getStop());
-  DataStructures::Expressions::UnaryOpearation operation(DataStructures::Expressions::UNARY_OPERATION_TYPES::UNARY_NEGATION,
-                                                         "Unary Negation", *expression, trace);
-  return operation;
+  auto operation = std::make_shared<DataStructures::Expressions::UnaryOpearation>(
+      DataStructures::Expressions::UNARY_OPERATION_TYPES::UNARY_NEGATION, "Unary Negation", *expression, trace);
+  return DataStructures::Expressions::ExpressionPtr(operation);
 }
 
 std::any ProgramVisitor::visitExprInBracket(KasXParser::ExprInBracketContext* ctx) {
   auto anyResult = visit(ctx->arithmetic_expression());
-  auto* expression = std::any_cast<DataStructures::Expressions::Expression>(&anyResult);
+  auto* expression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&anyResult);
 
-  if (expression == nullptr) {
+  if (expression == nullptr || *expression == nullptr) {
     // TODO: lazzy07 - Handle error
     CLI_ERROR("Expression inside brackets cannot be null");
-    return nullptr;
+    return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
 
   return *expression;
+}
+
+DataStructures::Expressions::BINARY_OPERATION_TYPES ProgramVisitor::getBinaryOperationType(KasXParser::Binary_opContext* ctx) {
+  using DataStructures::Expressions::BINARY_OPERATION_TYPES;
+
+  switch (ctx->op->getType()) {
+    case KasXParser::SUBTRACTION_KEYWORD:
+      return BINARY_OPERATION_TYPES::SUBSTRACTION;
+    case KasXParser::ADDITION_KEYWORD:
+      return BINARY_OPERATION_TYPES::ADDITION;
+    case KasXParser::DIVISION_KEYWORD:
+      return BINARY_OPERATION_TYPES::DIVISION;
+    case KasXParser::MULTIPLICATION_KEYWORD:
+      return BINARY_OPERATION_TYPES::MULTIPLICATION;
+    case KasXParser::LESS_THAN_KEYWORD:
+      return BINARY_OPERATION_TYPES::LESS_THAN;
+    case KasXParser::GREATER_THAN_KEYWORD:
+      return BINARY_OPERATION_TYPES::GREATER_THAN;
+    case KasXParser::LESS_THAN_OR_EQUAL_TO_KEYWORD:
+      return BINARY_OPERATION_TYPES::LESS_THAN_OR_EQUAL;
+    case KasXParser::GREATER_THAN_OR_EQUAL_TO_KEYWORD:
+      return BINARY_OPERATION_TYPES::GREATER_THAN_OR_EQUAL;
+    case KasXParser::NOT_EQUAL_TO_KEYWORD:
+      return BINARY_OPERATION_TYPES::NOT_EQUAL;
+    case KasXParser::EQUAL_TO_KEYWORD:
+      return BINARY_OPERATION_TYPES::EQUAL_TO;
+    case KasXParser::ASSIGNMENT_KEYWORD:
+      return BINARY_OPERATION_TYPES::ASSIGNMENT;
+    case KasXParser::DISJUNCTION_KEYWORD:
+      return BINARY_OPERATION_TYPES::DISJUNCTION;
+    case KasXParser::CONJUNCTION_KEYWORD:
+      return BINARY_OPERATION_TYPES::CONJUNCTION;
+    case KasXParser::COLON:
+      return BINARY_OPERATION_TYPES::INHERITANCE;
+    default:
+      // TODO: lazzy07 - Handle error
+      CLI_ERROR("Unknown binary operator: {}", ctx->getText());
+      return BINARY_OPERATION_TYPES::EQUAL_TO;
+  }
 }
 
 std::any ProgramVisitor::visitExprBinaryOp(KasXParser::ExprBinaryOpContext* ctx) {
   auto leftResult = visit(ctx->arithmetic_expression(0));
   auto rightResult = visit(ctx->arithmetic_expression(1));
 
-  auto* leftExpression = std::any_cast<DataStructures::Expressions::Expression>(&leftResult);
-  auto* rightExpression = std::any_cast<DataStructures::Expressions::Expression>(&rightResult);
+  auto* leftExpression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&leftResult);
+  auto* rightExpression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&rightResult);
 
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
-
-  if (leftExpression == nullptr) {
+  if (leftExpression == nullptr || *leftExpression == nullptr) {
     // TODO: lazzy07 - Handle error
     CLI_ERROR("Left side of a binary operation cannot be null");
-    return nullptr;
+    return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
 
-  if (rightExpression == nullptr) {
-    // If the right side of the operation is null, and if the left side is a fluent, that means it must be set to be true
-    if (leftExpression->expressionType == DataStructures::Expressions::EXPRESSION_TYPES::FLUENT) {
-    }
-
+  if (rightExpression == nullptr || *rightExpression == nullptr) {
     // TODO: lazzy07 - Handle error
-    CLI_ERROR("Left side of the binary operation is not a fluent, so right side cannot be null");
+    CLI_ERROR("Right side of a binary operation cannot be null");
+    return DataStructures::Expressions::ExpressionPtr(nullptr);
+  }
+
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto operationType = getBinaryOperationType(ctx->binary_op());
+  std::string operationName = (*leftExpression)->name + " " + ctx->binary_op()->getText() + " " + (*rightExpression)->name;
+
+  auto operation = std::make_shared<DataStructures::Expressions::BinaryOperation>(operationType, operationName, *leftExpression,
+                                                                                  *rightExpression, trace);
+
+  return DataStructures::Expressions::ExpressionPtr(operation);
+}
+
+std::any ProgramVisitor::visitFluentVal(KasXParser::FluentValContext* ctx) {
+  const std::string& fluentName = ctx->IDENTIFIER()->getText();
+  CLI_TRACE("Visiting fluent: {}", fluentName);
+
+  std::vector<std::string> arguments;
+  auto* argListCtx = ctx->argument_list();
+  if (argListCtx != nullptr) {
+    arguments = std::any_cast<std::vector<std::string>>(visit(argListCtx));
+  }
+
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto fluent = std::make_shared<DataStructures::Expressions::Fluent>(fluentName, arguments, trace);
+  auto* groundedFluent = m_Domain->getGlobalScope()->getGroundedFluentByName(fluent->name);
+
+  if (groundedFluent == nullptr) {
+    CLI_ERROR("Grounded fluent is not available in the global scope: {}", fluent->name);
     return nullptr;
   }
+
+  CLI_TRACE("Grounded fluent found: {}", fluent->name);
+  fluent->groundedFluent = groundedFluent;
+
+  CLI_TRACE("Visiting fluent: {} done", fluentName);
+  return DataStructures::Expressions::ExpressionPtr(fluent);
+}
+
+std::any ProgramVisitor::visitArgumentList(KasXParser::ArgumentListContext* ctx) {
+  CLI_TRACE("Accessing argument list");
+  std::vector<std::string> out;
+  std::vector<antlr4::tree::TerminalNode*> items = ctx->IDENTIFIER();
+  out.reserve(items.size());
+
+  for (auto* item : items) {
+    out.emplace_back(item->getText());
+  }
+  CLI_TRACE("Argument list access done");
+  return out;
+}
+
+std::any ProgramVisitor::visitExprFluent(KasXParser::ExprFluentContext* ctx) { return visit(ctx->fluent()); }
+
+std::any ProgramVisitor::visitExprIdentifier(KasXParser::ExprIdentifierContext* ctx) {
+  const std::string& identifierName = ctx->IDENTIFIER()->getText();
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+
+  auto identifier = std::make_shared<DataStructures::Expressions::Expression>(
+      true, DataStructures::Expressions::EXPRESSION_TYPES::IDENTIFIER, identifierName, trace);
+
+  return DataStructures::Expressions::ExpressionPtr(identifier);
+}
+
+std::any ProgramVisitor::visitExprNumber(KasXParser::ExprNumberContext* ctx) {
+  const std::string& numberText = ctx->NUMBER()->getText();
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+
+  auto number = std::make_shared<DataStructures::Expressions::DataTypes::Number>(std::stof(numberText), numberText, trace);
+
+  return DataStructures::Expressions::ExpressionPtr(number);
+}
+
+std::any ProgramVisitor::visitExprUnknown(KasXParser::ExprUnknownContext* ctx) {
+  const std::string& unknownText = ctx->UNKNOWN_KEYWORD()->getText();
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+
+  auto unknown = std::make_shared<DataStructures::Expressions::Expression>(
+      true, DataStructures::Expressions::EXPRESSION_TYPES::UNKNOWN_VALUE, unknownText, trace);
+
+  return DataStructures::Expressions::ExpressionPtr(unknown);
+}
+
+std::any ProgramVisitor::visitExprBelives(KasXParser::ExprBelivesContext* ctx) { return visit(ctx->belives_expression()); }
+
+bool ProgramVisitor::typeInheritsFrom(DataStructures::Declarations::TypeDeclaration* type, const std::string& typeName) {
+  if (type == nullptr) {
+    return false;
+  }
+
+  if (type->name == typeName) {
+    return true;
+  }
+
+  for (auto* parent : type->parents) {
+    if (typeInheritsFrom(parent, typeName)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool ProgramVisitor::entityIsOfType(DataStructures::Declarations::EntityDeclaration* entity, const std::string& typeName) {
+  for (auto* type : entity->types) {
+    if (typeInheritsFrom(type, typeName)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+std::any ProgramVisitor::visitBelives_expression(KasXParser::Belives_expressionContext* ctx) {
+  // Mirrors Sabre's Epistemic(Parameter character, Expression argument): the first argument must resolve to a declared
+  // entity of type 'character', the second can be any logical expression (a fluent, a comparison/assignment involving one,
+  // or even another believes expression for nested beliefs).
+  const std::string& characterName = ctx->IDENTIFIER()->getText();
+  CLI_TRACE("Visiting believes expression for: {}", characterName);
+
+  auto* characterEntity = m_Domain->getGlobalScope()->getEntityDeclaration(characterName);
+
+  if (characterEntity == nullptr) {
+    // TODO: lazzy07 - Handle error
+    CLI_ERROR("First argument '{}' of a 'believes' statement is not a declared entity", characterName);
+    return DataStructures::Expressions::ExpressionPtr(nullptr);
+  }
+
+  if (!entityIsOfType(characterEntity, "character")) {
+    // TODO: lazzy07 - Handle error
+    CLI_ERROR("First argument '{}' of a 'believes' statement must be a 'character'", characterName);
+    return DataStructures::Expressions::ExpressionPtr(nullptr);
+  }
+
+  auto anyResult = visit(ctx->arithmetic_expression());
+  auto* argumentExpression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&anyResult);
+
+  if (argumentExpression == nullptr || *argumentExpression == nullptr) {
+    // TODO: lazzy07 - Handle error
+    CLI_ERROR("Argument expression of a 'believes' statement cannot be null");
+    return DataStructures::Expressions::ExpressionPtr(nullptr);
+  }
+
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto believes = std::make_shared<DataStructures::Expressions::Believes>(characterName, *argumentExpression, trace);
+
+  CLI_TRACE("Visiting believes expression for: {} done", characterName);
+  return DataStructures::Expressions::ExpressionPtr(believes);
 }
 }  // namespace KasX::Compiler::Visitors
