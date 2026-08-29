@@ -17,12 +17,12 @@
 
 namespace KasX::Compiler::DataStructures::Expressions {
 struct BinaryOperation : public Expression {
-  Expression left;
-  Expression right;
+  ExpressionPtr left;
+  ExpressionPtr right;
 
   BINARY_OPERATION_TYPES operationType;
 
-  BinaryOperation(BINARY_OPERATION_TYPES operationType, const std::string& name, Expression left, Expression right,
+  BinaryOperation(BINARY_OPERATION_TYPES operationType, const std::string& name, ExpressionPtr left, ExpressionPtr right,
                   Debug::DomainFileTrace trace)
       : Expression(false, EXPRESSION_TYPES::BINARY_OPERATION, name, trace),
         operationType(operationType),

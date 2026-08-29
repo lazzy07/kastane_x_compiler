@@ -22,11 +22,13 @@ namespace KasX::Compiler::DataStructures::Expressions {
  *
  */
 struct UnaryOpearation : public Expression {
-  Expression expression;
+  ExpressionPtr expression;
   UNARY_OPERATION_TYPES operationType;
 
-  UnaryOpearation(UNARY_OPERATION_TYPES operationType, const std::string& name, Expression expression,
+  UnaryOpearation(UNARY_OPERATION_TYPES operationType, const std::string& name, ExpressionPtr expression,
                   Debug::DomainFileTrace trace)
-      : Expression(false, EXPRESSION_TYPES::UNARY_OPERATION, name, trace), expression(std::move(expression)) {}
+      : Expression(false, EXPRESSION_TYPES::UNARY_OPERATION, name, trace),
+        expression(std::move(expression)),
+        operationType(operationType) {}
 };
 }  // namespace KasX::Compiler::DataStructures::Expressions

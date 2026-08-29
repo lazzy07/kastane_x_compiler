@@ -7,6 +7,8 @@
 * ------
 */
 
+#pragma once
+
 #include <cstdint>
 namespace KasX::Compiler::DataStructures::Expressions {
 enum class BINARY_OPERATION_TYPES : std::uint8_t {
