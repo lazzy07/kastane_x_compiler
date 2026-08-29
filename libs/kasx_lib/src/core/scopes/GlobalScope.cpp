@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-27 12:32:41
-// Date modified: 2026-08-20 13:40:56
+// Date modified: 2026-08-28 23:00:58
 * ------
 */
 
@@ -136,10 +136,11 @@ void GlobalScope::createFluentDeclaration(const std::string& name,
     return;
   }
 
-  m_FluentDeclarations.emplace(name,
-                               std::make_unique<DataStructures::Declarations::FluentDeclaration>(name, header, type, trace));
+  auto decl = std::make_unique<DataStructures::Declarations::FluentDeclaration>(name, header, type, trace);
 
-  this->groundFluentDeclaration(m_FluentDeclarations.find(name)->second.get());
+  this->groundFluentDeclaration(decl.get());
+
+  m_FluentDeclarations.emplace(name, std::move(decl));
 }
 
 void GlobalScope::groundFluentDeclaration(DataStructures::Declarations::FluentDeclaration* fluentDeclaration) {
