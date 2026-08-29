@@ -3,10 +3,13 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2026-03-20 23:38:51
-// Date modified: 2026-08-19 12:49:04
+// Date modified: 2026-08-20 13:03:48
 * ------
 */
 
+#pragma once
+
+#include <memory>
 #include <string>
 #include <utility>
 
@@ -44,5 +47,14 @@ struct Expression : public Declarations::Traceable {
       : Traceable(fileTrace), isPrimitive(isPrimitive), expressionType(expressionType), name(std::move(name)) {
     CLI_TRACE("Exression created with Name: {}", name);
   }
+
+  virtual ~Expression() = default;
 };
+
+/**
+ * @brief Polymorphic handle to an Expression (or any of its derived types eg: Fluent, BinaryOperation).
+ * Visitor functions that build up expression trees pass their results around using this alias so that
+ * derived-type data (like a Fluent's arguments) survives being handed back through std::any.
+ */
+using ExpressionPtr = std::shared_ptr<Expression>;
 }  // namespace KasX::Compiler::DataStructures::Expressions

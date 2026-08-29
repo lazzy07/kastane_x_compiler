@@ -7,6 +7,8 @@
 * ------
 */
 
+#pragma once
+
 #include <cstdint>
 
 namespace KasX::Compiler::DataStructures::Expressions {
@@ -17,6 +19,7 @@ enum class EXPRESSION_TYPES : std::uint8_t {
   NULL_VALUE,
   UNARY_OPERATION,
   BINARY_OPERATION,
-  IDENTIFIER
+  IDENTIFIER,
+  BELIEVES_OPERATION
 };
 }  // namespace KasX::Compiler::DataStructures::Expressions
