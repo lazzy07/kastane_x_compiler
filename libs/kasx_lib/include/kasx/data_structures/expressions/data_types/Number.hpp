@@ -20,9 +20,7 @@ namespace KasX::Compiler::DataStructures::Expressions::DataTypes {
 struct Number : public Expression {
   kasx_number value;  ///< Stored value
 
-  explicit Number(kasx_number value) : value(value) {
-    isPrimitive = true;
-    expressionType = EXPRESSION_TYPES::NUMBER_VALUE;
-  }
+  Number(kasx_number value, const std::string& name, Debug::DomainFileTrace trace)
+      : Expression(true, EXPRESSION_TYPES::NUMBER_OPERATION, name, trace), value(value) {}
 };
 };  // namespace KasX::Compiler::DataStructures::Expressions::DataTypes
