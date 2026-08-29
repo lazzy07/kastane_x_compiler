@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-27 11:39:34
-// Date modified: 2026-08-17 23:38:09
+// Date modified: 2026-08-20 13:34:22
 * ------
 */
 
@@ -117,6 +117,25 @@ class GlobalScope : public Scope {
   std::vector<DataStructures::Declarations::EntityDeclaration*> getAllEntitiesFromType(
       DataStructures::Declarations::TypeDeclaration* type);
 
+  /**
+   * @brief Add a new expression to the initial state of the domain.
+   *
+   * @param expression Expression parsed from an initial state declaration, eg: path(Castle, Mountain) or master(Aladdin) =
+   * Jafar
+   */
+  void addInitialStateExpression(KasX::Compiler::DataStructures::Expressions::ExpressionPtr expression);
+
+  /**
+   * @brief Get all the expressions that make up the initial state of the domain.
+   *
+   * @return Vector of the initial state expressions.
+   */
+  [[nodiscard]] const std::vector<KasX::Compiler::DataStructures::Expressions::ExpressionPtr>& getInitialState() const {
+    return m_InitialState;
+  }
+
+  DataStructures::Grounded::GroundedFluent* getGroundedFluentByName(const std::string& name);
+
  private:
   std::vector<std::unique_ptr<Scope>> m_ChildrenScopes;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::TypeDeclaration>> m_TypeDeclarations;
@@ -125,7 +144,8 @@ class GlobalScope : public Scope {
 
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Grounded::GroundedFluent>> m_GroundedFluents;
 
-  std::vector<KasX::Compiler::DataStructures::Expressions::Expression> m_InitialState;  ///< Values of the fluents at this state.
+  std::vector<KasX::Compiler::DataStructures::Expressions::ExpressionPtr>
+      m_InitialState;  ///< Expressions that define the initial state of the domain.
 
   bool allParentTypesExists(const std::vector<std::string>& parents) const;
 

@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include <fmt/format.h>
-
 #include <string>
 
 #include "Log.hpp"
