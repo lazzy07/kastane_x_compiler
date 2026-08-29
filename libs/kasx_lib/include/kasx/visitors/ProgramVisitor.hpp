@@ -13,6 +13,7 @@
 #include "AntlrSafeBase.hpp"
 #include "KasXParser.h"
 #include "kasx/Domain.hpp"
+#include "kasx/data_structures/expressions/operations/BinaryOperationTypes.hpp"
 #include "kasx/debug/DomainFileTrace.hpp"
 
 namespace KasX::Compiler::Visitors {
@@ -114,6 +115,62 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
    */
   std::any visitExprBinaryOp(KasXParser::ExprBinaryOpContext* ctx) override;
 
+  /**
+   * @brief Fluent reference visitor function, eg: path(Castle, Mountain), alive(Aladdin)
+   *
+   * @param ctx Fluent value context
+   */
+  std::any visitFluentVal(KasXParser::FluentValContext* ctx) override;
+
+  /**
+   * @brief Argument list visitor function (Helper), returns the identifiers as a vector of strings
+   *
+   * @param ctx Argument list context
+   */
+  std::any visitArgumentList(KasXParser::ArgumentListContext* ctx) override;
+
+  /**
+   * @brief Fluent expression visitor function, delegates to the fluent rule
+   *
+   * @param ctx Fluent expression context
+   */
+  std::any visitExprFluent(KasXParser::ExprFluentContext* ctx) override;
+
+  /**
+   * @brief Bare identifier expression visitor function, eg: Jafar, Castle
+   *
+   * @param ctx Identifier expression context
+   */
+  std::any visitExprIdentifier(KasXParser::ExprIdentifierContext* ctx) override;
+
+  /**
+   * @brief Number literal expression visitor function
+   *
+   * @param ctx Number expression context
+   */
+  std::any visitExprNumber(KasXParser::ExprNumberContext* ctx) override;
+
+  /**
+   * @brief Unknown value ('?') expression visitor function
+   *
+   * @param ctx Unknown expression context
+   */
+  std::any visitExprUnknown(KasXParser::ExprUnknownContext* ctx) override;
+
+  /**
+   * @brief Believes expression visitor function, delegates to the belives_expression rule
+   *
+   * @param ctx Believes expression context
+   */
+  std::any visitExprBelives(KasXParser::ExprBelivesContext* ctx) override;
+
+  /**
+   * @brief Believes expression body visitor function, eg: believes(Merchant, at(Tom) = ?)
+   *
+   * @param ctx Believes expression context
+   */
+  std::any visitBelives_expression(KasXParser::Belives_expressionContext* ctx) override;
+
  private:
   Core::Domain* m_Domain;
 
@@ -125,5 +182,24 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
   static void EditParentsData(const std::string& typeDeclarationName, std::vector<std::string>& parents);
 
   static Debug::DomainFileTrace getTraceData(antlr4::Token* startToken, antlr4::Token* endToken);
+
+  static DataStructures::Expressions::BINARY_OPERATION_TYPES getBinaryOperationType(KasXParser::Binary_opContext* ctx);
+
+  /**
+   * @brief Check whether a type declaration is, or inherits from (directly or transitively), a type with the given name.
+   * Mirrors Sabre's `Parameter.mustBeCharacter()` check used to validate the first argument of an epistemic expression.
+   *
+   * @param type Type declaration to check, walking up its parents.
+   * @param typeName Name of the type it must be or inherit from, eg: "character"
+   */
+  static bool typeInheritsFrom(DataStructures::Declarations::TypeDeclaration* type, const std::string& typeName);
+
+  /**
+   * @brief Check whether an entity declaration is of (or inherits from) the given type.
+   *
+   * @param entity Entity declaration to check.
+   * @param typeName Name of the type it must be or inherit from, eg: "character"
+   */
+  static bool entityIsOfType(DataStructures::Declarations::EntityDeclaration* entity, const std::string& typeName);
 };
 }  // namespace KasX::Compiler::Visitors
