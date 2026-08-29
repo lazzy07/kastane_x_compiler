@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2026-03-20 23:38:51
-// Date modified: 2026-08-20 13:03:48
+// Date modified: 2026-08-28 23:24:47
 * ------
 */
 
@@ -44,9 +44,7 @@ struct Expression : public Declarations::Traceable {
    * @param fileTrace Debug file trace
    */
   Expression(bool isPrimitive, EXPRESSION_TYPES expressionType, std::string name, Debug::DomainFileTrace fileTrace)
-      : Traceable(fileTrace), isPrimitive(isPrimitive), expressionType(expressionType), name(std::move(name)) {
-    CLI_TRACE("Exression created with Name: {}", name);
-  }
+      : Traceable(fileTrace), isPrimitive(isPrimitive), expressionType(expressionType), name(std::move(name)) {}
 
   virtual ~Expression() = default;
 };
