@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 15:12:03
-// Date modified: 2026-08-20 14:47:49
+// Date modified: 2026-08-29 21:56:48
 * ------
 */
 
@@ -491,5 +491,12 @@ std::any ProgramVisitor::visitBelives_expression(KasXParser::Belives_expressionC
 
   CLI_TRACE("Visiting believes expression for: {} done", characterName);
   return DataStructures::Expressions::ExpressionPtr(believes);
+}
+
+std::any ProgramVisitor::visitExprForAll(KasXParser::ExprForAllContext* ctx) {
+  CLI_TRACE("Visiting for-all expression started");
+
+  CLI_TRACE("Visiting for-all expression done");
+  return nullptr;
 }
 }  // namespace KasX::Compiler::Visitors

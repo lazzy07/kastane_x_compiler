@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2026-03-20 23:38:51
-// Date modified: 2026-08-28 23:24:47
+// Date modified: 2026-08-29 12:36:19
 * ------
 */
 
@@ -14,7 +14,6 @@
 #include <utility>
 
 #include "ExpressionTypes.hpp"
-#include "Log.hpp"
 #include "kasx/Types.hpp"
 #include "kasx/data_structures/declarations/Traceable.hpp"
 #include "kasx/data_structures/declarations/TypeDeclaration.hpp"

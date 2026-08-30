@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2026-03-20 23:33:11
-// Date modified: 2026-08-19 13:57:21
+// Date modified: 2026-08-29 12:46:19
 * ------
 */
 
@@ -20,6 +20,7 @@ enum class EXPRESSION_TYPES : std::uint8_t {
   UNARY_OPERATION,
   BINARY_OPERATION,
   IDENTIFIER,
-  BELIEVES_OPERATION
+  BELIEVES_OPERATION,
+  FORALL_OPERATION
 };
 }  // namespace KasX::Compiler::DataStructures::Expressions

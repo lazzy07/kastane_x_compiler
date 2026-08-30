@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-21 14:20:04
-// Date modified: 2026-08-19 14:28:27
+// Date modified: 2026-08-29 10:33:35
 * ------
 */
 #pragma once
@@ -170,6 +170,13 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
    * @param ctx Believes expression context
    */
   std::any visitBelives_expression(KasXParser::Belives_expressionContext* ctx) override;
+
+  /**
+   * @brief For all expression visitor, (For loop)
+   *
+   * @param ctx For all expression context
+   */
+  std::any visitExprForAll(KasXParser::ExprForAllContext* ctx) override;
 
  private:
   Core::Domain* m_Domain;
