@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-27 11:39:34
-// Date modified: 2026-08-20 13:34:22
+// Date modified: 2026-08-29 15:58:32
 * ------
 */
 
@@ -62,7 +62,7 @@ class GlobalScope : public Scope {
    *
    * @param scope New scope as a unique pointer.
    */
-  void addChildScope(std::unique_ptr<Scope> scope) { m_ChildrenScopes.emplace_back(std::move(scope)); };
+  void addChildScope(std::unique_ptr<Scope> scope) { m_ChildScopes.emplace_back(std::move(scope)); };
 
   /**
    * @brief Get type declaration from the global scope.
@@ -137,7 +137,7 @@ class GlobalScope : public Scope {
   DataStructures::Grounded::GroundedFluent* getGroundedFluentByName(const std::string& name);
 
  private:
-  std::vector<std::unique_ptr<Scope>> m_ChildrenScopes;
+  std::vector<std::unique_ptr<Scope>> m_ChildScopes;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::TypeDeclaration>> m_TypeDeclarations;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::EntityDeclaration>> m_EntityDeclarations;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::FluentDeclaration>> m_FluentDeclarations;

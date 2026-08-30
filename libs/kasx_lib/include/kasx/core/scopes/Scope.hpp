@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-14 19:46:10
-// Date modified: 2025-12-28 12:25:54
+// Date modified: 2026-08-29 14:24:57
 * ------
 */
 
@@ -11,7 +11,7 @@
 #include <string>
 
 namespace KasX::Compiler::Core::Scopes {
-enum class SCOPE_TYPES : std::uint8_t { DEFAULT, GLOBAL, ACTION, TRIGGER, UTILITY };
+enum class SCOPE_TYPES : std::uint8_t { DEFAULT, GLOBAL, ACTION, TRIGGER, UTILITY, FOR_ALL };
 
 /**
  * @class Scope
