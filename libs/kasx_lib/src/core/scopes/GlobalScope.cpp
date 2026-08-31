@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-27 12:32:41
-// Date modified: 2026-08-28 23:00:58
+// Date modified: 2026-08-29 22:02:38
 * ------
 */
 
@@ -97,34 +97,6 @@ std::vector<DataStructures::Declarations::TypeDeclaration*> GlobalScope::getAllP
   return parentTypes;
 };
 
-void GlobalScope::createEntityDeclaration(const std::string& name, const std::vector<std::string>& types,
-                                          const Debug::DomainFileTrace& trace) {
-  const auto* existingEntityDecl = this->getEntityDeclaration(name);
-
-  if (existingEntityDecl != nullptr) {
-    CLI_ERROR("Entity declaration '{}' already exists", name);
-    return;
-  }
-
-  // Check if all the types of the entity exists
-  bool typesExists = this->allParentTypesExists(types);
-
-  if (!typesExists) {
-    CLI_ERROR("One or more types of the entity declaration '{}' does not exists!", name);
-    return;
-  }
-
-  // All the types of the entity exists. Hence get all the type declarations.
-  std::vector<DataStructures::Declarations::TypeDeclaration*> typeDeclarations = getAllParentDeclarations(types);
-
-  m_EntityDeclarations.emplace(name,
-                               std::make_unique<DataStructures::Declarations::EntityDeclaration>(name, typeDeclarations, trace));
-
-  for (const auto& type : typeDeclarations) {
-    type->addNewEntityDeclaration(this->getEntityDeclaration(name));
-  }
-}
-
 void GlobalScope::createFluentDeclaration(const std::string& name,
                                           const DataStructures::Declarations::Helpers::FunctionHeader& header,
                                           const std::string& dataType, const Debug::DomainFileTrace& trace) {
@@ -211,5 +183,33 @@ DataStructures::Grounded::GroundedFluent* GlobalScope::getGroundedFluentByName(c
   }
 
   return itr->second.get();
+}
+
+void GlobalScope::createEntityDeclaration(const std::string& name, const std::vector<std::string>& types,
+                                          const Debug::DomainFileTrace& trace) {
+  const auto* existingEntityDecl = this->getEntityDeclaration(name);
+
+  if (existingEntityDecl != nullptr) {
+    CLI_ERROR("Entity declaration '{}' already exists", name);
+    return;
+  }
+
+  // Check if all the types of the entity exists
+  bool typesExists = this->allParentTypesExists(types);
+
+  if (!typesExists) {
+    CLI_ERROR("One or more types of the entity declaration '{}' does not exists!", name);
+    return;
+  }
+
+  // All the types of the entity exists. Hence get all the type declarations.
+  std::vector<DataStructures::Declarations::TypeDeclaration*> typeDeclarations = this->getAllParentDeclarations(types);
+
+  m_EntityDeclarations.emplace(name,
+                               std::make_unique<DataStructures::Declarations::EntityDeclaration>(name, typeDeclarations, trace));
+
+  for (const auto& type : typeDeclarations) {
+    type->addNewEntityDeclaration(this->getEntityDeclaration(name));
+  }
 }
 }  // namespace KasX::Compiler::Core::Scopes

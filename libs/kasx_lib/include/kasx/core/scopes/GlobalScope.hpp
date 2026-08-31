@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-27 11:39:34
-// Date modified: 2026-08-29 15:58:32
+// Date modified: 2026-08-29 22:15:18
 * ------
 */
 
@@ -30,12 +30,18 @@ class GlobalScope : public Scope {
  public:
   /**
    * @brief Constructor of the Global scope.
+   *
+   * @param domain Domain pointer that currently owns the global scope
    */
-  GlobalScope();
+  explicit GlobalScope();
   /**
    * @brief Destructor of the Global scope.
    */
   ~GlobalScope();
+  GlobalScope& operator=(const GlobalScope&);
+  GlobalScope(const GlobalScope&);
+  GlobalScope& operator=(GlobalScope&&) noexcept;
+  GlobalScope(const GlobalScope&&) noexcept;
 
   /**
    * @brief Create a new type declaration in the global scope.
@@ -77,28 +83,6 @@ class GlobalScope : public Scope {
   };
 
   /**
-   * @brief Get entity declaration from the global scope.
-   *
-   * @param name Name of the requested entity declaration.
-   * @return DataStructures::Declarations::EntityDeclaration if found or nullptr
-   */
-  DataStructures::Declarations::EntityDeclaration* getEntityDeclaration(const std::string& name) const {
-    auto iter = m_EntityDeclarations.find(name);
-    if (iter == m_EntityDeclarations.end()) return nullptr;
-    return iter->second.get();
-  }
-
-  /**
-   * @brief Create a new entity declaration in global scope
-   *
-   * @param name Name of the entity
-   * @param types Type of the entity
-   * @param trace Debug file trace data to keep track of the domain file.
-   */
-  void createEntityDeclaration(const std::string& name, const std::vector<std::string>& types,
-                               const Debug::DomainFileTrace& trace);
-
-  /**
    * @brief Create a new fluent declaration in global scope.
    *
    * @param name Name of the fluent
@@ -136,8 +120,31 @@ class GlobalScope : public Scope {
 
   DataStructures::Grounded::GroundedFluent* getGroundedFluentByName(const std::string& name);
 
+  /**
+   * @brief Get entity declaration from the scope.
+   *
+   * @param name Name of the requested entity declaration.
+   * @return DataStructures::Declarations::EntityDeclaration if found or nullptr
+   */
+  DataStructures::Declarations::EntityDeclaration* getEntityDeclaration(const std::string& name) const {
+    auto iter = m_EntityDeclarations.find(name);
+    if (iter == m_EntityDeclarations.end()) return nullptr;
+    return iter->second.get();
+  }
+
+  /**
+   * @brief Create a new entity declaration in global scope
+   *
+   * @param name Name of the entity
+   * @param types Type of the entity
+   * @param trace Debug file trace data to keep track of the domain file.
+   */
+  void createEntityDeclaration(const std::string& name, const std::vector<std::string>& types,
+                               const Debug::DomainFileTrace& trace);
+
  private:
   std::vector<std::unique_ptr<Scope>> m_ChildScopes;
+
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::TypeDeclaration>> m_TypeDeclarations;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::EntityDeclaration>> m_EntityDeclarations;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::FluentDeclaration>> m_FluentDeclarations;
@@ -147,11 +154,6 @@ class GlobalScope : public Scope {
   std::vector<KasX::Compiler::DataStructures::Expressions::ExpressionPtr>
       m_InitialState;  ///< Expressions that define the initial state of the domain.
 
-  bool allParentTypesExists(const std::vector<std::string>& parents) const;
-
-  std::vector<DataStructures::Declarations::TypeDeclaration*> getAllParentDeclarations(
-      const std::vector<std::string>& parentNames) const;
-
   void groundFluentDeclaration(DataStructures::Declarations::FluentDeclaration* fluentDeclaration);
 
   void groundEntityVector(DataStructures::Declarations::FluentDeclaration* fluentDeclaration,
@@ -159,5 +161,10 @@ class GlobalScope : public Scope {
 
   void createGroundedFluent(DataStructures::Declarations::FluentDeclaration* fluentDeclaration,
                             const std::vector<DataStructures::Declarations::EntityDeclaration*>& combo);
+
+  bool allParentTypesExists(const std::vector<std::string>& parents) const;
+
+  std::vector<DataStructures::Declarations::TypeDeclaration*> getAllParentDeclarations(
+      const std::vector<std::string>& parentNames) const;
 };
 }  // namespace KasX::Compiler::Core::Scopes

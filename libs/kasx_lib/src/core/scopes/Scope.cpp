@@ -3,7 +3,7 @@
 * Project: KasX Compiler
 * Author: Lasantha M Senanayake
 * Date created: 2025-12-28 12:14:46
-// Date modified: 2025-12-30 22:08:32
+// Date modified: 2026-08-29 22:12:17
 * ------
 */
 #include <Log.hpp>
@@ -15,4 +15,5 @@ Scope::Scope(std::string name, SCOPE_TYPES type) : m_Type(type), m_Name(std::mov
 };
 
 Scope::~Scope() { CORE_TRACE("Scope {} Terminated", m_Name); }
+
 }  // namespace KasX::Compiler::Core::Scopes
