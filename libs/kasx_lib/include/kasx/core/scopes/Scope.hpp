@@ -32,13 +32,21 @@ class Scope {
    * @param type Type of the scope see: @ref SCOPE_TYPES
    * @param domain Domain that owns this scope
    */
-  Scope(std::string name, SCOPE_TYPES type);
+  Scope(std::string name, SCOPE_TYPES type, Scope* parent = nullptr);
   /**
    * @brief Scope destructor.
    */
   ~Scope();
 
+  /**
+   * @brief Returns the parent pointer of this scope
+   *
+   * @return Parent scope as a pointer
+   */
+  const Scope* getParentScope() const { return m_Parent; };
+
  private:
+  Scope* m_Parent;
   std::string m_Name;
   SCOPE_TYPES m_Type;
   bool m_ReplaceMode;  ///< Scope enters the replace mode

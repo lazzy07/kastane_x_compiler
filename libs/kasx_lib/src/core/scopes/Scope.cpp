@@ -10,7 +10,7 @@
 #include <kasx/core/scopes/Scope.hpp>
 
 namespace KasX::Compiler::Core::Scopes {
-Scope::Scope(std::string name, SCOPE_TYPES type) : m_Type(type), m_Name(std::move(name)) {
+Scope::Scope(std::string name, SCOPE_TYPES type, Scope* parent) : m_Type(type), m_Name(std::move(name)), m_Parent(parent) {
   CORE_TRACE("Scope Initialized: {}", m_Name);
 };
 
