@@ -7,12 +7,14 @@
 * ------
 */
 
-#include "IDHandler.hpp"
+#include <kasx/core/services/IDHandler.hpp>
 
 #include "kasx/Types.hpp"
 
 namespace KasX::Compiler::Core::Services {
 KasX::declaration_id IDHandler::currentLastID = -1;
+KasX::declaration_id IDHandler::currentLastExpressionID = -1;
 
 KasX::declaration_id IDHandler::GetID() { return ++currentLastID; }
+KasX::declaration_id IDHandler::GetExpressionID() { return ++currentLastExpressionID; }
 }  // namespace KasX::Compiler::Core::Services
