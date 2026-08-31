@@ -11,8 +11,8 @@
 #include <sstream>
 #include <vector>
 
-#include "../core/services/IDHandler.hpp"
 #include "Log.hpp"
+#include "kasx/core/services/IDHandler.hpp"
 #include "kasx/data_structures/declarations/EntityDeclaration.hpp"
 #include "kasx/data_structures/declarations/FluentDeclaration.hpp"
 

@@ -10,8 +10,8 @@
 #include <kasx/data_structures/declarations/Declaration.hpp>
 #include <utility>
 
-#include "../core/services/IDHandler.hpp"
 #include "Log.hpp"
+#include "kasx/core/services/IDHandler.hpp"
 #include "kasx/debug/DomainFileTrace.hpp"
 
 namespace KasX::Compiler::DataStructures::Declarations {

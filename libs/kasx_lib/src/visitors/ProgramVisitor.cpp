@@ -12,6 +12,7 @@
 #include <kasx/data_structures/declarations/helpers/Parameter.hpp>
 #include <kasx/debug/DomainFileTrace.hpp>
 #include <kasx/visitors/ProgramVisitor.hpp>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -19,11 +20,14 @@
 #include "Log.hpp"
 #include "Token.h"
 #include "kasx/Domain.hpp"
-#include "kasx/data_structures/declarations/Declaration.hpp"
+#include "kasx/core/scopes/Scope.hpp"
+#include "kasx/core/services/IDHandler.hpp"
 #include "kasx/data_structures/expressions/Believes.hpp"
+#include "kasx/data_structures/expressions/Expression.hpp"
 #include "kasx/data_structures/expressions/Fluent.hpp"
 #include "kasx/data_structures/expressions/data_types/Number.hpp"
 #include "kasx/data_structures/expressions/operations/BinaryOperation.hpp"
+#include "kasx/data_structures/expressions/operations/ForAllOperation.hpp"
 #include "kasx/data_structures/expressions/operations/UnaryOperation.hpp"
 
 namespace KasX::Compiler::Visitors {
@@ -496,7 +500,10 @@ std::any ProgramVisitor::visitBelives_expression(KasXParser::Belives_expressionC
 std::any ProgramVisitor::visitExprForAll(KasXParser::ExprForAllContext* ctx) {
   CLI_TRACE("Visiting for-all expression started");
 
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto forAll = std::make_shared<DataStructures::Expressions::ForAllOperation>(trace);
+
   CLI_TRACE("Visiting for-all expression done");
-  return nullptr;
+  return DataStructures::Expressions::ExpressionPtr(forAll);
 }
 }  // namespace KasX::Compiler::Visitors
