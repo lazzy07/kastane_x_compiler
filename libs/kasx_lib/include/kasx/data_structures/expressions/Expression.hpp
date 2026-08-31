@@ -15,6 +15,7 @@
 
 #include "ExpressionTypes.hpp"
 #include "kasx/Types.hpp"
+#include "kasx/core/services/IDHandler.hpp"
 #include "kasx/data_structures/declarations/Traceable.hpp"
 #include "kasx/data_structures/declarations/TypeDeclaration.hpp"
 #include "kasx/debug/DomainFileTrace.hpp"
@@ -43,7 +44,9 @@ struct Expression : public Declarations::Traceable {
    * @param fileTrace Debug file trace
    */
   Expression(bool isPrimitive, EXPRESSION_TYPES expressionType, std::string name, Debug::DomainFileTrace fileTrace)
-      : Traceable(fileTrace), isPrimitive(isPrimitive), expressionType(expressionType), name(std::move(name)) {}
+      : Traceable(fileTrace), isPrimitive(isPrimitive), expressionType(expressionType), name(std::move(name)) {
+    this->id = Core::Services::IDHandler::GetExpressionID();
+  }
 
   virtual ~Expression() = default;
 };
