@@ -63,12 +63,6 @@ class GlobalScope : public Scope {
    * @param name Name of the type declaration that needs to be moved.
    */
   void moveTypeDeclaration(const std::string& name, DataStructures::Declarations::TypeDeclaration* parentDeclaration);
-  /**
-   * @brief Add a new child scope to the global scope
-   *
-   * @param scope New scope as a unique pointer.
-   */
-  void addChildScope(std::unique_ptr<Scope> scope) { m_ChildScopes.emplace_back(std::move(scope)); };
 
   /**
    * @brief Get type declaration from the global scope.
@@ -143,8 +137,6 @@ class GlobalScope : public Scope {
                                const Debug::DomainFileTrace& trace);
 
  private:
-  std::vector<std::unique_ptr<Scope>> m_ChildScopes;
-
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::TypeDeclaration>> m_TypeDeclarations;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::EntityDeclaration>> m_EntityDeclarations;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::FluentDeclaration>> m_FluentDeclarations;

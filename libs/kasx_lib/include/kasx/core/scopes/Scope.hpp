@@ -45,11 +45,54 @@ class Scope {
    */
   const Scope* getParentScope() const { return m_Parent; };
 
+  /**
+   * @brief Get the current replace map from the scope.
+   *
+   * @return Replace map
+   */
+  const std::unordered_map<std::string, std::string>& getReplaceMap() const { return m_ReplaceMap; };
+
+  /**
+   * @brief Return the replace string for the perticular string that being replaced with
+   *
+   * @param name Name that trying to replace
+   * @return Name that is being replaced, returns the same name if it does not exists.
+   */
+  std::string getReplaceString(const std::string& name);
+
+  /**
+   * @brief Enable replace mode for this scope
+   */
+  void enableReplaceMode();
+
+  /**
+   * @brief Disables the replace mode
+   */
+  void disableReplaceMode();
+
+  /**
+   * @brief Add a replace pair to the scope
+   *
+   * @param identifier Identifier to replace
+   * @param replace replacing phrase
+   */
+  void addIdentifierToReplace(const std::string& identifier, const std::string& replace);
+
+  /**
+   * @brief Creates a child scope with the current scope as the parent
+   *
+   * @param name Name of the child scope
+   * @param type Scope type
+   * @return Returns a pointer to the newly created child scope
+   */
+  Scope* createChildScope(const std::string& name, SCOPE_TYPES type);
+
  private:
   Scope* m_Parent;
   std::string m_Name;
   SCOPE_TYPES m_Type;
   bool m_ReplaceMode;  ///< Scope enters the replace mode
   std::unordered_map<std::string, std::string> m_ReplaceMap;
+  std::unordered_map<std::string, Scope> m_ChildScopes;
 };
 }  // namespace KasX::Compiler::Core::Scopes

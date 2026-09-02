@@ -137,6 +137,7 @@ std::vector<DataStructures::Declarations::EntityDeclaration*> GlobalScope::getAl
     DataStructures::Declarations::TypeDeclaration* type) {
   std::vector<DataStructures::Declarations::EntityDeclaration*> entities;
   entities.insert(entities.end(), type->entities.begin(), type->entities.end());
+
   for (auto& child : type->children) {
     auto childEntities = getAllEntitiesFromType(child);
     entities.insert(entities.end(), childEntities.begin(), childEntities.end());
@@ -148,6 +149,7 @@ void GlobalScope::groundEntityVector(
     DataStructures::Declarations::FluentDeclaration* fluentDeclaration,
     const std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>>& fluentVec) {
   std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>> combinations = {{}};
+
   for (const auto& paramVec : fluentVec) {
     std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>> next;
     for (const auto& current : combinations) {
