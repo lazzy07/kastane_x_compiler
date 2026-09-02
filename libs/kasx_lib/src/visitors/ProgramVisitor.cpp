@@ -541,7 +541,8 @@ std::any ProgramVisitor::visitExprForAll(KasXParser::ExprForAllContext* ctx) {
     scope->addIdentifierToReplace(toBeReplaced, entity->name);
 
     auto val = visit(ctx->forall_function()->arithmetic_expression());
-    auto expr = std::any_cast<DataStructures::Expressions::Expression>(val);
+    auto expr = std::any_cast<DataStructures::Expressions::ExpressionPtr>(val);
+    forAll->expressions.push_back(expr);
   }
 
   // Change the scope back to the global scope

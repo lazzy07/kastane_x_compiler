@@ -32,7 +32,7 @@ void Scope::addIdentifierToReplace(const std::string& identifier, const std::str
     CORE_ERROR("Current scope {} is not in replacement mode", m_Name);
     return;
   }
-  m_ReplaceMap.emplace(std::pair<std::string, std::string>(identifier, replace));
+  m_ReplaceMap[identifier] = replace;
 }
 
 void Scope::disableReplaceMode() {
