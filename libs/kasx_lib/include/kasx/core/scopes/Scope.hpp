@@ -10,6 +10,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <unordered_map>
 
@@ -41,9 +42,9 @@ class Scope {
   /**
    * @brief Returns the parent pointer of this scope
    *
-   * @return Parent scope as a pointer
+   * @return Parent scope as a pointer (const)
    */
-  const Scope* getParentScope() const { return m_Parent; };
+  Scope* getParentScope() const { return m_Parent; };
 
   /**
    * @brief Get the current replace map from the scope.
@@ -70,6 +71,8 @@ class Scope {
    */
   void disableReplaceMode();
 
+  bool isReplaceModeOn() const { return m_ReplaceMode; };
+
   /**
    * @brief Add a replace pair to the scope
    *
@@ -93,6 +96,6 @@ class Scope {
   SCOPE_TYPES m_Type;
   bool m_ReplaceMode;  ///< Scope enters the replace mode
   std::unordered_map<std::string, std::string> m_ReplaceMap;
-  std::unordered_map<std::string, Scope> m_ChildScopes;
+  std::unordered_map<std::string, std::unique_ptr<Scope>> m_ChildScopes;
 };
 }  // namespace KasX::Compiler::Core::Scopes

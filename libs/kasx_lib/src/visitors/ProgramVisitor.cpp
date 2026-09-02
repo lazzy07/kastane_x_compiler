@@ -370,6 +370,16 @@ std::any ProgramVisitor::visitFluentVal(KasXParser::FluentValContext* ctx) {
     arguments = std::any_cast<std::vector<std::string>>(visit(argListCtx));
   }
 
+  if (this->m_Domain->getCurrentScope()->isReplaceModeOn()) {
+    auto replaceMap = this->m_Domain->getCurrentScope()->getReplaceMap();
+    for (auto& arg : arguments) {
+      auto itr = replaceMap.find(arg);
+      if (itr != replaceMap.end()) {
+        arg = itr->second;
+      }
+    }
+  }
+
   auto trace = getTraceData(ctx->getStart(), ctx->getStop());
   auto fluent = std::make_shared<DataStructures::Expressions::Fluent>(fluentName, arguments, trace);
   auto* groundedFluent = m_Domain->getGlobalScope()->getGroundedFluentByName(fluent->name);
@@ -402,7 +412,14 @@ std::any ProgramVisitor::visitArgumentList(KasXParser::ArgumentListContext* ctx)
 std::any ProgramVisitor::visitExprFluent(KasXParser::ExprFluentContext* ctx) { return visit(ctx->fluent()); }
 
 std::any ProgramVisitor::visitExprIdentifier(KasXParser::ExprIdentifierContext* ctx) {
-  const std::string& identifierName = ctx->IDENTIFIER()->getText();
+  std::string identifierName = ctx->IDENTIFIER()->getText();
+
+  auto* currentScope = this->m_Domain->getCurrentScope();
+
+  if (currentScope->isReplaceModeOn()) {
+    identifierName = currentScope->getReplaceString(identifierName);
+  }
+
   auto trace = getTraceData(ctx->getStart(), ctx->getStop());
 
   auto identifier = std::make_shared<DataStructures::Expressions::Expression>(
@@ -499,10 +516,36 @@ std::any ProgramVisitor::visitBelives_expression(KasXParser::Belives_expressionC
 
 std::any ProgramVisitor::visitExprForAll(KasXParser::ExprForAllContext* ctx) {
   CLI_TRACE("Visiting for-all expression started");
-
   auto trace = getTraceData(ctx->getStart(), ctx->getStop());
   auto forAll = std::make_shared<DataStructures::Expressions::ForAllOperation>(trace);
+  const auto forAllName = "For-All-" + std::to_string(forAll->id);
+  auto* scope = this->m_Domain->getCurrentScope()->createChildScope(forAllName, Core::Scopes::SCOPE_TYPES::FOR_ALL);
 
+  // Change the current scope to be the for-all scope just created
+  this->m_Domain->setCurrentScope(scope);
+
+  const auto& toBeReplaced = ctx->forall_function()->IDENTIFIER(0)->getText();
+  const auto& typeDeclStr = ctx->forall_function()->IDENTIFIER(1)->getText();
+
+  auto* typeDecl = this->m_Domain->getGlobalScope()->getTypeDeclaration(typeDeclStr);
+  if (typeDecl == nullptr) {
+    // TODO: lazzy07 - Handle error
+    CLI_ERROR("Type definition: {} does not exists", typeDeclStr);
+    return nullptr;
+  }
+  auto entities = this->m_Domain->getGlobalScope()->getAllEntitiesFromType(typeDecl);
+
+  scope->enableReplaceMode();
+
+  for (auto* entity : entities) {
+    scope->addIdentifierToReplace(toBeReplaced, entity->name);
+
+    auto val = visit(ctx->forall_function()->arithmetic_expression());
+    auto expr = std::any_cast<DataStructures::Expressions::Expression>(val);
+  }
+
+  // Change the scope back to the global scope
+  this->m_Domain->setCurrentScope(scope->getParentScope());
   CLI_TRACE("Visiting for-all expression done");
   return DataStructures::Expressions::ExpressionPtr(forAll);
 }

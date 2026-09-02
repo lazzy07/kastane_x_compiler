@@ -20,6 +20,7 @@
 namespace KasX::Compiler::Core {
 Domain::Domain(DomainData& data) : m_DomainData(std::move(data)) {
   m_ProgramVisitor = std::make_unique<Visitors::ProgramVisitor>(this);
+  m_CurrentScope = &m_GlobalScope;
   CORE_TRACE("Domain initialized");
 };
 

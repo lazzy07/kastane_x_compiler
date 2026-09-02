@@ -8,6 +8,7 @@
 */
 #include <Log.hpp>
 #include <kasx/core/scopes/Scope.hpp>
+#include <memory>
 
 namespace KasX::Compiler::Core::Scopes {
 Scope::Scope(std::string name, SCOPE_TYPES type, Scope* parent) : m_Type(type), m_Name(std::move(name)), m_Parent(parent) {
@@ -44,8 +45,8 @@ void Scope::enableReplaceMode() {
 }
 
 Scope* Scope::createChildScope(const std::string& name, SCOPE_TYPES type) {
-  m_ChildScopes.emplace(name, Scope(name, type, this));
+  m_ChildScopes.emplace(name, std::make_unique<Scope>(name, type, this));
 
-  return &m_ChildScopes.find(name)->second;
+  return m_ChildScopes.find(name)->second.get();
 }
 }  // namespace KasX::Compiler::Core::Scopes

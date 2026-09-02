@@ -12,6 +12,7 @@
 #include <kasx/core/scopes/GlobalScope.hpp>
 
 #include "kasx/Types.hpp"
+#include "kasx/core/scopes/Scope.hpp"
 
 namespace KasX::Compiler::Visitors {
 class ProgramVisitor;
@@ -48,6 +49,20 @@ class Domain {
    * @return Global scope.
    */
   Scopes::GlobalScope* getGlobalScope() { return &m_GlobalScope; };
+
+  /**
+   * @brief Get the currently active scope
+   *
+   * @return Current scope
+   */
+  Scopes::Scope* getCurrentScope() const { return m_CurrentScope; };
+
+  /**
+   * @brief Set a new scope as current scope
+   *
+   * @param scope Scope to be set as the current scope
+   */
+  void setCurrentScope(Scopes::Scope* scope) { m_CurrentScope = scope; }
 
  private:
   Scopes::Scope* m_CurrentScope;
