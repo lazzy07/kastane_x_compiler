@@ -50,6 +50,7 @@ class Domain {
   Scopes::GlobalScope* getGlobalScope() { return &m_GlobalScope; };
 
  private:
+  Scopes::Scope* m_CurrentScope;
   Scopes::GlobalScope m_GlobalScope;
   DomainData m_DomainData;
   std::unique_ptr<Compiler::Visitors::ProgramVisitor> m_ProgramVisitor;
