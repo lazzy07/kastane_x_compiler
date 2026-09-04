@@ -550,4 +550,10 @@ std::any ProgramVisitor::visitExprForAll(KasXParser::ExprForAllContext* ctx) {
   CLI_TRACE("Visiting for-all expression done");
   return DataStructures::Expressions::ExpressionPtr(forAll);
 }
+
+std::any ProgramVisitor::visitActionDecl(KasXParser::ActionDeclContext* ctx) { return nullptr; }
+
+std::any ProgramVisitor::visitTriggerDecl(KasXParser::TriggerDeclContext* ctx) { return nullptr; }
+
+std::any ProgramVisitor::visitUtilityDecl(KasXParser::UtilityDeclContext* ctx) { return nullptr; }
 }  // namespace KasX::Compiler::Visitors

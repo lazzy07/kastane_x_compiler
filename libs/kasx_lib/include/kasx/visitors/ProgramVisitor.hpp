@@ -178,6 +178,30 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
    */
   std::any visitExprForAll(KasXParser::ExprForAllContext* ctx) override;
 
+  /**
+   * @brief Visitor function for action declarations
+   *
+   * @param ctx Action declaration context
+   * @return returns nullptr
+   */
+  std::any visitActionDecl(KasXParser::ActionDeclContext* ctx) override;
+
+  /**
+   * @brief Visitor function for trigger declarations
+   *
+   * @param ctx Trigger delcaration context
+   * @return returns nullptr
+   */
+  std::any visitTriggerDecl(KasXParser::TriggerDeclContext* ctx) override;
+
+  /**
+   * @brief Visitor function for utility declarations
+   *
+   * @param ctx Utility declaration context
+   * @return returns nullptr
+   */
+  std::any visitUtilityDecl(KasXParser::UtilityDeclContext* ctx) override;
+
  private:
   Core::Domain* m_Domain;
 
