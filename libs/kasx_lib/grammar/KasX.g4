@@ -123,7 +123,7 @@ initial_state_declaration
   ;
 
 trigger_definition
-  : TRIGGER_DEFINITION_KEYWORD function_header START_CUR_BRACES trigger_body END_CUR_BRACES DEFINITION_SEPARATOR
+  : TRIGGER_DEFINITION_KEYWORD function_header START_CUR_BRACES trigger_body END_CUR_BRACES DEFINITION_SEPARATOR  #TriggerDecl
   ;
 
 trigger_body
@@ -132,7 +132,7 @@ trigger_body
   ;
 
 utility_definition
-  : UTILITY_DEFINITION_KEYWORD OPEN_BRACKET (IDENTIFIER)? CLOSE_BRACKET COLON arithmetic_expression DEFINITION_SEPARATOR
+  : UTILITY_DEFINITION_KEYWORD OPEN_BRACKET (IDENTIFIER)? CLOSE_BRACKET COLON arithmetic_expression DEFINITION_SEPARATOR  #UtilityDecl
   ;
 
 
