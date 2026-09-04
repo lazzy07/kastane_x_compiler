@@ -13,8 +13,8 @@
 
 namespace KasX::Compiler::DataStructures::Grounded {
 struct GroundedTrigger {
-  declaration_id id;                                                     ///< Grounded actions ID
-  Compiler::DataStructures::Declarations::TypeDeclaration* declaration;  ///< Parent action declaration pointer
+  declaration_id id;                                                     ///< Grounded trigger ID
+  Compiler::DataStructures::Declarations::TypeDeclaration* declaration;  ///< Parent trigger declaration pointer
 
   Expressions::ExpressionPtr precondition;  ///< Precondition of the action
   Expressions::ExpressionPtr effect;        ///< Effect of the action
