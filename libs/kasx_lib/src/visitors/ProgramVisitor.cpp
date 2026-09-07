@@ -586,6 +586,7 @@ std::any ProgramVisitor::visitActionDecl(KasXParser::ActionDeclContext* ctx) {
   auto functionHeader = std::any_cast<DataStructures::Declarations::Helpers::FunctionHeader>(visit(ctx->function_header()));
 
   auto* scope = this->m_Domain->getCurrentScope()->createChildScope(functionHeader.name, Core::Scopes::SCOPE_TYPES::ACTION);
+  this->m_Domain->setCurrentScope(scope);
   std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>> vecs;
   vecs.resize(functionHeader.parameters.size());
 
@@ -594,21 +595,36 @@ std::any ProgramVisitor::visitActionDecl(KasXParser::ActionDeclContext* ctx) {
   std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>> combinations;
   std::vector<DataStructures::Declarations::EntityDeclaration*> current;
   recurseParams(vecs, 0, current, combinations);
-  CLI_TRACE("Combinations size: {}", combinations.size());
+  CLI_TRACE("# of combinations found for the action {}: {}", functionHeader.name, combinations.size());
+
   for (auto& combination : combinations) {
-    CLI_TRACE("Combination start");
-    for (auto* entity : combination) {
-      CLI_TRACE("Combination val: {}", entity->name);
+    scope->enableReplaceMode();
+    for (int i = 0; i < combination.size(); i++) {
+      scope->addIdentifierToReplace(functionHeader.parameters.at(i).name, combination.at(i)->name);
     }
-    CLI_TRACE("Combination end");
+    // Grounded action creation functionality
+    auto precondition = std::any_cast<DataStructures::Expressions::ExpressionPtr>(
+        visit(ctx->action_body()->precondition_block()->conditions_list()->arithmetic_expression()));
+    CLI_TRACE("Precondition name: ", precondition->name);
+    auto effect = std::any_cast<DataStructures::Expressions::ExpressionPtr>(
+        visit(ctx->action_body()->effect_block()->conditions_list()->arithmetic_expression()));
   }
 
+  scope->disableReplaceMode();
+  this->m_Domain->setCurrentScope(this->m_Domain->getGlobalScope());
   PrintEndVisit("Action Declaration", functionHeader.name);
 
   return nullptr;
 }
 
-std::any ProgramVisitor::visitTriggerDecl(KasXParser::TriggerDeclContext* ctx) { return nullptr; }
+std::any ProgramVisitor::visitTriggerDecl(KasXParser::TriggerDeclContext* ctx) {
+  PrintStartVisit("Trigger Declaration", "");
+
+  auto functionHeader = std::any_cast<DataStructures::Declarations::Helpers::FunctionHeader>(visit(ctx->function_header()));
+  auto* scope = this->m_Domain->getCurrentScope()->createChildScope(functionHeader.name, Core::Scopes::SCOPE_TYPES::TRIGGER);
+
+  return nullptr;
+}
 
 std::any ProgramVisitor::visitUtilityDecl(KasXParser::UtilityDeclContext* ctx) { return nullptr; }
 }  // namespace KasX::Compiler::Visitors
