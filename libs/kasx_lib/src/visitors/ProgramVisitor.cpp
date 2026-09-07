@@ -8,6 +8,7 @@
 */
 
 #include <any>
+#include <cstddef>
 #include <kasx/data_structures/declarations/FluentDeclaration.hpp>
 #include <kasx/data_structures/declarations/helpers/Parameter.hpp>
 #include <kasx/debug/DomainFileTrace.hpp>
@@ -551,7 +552,61 @@ std::any ProgramVisitor::visitExprForAll(KasXParser::ExprForAllContext* ctx) {
   return DataStructures::Expressions::ExpressionPtr(forAll);
 }
 
-std::any ProgramVisitor::visitActionDecl(KasXParser::ActionDeclContext* ctx) { return nullptr; }
+void ProgramVisitor::recurseParams(const std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>>& vecs,
+                                   size_t depth, std::vector<DataStructures::Declarations::EntityDeclaration*>& current,
+                                   std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>>& combinations) {
+  if (depth == vecs.size()) {
+    combinations.emplace_back(current);
+    return;
+  }
+  for (auto* val : vecs[depth]) {
+    current.push_back(val);
+    recurseParams(vecs, depth + 1, current, combinations);
+    current.pop_back();
+  }
+}
+
+void ProgramVisitor::getAllEntityDeclFromHeader(
+    const DataStructures::Declarations::Helpers::FunctionHeader& functionHeader,
+    std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>>& vecs) {
+  size_t inc = 0;
+
+  for (const auto& param : functionHeader.parameters) {
+    if (param.isTypeDeclaration) {
+      vecs[inc] = this->m_Domain->getGlobalScope()->getAllEntitiesFromType(param.dataType);
+    } else {
+      vecs[inc] = {param.entityType};
+    }
+    inc++;
+  }
+}
+
+std::any ProgramVisitor::visitActionDecl(KasXParser::ActionDeclContext* ctx) {
+  PrintStartVisit("Action Declaration", "");
+  auto functionHeader = std::any_cast<DataStructures::Declarations::Helpers::FunctionHeader>(visit(ctx->function_header()));
+
+  auto* scope = this->m_Domain->getCurrentScope()->createChildScope(functionHeader.name, Core::Scopes::SCOPE_TYPES::ACTION);
+  std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>> vecs;
+  vecs.resize(functionHeader.parameters.size());
+
+  getAllEntityDeclFromHeader(functionHeader, vecs);
+
+  std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>> combinations;
+  std::vector<DataStructures::Declarations::EntityDeclaration*> current;
+  recurseParams(vecs, 0, current, combinations);
+  CLI_TRACE("Combinations size: {}", combinations.size());
+  for (auto& combination : combinations) {
+    CLI_TRACE("Combination start");
+    for (auto* entity : combination) {
+      CLI_TRACE("Combination val: {}", entity->name);
+    }
+    CLI_TRACE("Combination end");
+  }
+
+  PrintEndVisit("Action Declaration", functionHeader.name);
+
+  return nullptr;
+}
 
 std::any ProgramVisitor::visitTriggerDecl(KasXParser::TriggerDeclContext* ctx) { return nullptr; }
 

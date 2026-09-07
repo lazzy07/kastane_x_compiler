@@ -9,10 +9,13 @@
 #pragma once
 #include <any>
 #include <kasx/core/logging/TraceableClass.hpp>
+#include <vector>
 
 #include "AntlrSafeBase.hpp"
 #include "KasXParser.h"
 #include "kasx/Domain.hpp"
+#include "kasx/data_structures/declarations/EntityDeclaration.hpp"
+#include "kasx/data_structures/declarations/helpers/FunctionHeader.hpp"
 #include "kasx/data_structures/expressions/operations/BinaryOperationTypes.hpp"
 #include "kasx/debug/DomainFileTrace.hpp"
 
@@ -232,5 +235,12 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
    * @param typeName Name of the type it must be or inherit from, eg: "character"
    */
   static bool entityIsOfType(DataStructures::Declarations::EntityDeclaration* entity, const std::string& typeName);
+
+  void recurseParams(const std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>>& vecs, size_t depth,
+                     std::vector<DataStructures::Declarations::EntityDeclaration*>& current,
+                     std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>>& combinations);
+
+  void getAllEntityDeclFromHeader(const DataStructures::Declarations::Helpers::FunctionHeader& functionHeader,
+                                  std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>>& vecs);
 };
 }  // namespace KasX::Compiler::Visitors
