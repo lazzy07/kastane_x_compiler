@@ -20,7 +20,7 @@ namespace KasX::Compiler::DataStructures::Declarations::Helpers {
  *
  */
 struct Parameter : public Traceable {
-  bool isTypeDeclaration;  ///< This will be true if the parameter type is an entity.
+  bool isTypeDeclaration;  ///< This will be false if the parameter type is an entity.
   TypeDeclaration*
       dataType;  ///< Type of the parameter, this will be null if the parameter type is just an entity instead of a type.
   EntityDeclaration* entityType;  ///< If the parameter is an entity, it will be pointed here.
