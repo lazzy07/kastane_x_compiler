@@ -8,6 +8,8 @@
  */
 #pragma once
 
+#include <vector>
+
 #include "kasx/Types.hpp"
 #include "kasx/data_structures/declarations/ActionDeclaration.hpp"
 #include "kasx/data_structures/declarations/EntityDeclaration.hpp"
@@ -20,7 +22,7 @@ struct GroundedAction {
   Expressions::ExpressionPtr precondition;  ///< Precondition of the action
   Expressions::ExpressionPtr effect;        ///< Effect of the action
 
-  Declarations::EntityDeclaration* consenting;  ///< Consenting characters for this action
-  Expressions::ExpressionPtr observation;       ///< Observation expressions
+  std::vector<Declarations::EntityDeclaration*> consenting;  ///< Consenting characters for this action
+  std::vector<Expressions::ExpressionPtr> observation;       ///< Observation expressions
 };
 }  // namespace KasX::Compiler::DataStructures::Grounded

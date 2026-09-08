@@ -14,6 +14,7 @@
 
 #include "kasx/core/scopes/Scope.hpp"
 #include "kasx/data_structures/declarations/Declaration.hpp"
+#include "kasx/debug/DomainFileTrace.hpp"
 
 namespace KasX::Compiler::DataStructures::Grounded {
 struct GroundedAction;
@@ -28,5 +29,8 @@ namespace KasX::Compiler::DataStructures::Declarations {
 struct ActionDeclaration : public Declaration {
   Core::Scopes::Scope* scope;                                               ///< Action scope
   std::vector<std::unique_ptr<Grounded::GroundedAction*>> groundedActions;  ///< Grounded functions created from the declaration
+
+  ActionDeclaration(const std::string& name, Debug::DomainFileTrace fileTrace)
+      : Declaration(name, DECLARATION_TYPES::ACTION_DECL, fileTrace) {}
 };
 }  // namespace KasX::Compiler::DataStructures::Declarations
