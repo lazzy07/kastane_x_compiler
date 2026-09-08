@@ -22,7 +22,8 @@
 #include "Token.h"
 #include "kasx/Domain.hpp"
 #include "kasx/core/scopes/Scope.hpp"
-#include "kasx/core/services/IDHandler.hpp"
+#include "kasx/data_structures/declarations/ActionDeclaration.hpp"
+#include "kasx/data_structures/declarations/EntityDeclaration.hpp"
 #include "kasx/data_structures/expressions/Believes.hpp"
 #include "kasx/data_structures/expressions/Expression.hpp"
 #include "kasx/data_structures/expressions/Fluent.hpp"
@@ -583,18 +584,27 @@ void ProgramVisitor::getAllEntityDeclFromHeader(
 
 std::any ProgramVisitor::visitActionDecl(KasXParser::ActionDeclContext* ctx) {
   PrintStartVisit("Action Declaration", "");
+
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+
   auto functionHeader = std::any_cast<DataStructures::Declarations::Helpers::FunctionHeader>(visit(ctx->function_header()));
 
   auto* scope = this->m_Domain->getCurrentScope()->createChildScope(functionHeader.name, Core::Scopes::SCOPE_TYPES::ACTION);
   this->m_Domain->setCurrentScope(scope);
+
   std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>> vecs;
   vecs.resize(functionHeader.parameters.size());
 
   getAllEntityDeclFromHeader(functionHeader, vecs);
 
+  DataStructures::Declarations::ActionDeclaration actionDecl(functionHeader.name, trace);
+  actionDecl.scope = scope;
+
   std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>> combinations;
   std::vector<DataStructures::Declarations::EntityDeclaration*> current;
+
   recurseParams(vecs, 0, current, combinations);
+
   CLI_TRACE("# of combinations found for the action {}: {}", functionHeader.name, combinations.size());
 
   for (auto& combination : combinations) {
@@ -602,16 +612,34 @@ std::any ProgramVisitor::visitActionDecl(KasXParser::ActionDeclContext* ctx) {
     for (int i = 0; i < combination.size(); i++) {
       scope->addIdentifierToReplace(functionHeader.parameters.at(i).name, combination.at(i)->name);
     }
+
     // Grounded action creation functionality
-    auto precondition = std::any_cast<DataStructures::Expressions::ExpressionPtr>(
-        visit(ctx->action_body()->precondition_block()->conditions_list()->arithmetic_expression()));
-    CLI_TRACE("Precondition name: ", precondition->name);
-    auto effect = std::any_cast<DataStructures::Expressions::ExpressionPtr>(
-        visit(ctx->action_body()->effect_block()->conditions_list()->arithmetic_expression()));
+    // Preconditions
+    auto precondition = visit(ctx->action_body()->precondition_block()->conditions_list()->arithmetic_expression());
+    auto* preconditionPtr = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&precondition);
+
+    auto* effectBlock = ctx->action_body()->effect_block();
+    if (effectBlock != nullptr) {
+      auto effect = visit(effectBlock->conditions_list()->arithmetic_expression());
+      auto* effectPtr = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&effect);
+    }
+
+    auto* consentingList = ctx->action_body()->consenting_list();
+
+    if (consentingList != nullptr) {
+      std::vector<antlr4::tree::TerminalNode*> items = consentingList->identifiers_list()->IDENTIFIER();
+      std::vector<std::string> consenting;
+      consenting.reserve(items.size());
+
+      for (auto* item : items) {
+        CLI_TRACE("Item: {}", item->getText());
+        consenting.emplace_back(item->getText());
+      }
+    }
   }
 
   scope->disableReplaceMode();
-  this->m_Domain->setCurrentScope(this->m_Domain->getGlobalScope());
+  this->m_Domain->setCurrentScope(scope->getParentScope());
   PrintEndVisit("Action Declaration", functionHeader.name);
 
   return nullptr;
@@ -621,8 +649,39 @@ std::any ProgramVisitor::visitTriggerDecl(KasXParser::TriggerDeclContext* ctx) {
   PrintStartVisit("Trigger Declaration", "");
 
   auto functionHeader = std::any_cast<DataStructures::Declarations::Helpers::FunctionHeader>(visit(ctx->function_header()));
-  auto* scope = this->m_Domain->getCurrentScope()->createChildScope(functionHeader.name, Core::Scopes::SCOPE_TYPES::TRIGGER);
 
+  auto* scope = this->m_Domain->getCurrentScope()->createChildScope(functionHeader.name, Core::Scopes::SCOPE_TYPES::TRIGGER);
+  this->m_Domain->setCurrentScope(scope);
+
+  std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>> vecs;
+  vecs.resize(functionHeader.parameters.size());
+
+  getAllEntityDeclFromHeader(functionHeader, vecs);
+
+  std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>> combinations;
+  std::vector<DataStructures::Declarations::EntityDeclaration*> current;
+
+  recurseParams(vecs, 0, current, combinations);
+
+  CLI_TRACE("# of combinations found for the action {}: {}", functionHeader.name, combinations.size());
+
+  for (auto& combination : combinations) {
+    scope->enableReplaceMode();
+    for (int i = 0; i < combination.size(); i++) {
+      scope->addIdentifierToReplace(functionHeader.parameters.at(i).name, combination.at(i)->name);
+    }
+
+    // Grounded trigger creation functionality
+    auto precondition = std::any_cast<DataStructures::Expressions::ExpressionPtr>(
+        visit(ctx->trigger_body()->precondition_block()->conditions_list()->arithmetic_expression()));
+    auto effect = std::any_cast<DataStructures::Expressions::ExpressionPtr>(
+        visit(ctx->trigger_body()->effect_block()->conditions_list()->arithmetic_expression()));
+  }
+
+  scope->disableReplaceMode();
+  this->m_Domain->setCurrentScope(scope->getParentScope());
+
+  PrintEndVisit("Trigger Declaration", functionHeader.name);
   return nullptr;
 }
 
