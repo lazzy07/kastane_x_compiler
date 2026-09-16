@@ -31,6 +31,7 @@
 #include "kasx/data_structures/expressions/operations/BinaryOperation.hpp"
 #include "kasx/data_structures/expressions/operations/ForAllOperation.hpp"
 #include "kasx/data_structures/expressions/operations/UnaryOperation.hpp"
+#include "kasx/data_structures/grounded/GroundedAction.hpp"
 
 namespace KasX::Compiler::Visitors {
 using std::string;
@@ -483,7 +484,9 @@ std::any ProgramVisitor::visitBelives_expression(KasXParser::Belives_expressionC
   // Mirrors Sabre's Epistemic(Parameter character, Expression argument): the first argument must resolve to a declared
   // entity of type 'character', the second can be any logical expression (a fluent, a comparison/assignment involving one,
   // or even another believes expression for nested beliefs).
-  const std::string& characterName = ctx->IDENTIFIER()->getText();
+  std::string characterName = ctx->IDENTIFIER()->getText();
+  characterName = this->m_Domain->getCurrentScope()->getReplaceString(characterName);
+
   CLI_TRACE("Visiting believes expression for: {}", characterName);
 
   auto* characterEntity = m_Domain->getGlobalScope()->getEntityDeclaration(characterName);
@@ -597,8 +600,7 @@ std::any ProgramVisitor::visitActionDecl(KasXParser::ActionDeclContext* ctx) {
 
   getAllEntityDeclFromHeader(functionHeader, vecs);
 
-  DataStructures::Declarations::ActionDeclaration actionDecl(functionHeader.name, trace);
-  actionDecl.scope = scope;
+  auto* actionDecl = this->m_Domain->getGlobalScope()->createActionDeclaration(functionHeader.name, scope, trace);
 
   std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>> combinations;
   std::vector<DataStructures::Declarations::EntityDeclaration*> current;
@@ -612,16 +614,23 @@ std::any ProgramVisitor::visitActionDecl(KasXParser::ActionDeclContext* ctx) {
     for (int i = 0; i < combination.size(); i++) {
       scope->addIdentifierToReplace(functionHeader.parameters.at(i).name, combination.at(i)->name);
     }
-
+    auto groundedAction = std::make_unique<DataStructures::Grounded::GroundedAction>();
+    groundedAction->declaration = actionDecl;
     // Grounded action creation functionality
     // Preconditions
-    auto precondition = visit(ctx->action_body()->precondition_block()->conditions_list()->arithmetic_expression());
-    auto* preconditionPtr = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&precondition);
+    auto* preconditionBlock = ctx->action_body()->precondition_block();
 
+    if (preconditionBlock != nullptr) {
+      auto precondition = visit(preconditionBlock->conditions_list()->arithmetic_expression());
+      auto* preconditionPtr = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&precondition);
+      groundedAction->precondition = *preconditionPtr;
+    }
+    // Effect
     auto* effectBlock = ctx->action_body()->effect_block();
     if (effectBlock != nullptr) {
       auto effect = visit(effectBlock->conditions_list()->arithmetic_expression());
       auto* effectPtr = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&effect);
+      groundedAction->effect = *effectPtr;
     }
 
     auto* consentingList = ctx->action_body()->consenting_list();
@@ -635,7 +644,58 @@ std::any ProgramVisitor::visitActionDecl(KasXParser::ActionDeclContext* ctx) {
         CLI_TRACE("Item: {}", item->getText());
         consenting.emplace_back(item->getText());
       }
+
+      for (auto& consentingStr : consenting) {
+        const std::string& replacedChar = scope->getReplaceString(consentingStr);
+        auto* entity = m_Domain->getGlobalScope()->getEntityDeclaration(replacedChar);
+        if (entity == nullptr) {
+          // TODO: lazzy07 - Handle error
+          CLI_ERROR("Entity {} not found in the global scope to add as a consenting character", replacedChar);
+          continue;
+        }
+        groundedAction->consenting.emplace_back(entity);
+        CLI_TRACE("Entity {} added as a consenting character for action: {}", replacedChar, functionHeader.name);
+      }
     }
+
+    // Observing
+    auto* observingFunc = ctx->action_body()->observing_fun();
+
+    if (observingFunc != nullptr) {
+      const std::string& observer = observingFunc->IDENTIFIER()->getText();
+
+      DataStructures::Expressions::ExpressionPtr observingExp;
+
+      auto* observerTypeCtx = observingFunc->data_type();
+
+      if (observerTypeCtx == nullptr) {
+        CLI_TRACE("Observer has only one entity, no replace needed");
+        observingExp = std::any_cast<DataStructures::Expressions::ExpressionPtr>(
+            visit(observingFunc->conditions_list()->arithmetic_expression()));
+        groundedAction->observation.emplace_back(observingExp);
+      } else {
+        CLI_TRACE("Observer has multiple entities");
+        const std::string& observerTypeStr = observerTypeCtx->getText();
+        auto* observerType = m_Domain->getGlobalScope()->getTypeDeclaration(observerTypeStr);
+
+        if (observerType == nullptr) {
+          CLI_ERROR("Observer type {} not found in the global scope", observerTypeStr);
+        }
+
+        auto observingEntities = m_Domain->getGlobalScope()->getAllEntitiesFromType(observerType);
+
+        for (auto& entity : observingEntities) {
+          CLI_TRACE("Observing entity: {}", entity->name);
+          scope->addIdentifierToReplace(observer, entity->name);
+          observingExp = std::any_cast<DataStructures::Expressions::ExpressionPtr>(
+              visit(observingFunc->conditions_list()->arithmetic_expression()));
+          groundedAction->observation.emplace_back(observingExp);
+          scope->removeReplaceIdentifier(observer);
+        }
+      }
+    }
+
+    actionDecl->groundedActions.emplace_back(std::move(groundedAction));
   }
 
   scope->disableReplaceMode();
