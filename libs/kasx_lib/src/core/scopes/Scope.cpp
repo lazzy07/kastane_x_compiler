@@ -35,6 +35,8 @@ void Scope::addIdentifierToReplace(const std::string& identifier, const std::str
   m_ReplaceMap[identifier] = replace;
 }
 
+void Scope::removeReplaceIdentifier(const std::string& identifier) { m_ReplaceMap.erase(identifier); }
+
 void Scope::disableReplaceMode() {
   m_ReplaceMode = false;
   m_ReplaceMap = {};

@@ -82,6 +82,13 @@ class Scope {
   void addIdentifierToReplace(const std::string& identifier, const std::string& replace);
 
   /**
+   * @brief Remove an replace identifier from the scope
+   *
+   * @param identifier Replace identifier to remove
+   */
+  void removeReplaceIdentifier(const std::string& identifier);
+
+  /**
    * @brief Creates a child scope with the current scope as the parent
    *
    * @param name Name of the child scope

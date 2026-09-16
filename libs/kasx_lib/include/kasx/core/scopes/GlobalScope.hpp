@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "Scope.hpp"
+#include "kasx/data_structures/declarations/ActionDeclaration.hpp"
 #include "kasx/data_structures/declarations/EntityDeclaration.hpp"
 #include "kasx/data_structures/declarations/FluentDeclaration.hpp"
 #include "kasx/data_structures/declarations/TypeDeclaration.hpp"
@@ -136,11 +137,14 @@ class GlobalScope : public Scope {
   void createEntityDeclaration(const std::string& name, const std::vector<std::string>& types,
                                const Debug::DomainFileTrace& trace);
 
+  DataStructures::Declarations::ActionDeclaration* createActionDeclaration(const std::string& name, Scopes::Scope* scope,
+                                                                           const Debug::DomainFileTrace& trace);
+
  private:
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::TypeDeclaration>> m_TypeDeclarations;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::EntityDeclaration>> m_EntityDeclarations;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::FluentDeclaration>> m_FluentDeclarations;
-
+  std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::ActionDeclaration>> m_ActionDeclarations;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Grounded::GroundedFluent>> m_GroundedFluents;
 
   std::vector<KasX::Compiler::DataStructures::Expressions::ExpressionPtr>

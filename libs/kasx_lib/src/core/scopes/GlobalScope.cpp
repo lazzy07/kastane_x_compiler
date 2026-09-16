@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "Log.hpp"
+#include "kasx/data_structures/declarations/ActionDeclaration.hpp"
 #include "kasx/data_structures/declarations/Declaration.hpp"
 #include "kasx/data_structures/declarations/EntityDeclaration.hpp"
 #include "kasx/data_structures/declarations/TypeDeclaration.hpp"
@@ -213,5 +214,13 @@ void GlobalScope::createEntityDeclaration(const std::string& name, const std::ve
   for (const auto& type : typeDeclarations) {
     type->addNewEntityDeclaration(this->getEntityDeclaration(name));
   }
+}
+
+DataStructures::Declarations::ActionDeclaration* GlobalScope::createActionDeclaration(const std::string& name,
+                                                                                      Scopes::Scope* scope,
+                                                                                      const Debug::DomainFileTrace& trace) {
+  m_ActionDeclarations[name] = std::make_unique<DataStructures::Declarations::ActionDeclaration>(name, trace);
+  m_ActionDeclarations[name]->scope = scope;
+  return m_ActionDeclarations[name].get();
 }
 }  // namespace KasX::Compiler::Core::Scopes
