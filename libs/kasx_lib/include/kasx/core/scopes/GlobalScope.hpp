@@ -15,9 +15,13 @@
 #include "kasx/data_structures/declarations/ActionDeclaration.hpp"
 #include "kasx/data_structures/declarations/EntityDeclaration.hpp"
 #include "kasx/data_structures/declarations/FluentDeclaration.hpp"
+#include "kasx/data_structures/declarations/TriggerDeclaration.hpp"
 #include "kasx/data_structures/declarations/TypeDeclaration.hpp"
+#include "kasx/data_structures/declarations/UtilityDeclatation.hpp"
 #include "kasx/data_structures/expressions/Expression.hpp"
+#include "kasx/data_structures/grounded/GroundedAction.hpp"
 #include "kasx/data_structures/grounded/GroundedFluent.hpp"
+#include "kasx/data_structures/grounded/GroundedTrigger.hpp"
 #include "kasx/debug/DomainFileTrace.hpp"
 
 namespace KasX::Compiler::Core::Scopes {
@@ -140,11 +144,33 @@ class GlobalScope : public Scope {
   DataStructures::Declarations::ActionDeclaration* createActionDeclaration(const std::string& name, Scopes::Scope* scope,
                                                                            const Debug::DomainFileTrace& trace);
 
+  /**
+   * @brief Create a new trigger declaration in the global scope.
+   *
+   * @param name Name of the trigger.
+   * @param scope Scope created for this trigger's parameters.
+   * @param trace Debug file trace data to keep track of the domain file.
+   */
+  DataStructures::Declarations::TriggerDeclaration* createTriggerDeclaration(const std::string& name, Scopes::Scope* scope,
+                                                                             const Debug::DomainFileTrace& trace);
+
+  /**
+   * @brief Create a new utility declaration in the global scope.
+   *
+   * @param name Name of the utility.
+   * @param scope Scope created for this utility declaration.
+   * @param trace Debug file trace data to keep track of the domain file.
+   */
+  DataStructures::Declarations::UtilityDeclaration* createUtilityDeclaration(const std::string& name, Scopes::Scope* scope,
+                                                                             const Debug::DomainFileTrace& trace);
+
  private:
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::TypeDeclaration>> m_TypeDeclarations;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::EntityDeclaration>> m_EntityDeclarations;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::FluentDeclaration>> m_FluentDeclarations;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::ActionDeclaration>> m_ActionDeclarations;
+  std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::TriggerDeclaration>> m_TriggerDeclarations;
+  std::unordered_map<std::string, std::unique_ptr<DataStructures::Declarations::UtilityDeclaration>> m_UtilityDeclarations;
   std::unordered_map<std::string, std::unique_ptr<DataStructures::Grounded::GroundedFluent>> m_GroundedFluents;
 
   std::vector<KasX::Compiler::DataStructures::Expressions::ExpressionPtr>

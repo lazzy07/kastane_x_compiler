@@ -223,4 +223,20 @@ DataStructures::Declarations::ActionDeclaration* GlobalScope::createActionDeclar
   m_ActionDeclarations[name]->scope = scope;
   return m_ActionDeclarations[name].get();
 }
+
+DataStructures::Declarations::TriggerDeclaration* GlobalScope::createTriggerDeclaration(const std::string& name,
+                                                                                        Scopes::Scope* scope,
+                                                                                        const Debug::DomainFileTrace& trace) {
+  m_TriggerDeclarations[name] = std::make_unique<DataStructures::Declarations::TriggerDeclaration>(name, trace);
+  m_TriggerDeclarations[name]->scope = scope;
+  return m_TriggerDeclarations[name].get();
+}
+
+DataStructures::Declarations::UtilityDeclaration* GlobalScope::createUtilityDeclaration(const std::string& name,
+                                                                                        Scopes::Scope* scope,
+                                                                                        const Debug::DomainFileTrace& trace) {
+  m_UtilityDeclarations[name] = std::make_unique<DataStructures::Declarations::UtilityDeclaration>(name, trace);
+  m_UtilityDeclarations[name]->scope = scope;
+  return m_UtilityDeclarations[name].get();
+}
 }  // namespace KasX::Compiler::Core::Scopes
