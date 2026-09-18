@@ -8,6 +8,7 @@
 */
 #pragma once
 #include <any>
+#include <functional>
 #include <kasx/core/logging/TraceableClass.hpp>
 #include <vector>
 
@@ -16,6 +17,7 @@
 #include "kasx/Domain.hpp"
 #include "kasx/data_structures/declarations/EntityDeclaration.hpp"
 #include "kasx/data_structures/declarations/helpers/FunctionHeader.hpp"
+#include "kasx/data_structures/expressions/Expression.hpp"
 #include "kasx/data_structures/expressions/operations/BinaryOperationTypes.hpp"
 #include "kasx/debug/DomainFileTrace.hpp"
 
@@ -242,5 +244,52 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
 
   void getAllEntityDeclFromHeader(const DataStructures::Declarations::Helpers::FunctionHeader& functionHeader,
                                   std::vector<std::vector<DataStructures::Declarations::EntityDeclaration*>>& vecs);
+
+  /**
+   * @brief Grounds every parameter combination of a function header against the given scope's replace map and invokes
+   * `perCombination` once per combination. Shared by action and trigger declarations, which both ground a function header
+   * the same way but build a different kind of grounded declaration out of it.
+   *
+   * @param functionHeader Function header (name + parameters) to ground.
+   * @param scope Scope that owns the replace map to populate for each combination.
+   * @param perCombination Callback invoked once per combination, after the scope's replace map has been updated.
+   */
+  void groundHeaderParameters(const DataStructures::Declarations::Helpers::FunctionHeader& functionHeader,
+                              Core::Scopes::Scope* scope, const std::function<void()>& perCombination);
+
+  /**
+   * @brief Visits the (optional) precondition/effect blocks shared by action and trigger bodies.
+   *
+   * @param preconditionCtx Precondition block context, or nullptr if not present.
+   * @param effectCtx Effect block context, or nullptr if not present.
+   * @param precondition Out param set to the visited precondition expression, if preconditionCtx isn't null.
+   * @param effect Out param set to the visited effect expression, if effectCtx isn't null.
+   */
+  void assignPreconditionAndEffect(KasXParser::Precondition_blockContext* preconditionCtx,
+                                   KasXParser::Effect_blockContext* effectCtx,
+                                   DataStructures::Expressions::ExpressionPtr& precondition,
+                                   DataStructures::Expressions::ExpressionPtr& effect);
+
+  /**
+   * @brief Resolves an action's consenting character list (if present) to entity declarations, applying the scope's replace
+   * map first, and appends them to `consenting`.
+   *
+   * @param consentingListCtx Consenting list context, or nullptr if not present.
+   * @param scope Scope used to resolve replaced identifiers.
+   * @param consenting Out vector that resolved entities are appended to.
+   */
+  void assignConsentingCharacters(KasXParser::Consenting_listContext* consentingListCtx, Core::Scopes::Scope* scope,
+                                  std::vector<DataStructures::Declarations::EntityDeclaration*>& consenting);
+
+  /**
+   * @brief Visits an action's observing function (if present), evaluating its expression once for a single bound observer or
+   * once per entity of the observer's type, and appends the resulting expressions to `observations`.
+   *
+   * @param observingFuncCtx Observing function context, or nullptr if not present.
+   * @param scope Scope used to bind the observer identifier while grounding over a type.
+   * @param observations Out vector that visited observation expressions are appended to.
+   */
+  void assignObservations(KasXParser::Observing_funContext* observingFuncCtx, Core::Scopes::Scope* scope,
+                          std::vector<DataStructures::Expressions::ExpressionPtr>& observations);
 };
 }  // namespace KasX::Compiler::Visitors
