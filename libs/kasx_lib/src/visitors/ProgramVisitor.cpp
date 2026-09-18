@@ -41,6 +41,34 @@ ProgramVisitor::ProgramVisitor(Core::Domain* domain) : m_Domain(domain) { CORE_T
 
 ProgramVisitor::~ProgramVisitor() { CORE_TRACE("ProgramVisitor Terminated"); }
 
+std::any ProgramVisitor::visitProgram(KasXParser::ProgramContext* ctx) {
+  auto isTypeOrEntity = [](KasXParser::DefinitionContext* def) {
+    return def->type_declaration() != nullptr || def->entity_declaration() != nullptr;
+  };
+  auto isFluent = [](KasXParser::DefinitionContext* def) { return def->fluent_declaration() != nullptr; };
+
+  // Pass 1: types and entities, in file order.
+  for (auto* def : ctx->definition()) {
+    if (isTypeOrEntity(def)) {
+      visit(def);
+    }
+  }
+  // Pass 2: fluents, now that every entity is known.
+  for (auto* def : ctx->definition()) {
+    if (isFluent(def)) {
+      visit(def);
+    }
+  }
+  // Pass 3: everything else (initial state, actions, triggers, utility) - these only reference already-declared
+  // entities/fluents, never introduce new ones.
+  for (auto* def : ctx->definition()) {
+    if (!isTypeOrEntity(def) && !isFluent(def)) {
+      visit(def);
+    }
+  }
+  return nullptr;
+}
+
 std::any ProgramVisitor::visitTypeDeclaration(KasXParser::TypeDeclarationContext* ctx) {
   std::string typeDeclarationName = ctx->IDENTIFIER()->getText();
 

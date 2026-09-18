@@ -37,6 +37,15 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
   ~ProgramVisitor() override;
 
   /**
+   * @brief Root visitor for the program. Visits definitions in three passes (types/entities, then fluents, then
+   * everything else) instead of file order, so that fluent grounding always sees every declared entity regardless
+   * of where fluents/actions/triggers/utility declarations appear in the source file.
+   *
+   * @param ctx Program context (root of the parse tree)
+   */
+  std::any visitProgram(KasXParser::ProgramContext* ctx) override;
+
+  /**
    * @brief Visitor function for the type declaration.
    *
    * @param ctx Type Declaration context
