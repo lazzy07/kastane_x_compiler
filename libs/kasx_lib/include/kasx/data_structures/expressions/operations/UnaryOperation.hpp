@@ -12,7 +12,7 @@
 #include <utility>
 
 #include "UnaryOperationTypes.hpp"
-#include "kasx/Domain.hpp"
+#include "kasx/data_structures/expressions/Expression.hpp"
 #include "kasx/debug/DomainFileTrace.hpp"
 
 namespace KasX::Compiler::DataStructures::Expressions {
