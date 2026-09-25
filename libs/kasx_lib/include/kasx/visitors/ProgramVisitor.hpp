@@ -311,7 +311,7 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
   void assignObservations(KasXParser::Observing_funContext* observingFuncCtx, Core::Scopes::Scope* scope,
                           std::vector<DataStructures::Expressions::ExpressionPtr>& observations);
 
-  // Visitor functionality for if else operatin
+  // Visitor functionality for if else operation
   void visitConditionalPart(KasXParser::ExprIfElseContext* ctx, size_t index,
                             DataStructures::Expressions::IfElseOperation* ifElseOperation);
   void visitPartIfElse(KasXParser::ExprIfElseContext* ctx, DataStructures::Expressions::IfElseOperation* ifElseOperation);
