@@ -216,6 +216,14 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
    */
   std::any visitUtilityDecl(KasXParser::UtilityDeclContext* ctx) override;
 
+  /**
+   * @brief Visitor function for if else expressions
+   *
+   * @param ctx If else expression context
+   * @return returns ExpressionPtr
+   */
+  std::any visitExprIfElse(KasXParser::ExprIfElseContext* ctx) override;
+
  private:
   Core::Domain* m_Domain;
 

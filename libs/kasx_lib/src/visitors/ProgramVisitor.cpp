@@ -790,4 +790,12 @@ std::any ProgramVisitor::visitUtilityDecl(KasXParser::UtilityDeclContext* ctx) {
 
   return nullptr;
 }
+
+std::any ProgramVisitor::visitExprIfElse(KasXParser::ExprIfElseContext* ctx) {
+  PrintStartVisit("If Else Expression", "");
+  auto* ifElseCtx = ctx->if_else_block();
+
+  CLI_TRACE("Acccessing If Else Expression done");
+  PrintEndVisit("If Else Expression", "");
+}
 }  // namespace KasX::Compiler::Visitors
