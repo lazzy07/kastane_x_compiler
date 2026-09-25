@@ -792,6 +792,34 @@ std::any ProgramVisitor::visitUtilityDecl(KasXParser::UtilityDeclContext* ctx) {
   return nullptr;
 }
 
+void ProgramVisitor::visitConditionalPart(KasXParser::ExprIfElseContext* ctx, size_t index,
+                                          DataStructures::Expressions::IfElseOperation* ifElseOperation) {
+  auto ifConditionRet = visit(ctx->if_else_block()->arithmetic_expression(index));
+  auto ifCondition = std::any_cast<DataStructures::Expressions::ExpressionPtr>(ifConditionRet);
+  auto ifExpressionRet = visit(ctx->if_else_block()->conditions_list(index)->arithmetic_expression());
+  auto ifExpression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(ifExpressionRet);
+
+  ifElseOperation->ifConditions.emplace_back(ifCondition);
+  ifElseOperation->ifExpressions.emplace_back(ifExpression);
+}
+
+void ProgramVisitor::visitPartElse(KasXParser::ExprIfElseContext* ctx, size_t expressionIndex,
+                                   DataStructures::Expressions::IfElseOperation* ifElseOperation) {
+  auto elseExpressionRet = visit(ctx->if_else_block()->conditions_list(expressionIndex)->arithmetic_expression());
+  auto elseExpression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(elseExpressionRet);
+
+  ifElseOperation->elseExpression = DataStructures::Expressions::ExpressionPtr(elseExpression);
+}
+
+void ProgramVisitor::visitPartIfElse(KasXParser::ExprIfElseContext* ctx,
+                                     DataStructures::Expressions::IfElseOperation* ifElseOperation) {
+  size_t noOfIfElseOpereations = ctx->if_else_block()->CONDITIONAL_MIDDLE_BRANCH_KEYWORD().size();
+
+  for (int i = 1; i <= noOfIfElseOpereations; i++) {
+    this->visitConditionalPart(ctx, i, ifElseOperation);
+  }
+}
+
 std::any ProgramVisitor::visitExprIfElse(KasXParser::ExprIfElseContext* ctx) {
   PrintStartVisit("If Else Expression", "");
   auto* ifElseCtx = ctx->if_else_block();
@@ -799,14 +827,33 @@ std::any ProgramVisitor::visitExprIfElse(KasXParser::ExprIfElseContext* ctx) {
 
   auto ifElseExpr = std::make_shared<DataStructures::Expressions::IfElseOperation>(trace);
 
-  auto ifConditionRet = visit(ctx->if_else_block()->arithmetic_expression(0));
-  auto ifCondition = std::any_cast<DataStructures::Expressions::ExpressionPtr>(ifConditionRet);
-  auto ifExpressionRet = visit(ctx->if_else_block()->conditions_list(0)->arithmetic_expression());
-  auto ifExpression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(ifExpressionRet);
+  const size_t ifElsePartSize = ctx->if_else_block()->CONDITIONAL_MIDDLE_BRANCH_KEYWORD().size();
 
-  ifElseExpr->ifConditions.emplace_back(ifCondition);
-  ifElseExpr->ifExpressions.emplace_back(ifExpression);
+  // Visit if part
+  if (ctx->if_else_block()->CONDITIONAL_FIRST_BRANCH_KEYWORD() == nullptr) {
+    // TODO: lazzy07 - Handle Error
+    CLI_ERROR("If part of the if else expression is missing");
+    return std::make_shared<DataStructures::Expressions::ExpressionPtr>(nullptr);
+  }
 
+  this->visitConditionalPart(ctx, 0, ifElseExpr.get());
+
+  // Visit if else part
+  if (ifElsePartSize != 0) {
+    this->visitPartIfElse(ctx, ifElseExpr.get());
+  }
+
+  // Visit else part
+  if (ctx->if_else_block()->CONDITIONAL_LAST_BRANCH_KEYWORD() != nullptr) {
+    // Check if the if else expression size is correct (2 comes from the if expression and else expression)
+    if (ctx->if_else_block()->conditions_list().size() != ifElsePartSize + 2) {
+      // TODO: lazzy07 - Handle Error
+      CLI_ERROR("If else arithmetic expression size not matched");
+      return std::make_shared<DataStructures::Expressions::ExpressionPtr>(nullptr);
+    }
+    // + 1 because if part of the expression includes an conditions_list as well
+    this->visitPartElse(ctx, ifElsePartSize + 1, ifElseExpr.get());
+  }
   CLI_TRACE("Acccessing If Else Expression done");
   PrintEndVisit("If Else Expression", "");
 

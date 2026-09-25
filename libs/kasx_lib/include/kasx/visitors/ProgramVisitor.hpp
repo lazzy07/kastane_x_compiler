@@ -8,6 +8,7 @@
 */
 #pragma once
 #include <any>
+#include <cstddef>
 #include <functional>
 #include <kasx/core/logging/TraceableClass.hpp>
 #include <vector>
@@ -19,6 +20,7 @@
 #include "kasx/data_structures/declarations/helpers/FunctionHeader.hpp"
 #include "kasx/data_structures/expressions/Expression.hpp"
 #include "kasx/data_structures/expressions/operations/BinaryOperationTypes.hpp"
+#include "kasx/data_structures/expressions/operations/IfElseOperation.hpp"
 #include "kasx/debug/DomainFileTrace.hpp"
 
 namespace KasX::Compiler::Visitors {
@@ -308,5 +310,12 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
    */
   void assignObservations(KasXParser::Observing_funContext* observingFuncCtx, Core::Scopes::Scope* scope,
                           std::vector<DataStructures::Expressions::ExpressionPtr>& observations);
+
+  // Visitor functionality for if else operatin
+  void visitConditionalPart(KasXParser::ExprIfElseContext* ctx, size_t index,
+                            DataStructures::Expressions::IfElseOperation* ifElseOperation);
+  void visitPartIfElse(KasXParser::ExprIfElseContext* ctx, DataStructures::Expressions::IfElseOperation* ifElseOperation);
+  void visitPartElse(KasXParser::ExprIfElseContext* ctx, size_t expressionIndex,
+                     DataStructures::Expressions::IfElseOperation* ifElseOperation);
 };
 }  // namespace KasX::Compiler::Visitors
