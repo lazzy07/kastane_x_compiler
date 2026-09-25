@@ -226,6 +226,22 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
    */
   std::any visitExprIfElse(KasXParser::ExprIfElseContext* ctx) override;
 
+  /**
+   * @brief Sum expression visitor
+   *
+   * @param ctx Sum expression context
+   * @return returns ExpressionPtr
+   */
+  std::any visitExprSum(KasXParser::ExprSumContext* ctx) override;
+
+  /**
+   * @brief Exists expression visitor
+   *
+   * @param ctx Exists expression context
+   * @return returns ExpressionPtr
+   */
+  std::any visitExprExists(KasXParser::ExprExistsContext* ctx) override;
+
  private:
   Core::Domain* m_Domain;
 

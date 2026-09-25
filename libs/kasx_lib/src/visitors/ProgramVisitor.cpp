@@ -29,8 +29,10 @@
 #include "kasx/data_structures/expressions/Fluent.hpp"
 #include "kasx/data_structures/expressions/data_types/Number.hpp"
 #include "kasx/data_structures/expressions/operations/BinaryOperation.hpp"
+#include "kasx/data_structures/expressions/operations/ExistsOperation.hpp"
 #include "kasx/data_structures/expressions/operations/ForAllOperation.hpp"
 #include "kasx/data_structures/expressions/operations/IfElseOperation.hpp"
+#include "kasx/data_structures/expressions/operations/SumOperation.hpp"
 #include "kasx/data_structures/expressions/operations/UnaryOperation.hpp"
 #include "kasx/data_structures/grounded/GroundedAction.hpp"
 #include "kasx/data_structures/grounded/GroundedTrigger.hpp"
@@ -821,7 +823,7 @@ void ProgramVisitor::visitPartIfElse(KasXParser::ExprIfElseContext* ctx,
 }
 
 std::any ProgramVisitor::visitExprIfElse(KasXParser::ExprIfElseContext* ctx) {
-  PrintStartVisit("If Else Expression", "");
+  CLI_TRACE("Accessing If Else Expression started");
   auto* ifElseCtx = ctx->if_else_block();
   auto trace = getTraceData(ctx->getStart(), ctx->getStop());
 
@@ -855,8 +857,75 @@ std::any ProgramVisitor::visitExprIfElse(KasXParser::ExprIfElseContext* ctx) {
     this->visitPartElse(ctx, ifElsePartSize + 1, ifElseExpr.get());
   }
   CLI_TRACE("Acccessing If Else Expression done");
-  PrintEndVisit("If Else Expression", "");
 
   return DataStructures::Expressions::ExpressionPtr(ifElseExpr);
+}
+
+std::any ProgramVisitor::visitExprSum(KasXParser::ExprSumContext* ctx) {
+  CLI_TRACE("Starting visiting sum expression");
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto* scope = this->m_Domain->getCurrentScope()->createChildScope(
+      "Sum: " + std::to_string(trace.start.line) + "-" + std::to_string(trace.start.character), Core::Scopes::SCOPE_TYPES::SUM);
+  this->m_Domain->setCurrentScope(scope);
+  scope->enableReplaceMode();
+
+  auto sumExpression = std::make_shared<DataStructures::Expressions::SumOperation>(trace);
+  sumExpression->scope = scope;
+
+  const std::string& replace = ctx->sum_function()->IDENTIFIER(0)->getText();
+  const std::string& replaceType = ctx->sum_function()->IDENTIFIER(1)->getText();
+
+  auto* type = this->m_Domain->getGlobalScope()->getTypeDeclaration(replaceType);
+  auto entities = this->m_Domain->getGlobalScope()->getAllEntitiesFromType(type);
+
+  for (const auto* entity : entities) {
+    scope->addIdentifierToReplace(replace, entity->name);
+    auto expression =
+        std::any_cast<DataStructures::Expressions::ExpressionPtr>(visit(ctx->sum_function()->arithmetic_expression()));
+    sumExpression->expressions.emplace_back(expression);
+  }
+  scope->disableReplaceMode();
+  this->m_Domain->setCurrentScope(scope->getParentScope());
+
+  CLI_TRACE("Visiting sum expression done");
+  return DataStructures::Expressions::ExpressionPtr(sumExpression);
+}
+
+std::any ProgramVisitor::visitExprExists(KasXParser::ExprExistsContext* ctx) {
+  CLI_TRACE("Started visiting exists expression");
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto* scope = this->m_Domain->getCurrentScope()->createChildScope(
+      "Exists: " + std::to_string(trace.start.line) + "-" + std::to_string(trace.start.character),
+      Core::Scopes::SCOPE_TYPES::SUM);
+  this->m_Domain->setCurrentScope(scope);
+  scope->enableReplaceMode();
+
+  auto existsExpression = std::make_shared<DataStructures::Expressions::ExistsOperation>(trace);
+
+  const std::string& replace = ctx->exists_clause()->param()->IDENTIFIER()->getText();
+  auto* replaceTypeCtx = ctx->exists_clause()->param()->data_type();
+
+  if (replaceTypeCtx != nullptr) {
+    const std::string& replaceType = replaceTypeCtx->getText();
+    auto* type = this->m_Domain->getGlobalScope()->getTypeDeclaration(replaceType);
+    auto entities = this->m_Domain->getGlobalScope()->getAllEntitiesFromType(type);
+
+    for (const auto* entity : entities) {
+      scope->addIdentifierToReplace(replace, entity->name);
+      auto expression =
+          std::any_cast<DataStructures::Expressions::ExpressionPtr>(visit(ctx->exists_clause()->arithmetic_expression()));
+      existsExpression->expressions.emplace_back(expression);
+    }
+  } else {
+    scope->addIdentifierToReplace(replace, replace);
+    auto expression =
+        std::any_cast<DataStructures::Expressions::ExpressionPtr>(visit(ctx->exists_clause()->arithmetic_expression()));
+    existsExpression->expressions.emplace_back(expression);
+  }
+
+  scope->disableReplaceMode();
+  CLI_TRACE("Visiting exists expression done");
+
+  return DataStructures::Expressions::ExpressionPtr(existsExpression);
 }
 }  // namespace KasX::Compiler::Visitors
