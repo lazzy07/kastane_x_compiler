@@ -21,6 +21,7 @@ enum class EXPRESSION_TYPES : std::uint8_t {
   BINARY_OPERATION,
   IDENTIFIER,
   BELIEVES_OPERATION,
-  FORALL_OPERATION
+  FORALL_OPERATION,
+  IFELSE_OPERATION
 };
 }  // namespace KasX::Compiler::DataStructures::Expressions
