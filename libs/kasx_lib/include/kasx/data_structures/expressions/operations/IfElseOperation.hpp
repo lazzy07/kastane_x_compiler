@@ -11,6 +11,7 @@
 
 #include <vector>
 
+#include "Log.hpp"
 #include "kasx/data_structures/expressions/Expression.hpp"
 
 namespace KasX::Compiler::DataStructures::Expressions {
@@ -19,11 +20,16 @@ namespace KasX::Compiler::DataStructures::Expressions {
  * @brief If Else clause related data
  *
  */
-struct IfElseOperation {
+struct IfElseOperation : public Expression {
   std::vector<Expressions::ExpressionPtr> ifConditions;  ///< All the if and elseif boolean conditions
   std::vector<Expressions::ExpressionPtr>
       ifExpressions;  ///< Expressions that need to evaluate if the corresponding if or elseif condition is satisfied
 
   Expressions::ExpressionPtr elseExpression;  ///< Else part of the if condition
+
+  explicit IfElseOperation(Debug::DomainFileTrace fileTrace)
+      : Expression(false, EXPRESSION_TYPES::IFELSE_OPERATION, "If Else Operation", fileTrace) {
+    CLI_TRACE("For-All Expression Created");
+  };
 };
 }  // namespace KasX::Compiler::DataStructures::Expressions

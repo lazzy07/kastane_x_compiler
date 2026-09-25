@@ -30,6 +30,7 @@
 #include "kasx/data_structures/expressions/data_types/Number.hpp"
 #include "kasx/data_structures/expressions/operations/BinaryOperation.hpp"
 #include "kasx/data_structures/expressions/operations/ForAllOperation.hpp"
+#include "kasx/data_structures/expressions/operations/IfElseOperation.hpp"
 #include "kasx/data_structures/expressions/operations/UnaryOperation.hpp"
 #include "kasx/data_structures/grounded/GroundedAction.hpp"
 #include "kasx/data_structures/grounded/GroundedTrigger.hpp"
@@ -779,7 +780,7 @@ std::any ProgramVisitor::visitUtilityDecl(KasXParser::UtilityDeclContext* ctx) {
     auto* entityDecl = m_Domain->getGlobalScope()->getEntityDeclaration(utilityName);
     if (entityDecl == nullptr) {
       // TODO: @lazzy07 - Handle error
-      CLI_ERROR("Ccould not find the entity {} in the global scope related to the utility function", utilityName);
+      CLI_ERROR("Could not find the entity {} in the global scope related to the utility function", utilityName);
       return nullptr;
     }
     utilityDecl->entity = entityDecl;
@@ -794,8 +795,21 @@ std::any ProgramVisitor::visitUtilityDecl(KasXParser::UtilityDeclContext* ctx) {
 std::any ProgramVisitor::visitExprIfElse(KasXParser::ExprIfElseContext* ctx) {
   PrintStartVisit("If Else Expression", "");
   auto* ifElseCtx = ctx->if_else_block();
+  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+
+  auto ifElseExpr = std::make_shared<DataStructures::Expressions::IfElseOperation>(trace);
+
+  auto ifConditionRet = visit(ctx->if_else_block()->arithmetic_expression(0));
+  auto ifCondition = std::any_cast<DataStructures::Expressions::ExpressionPtr>(ifConditionRet);
+  auto ifExpressionRet = visit(ctx->if_else_block()->conditions_list(0)->arithmetic_expression());
+  auto ifExpression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(ifExpressionRet);
+
+  ifElseExpr->ifConditions.emplace_back(ifCondition);
+  ifElseExpr->ifExpressions.emplace_back(ifExpression);
 
   CLI_TRACE("Acccessing If Else Expression done");
   PrintEndVisit("If Else Expression", "");
+
+  return DataStructures::Expressions::ExpressionPtr(ifElseExpr);
 }
 }  // namespace KasX::Compiler::Visitors
