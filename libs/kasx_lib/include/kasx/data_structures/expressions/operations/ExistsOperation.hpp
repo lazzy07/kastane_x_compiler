@@ -31,7 +31,7 @@ struct ExistsOperation : public Expression {
    * @param trace Debug file trace
    */
   explicit ExistsOperation(Debug::DomainFileTrace trace)
-      : Expression(false, EXPRESSION_TYPES::SUM_OPERATION, "Sum Operation", trace) {
+      : Expression(false, EXPRESSION_TYPES::EXISTS_OPERATION, "Exists Operation", trace) {
     CLI_TRACE("Sum Expression Created");
   }
 };
