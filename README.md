@@ -47,6 +47,8 @@ To generate the documentation, `docxygen` is required. (Check the dev.sh to see 
 
 ## Using `dev.sh` commands
 
+You can use commands in the `dev.sh` to easily compile and run the project.
+
 ```bash
 Usage: ./dev.sh <command> [args]
 
