@@ -41,9 +41,10 @@ void Scope::disableReplaceMode() {
   m_ReplaceMode = false;
   m_ReplaceMap = {};
 }
+
 void Scope::enableReplaceMode() {
   m_ReplaceMode = true;
-  m_ReplaceMap = {};
+  m_ReplaceMap = m_Parent->m_ReplaceMap;
 }
 
 Scope* Scope::createChildScope(const std::string& name, SCOPE_TYPES type) {
