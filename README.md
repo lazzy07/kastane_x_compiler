@@ -33,7 +33,6 @@ git commit -m "Initial commit"
 git tag -a v1.0.0 -m "Version 1.0.0"
 ```
 
-
 ## Compiling and running the project
 
 This project uses `CMake`. To build the project, Also, there is `dev.sh` shell script available, if you want to use that to compile the project.
@@ -45,3 +44,22 @@ cmake --build build -j
 ```
 
 To generate the documentation, `docxygen` is required. (Check the dev.sh to see the command to generate the docs).
+
+## Using `dev.sh` commands
+
+```bash
+Usage: ./dev.sh <command> [args]
+
+Commands:
+  configure      Run CMake configure step (no clean).
+  reconfigure    Delete $BUILD_DIR and run CMake from scratch.
+  build          Build the project.
+  docs           Generate the documentation.
+  run [args...]  Run the built program with optional args.
+  all            Configure, build, and run (no args to program).
+
+Env vars you can override:
+  BUILD_DIR      (default: build)
+  BUILD_TYPE     (default: Debug)
+  EXECUTABLE     (default: $BUILD_DIR/bin/my_program)
+```
