@@ -15,7 +15,7 @@
 #include <unordered_map>
 
 namespace KasX::Compiler::Core::Scopes {
-enum class SCOPE_TYPES : std::uint8_t { DEFAULT, GLOBAL, ACTION, TRIGGER, UTILITY, FOR_ALL };
+enum class SCOPE_TYPES : std::uint8_t { DEFAULT, GLOBAL, ACTION, TRIGGER, UTILITY, FOR_ALL, SUM, EXISTS };
 
 /**
  * @class Scope

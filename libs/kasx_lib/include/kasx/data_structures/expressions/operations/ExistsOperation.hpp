@@ -1,9 +1,9 @@
 /*
- * File name: SumOperation.hpp
+ * File name: ExistsOperation.hpp
  * Project: KasX Compiler
  * Author: Lasantha M Senanayake
- * Date created: 2026-09-19 12:39:00
- * Date modified: 2026-09-19 12:39:00
+ * Date created: 2026-09-25 16:59:03
+ * Date modified: 2026-09-25 16:59:03
  * ------
  */
 
@@ -14,22 +14,23 @@
 #include "kasx/data_structures/expressions/Expression.hpp"
 #include "kasx/data_structures/expressions/ExpressionTypes.hpp"
 #include "kasx/debug/DomainFileTrace.hpp"
+
 namespace KasX::Compiler::DataStructures::Expressions {
 /**
- * @class SumOperation
- * @brief Summation operation data
+ * @class ExistsOperation
+ * @brief Exists operation data
  *
  */
-struct SumOperation : public Expression {
+struct ExistsOperation : public Expression {
   Core::Scopes::Scope* scope;
   std::vector<Expressions::ExpressionPtr> expressions;
 
   /**
-   * @brief Contructor for Sum Opereation Expression
+   * @brief Contructor for Exists Opereation Expression
    *
    * @param trace Debug file trace
    */
-  explicit SumOperation(Debug::DomainFileTrace trace)
+  explicit ExistsOperation(Debug::DomainFileTrace trace)
       : Expression(false, EXPRESSION_TYPES::SUM_OPERATION, "Sum Operation", trace) {
     CLI_TRACE("Sum Expression Created");
   }
