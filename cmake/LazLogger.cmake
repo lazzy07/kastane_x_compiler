@@ -16,7 +16,9 @@ if(NOT EXISTS "${LAZLOGGER_DIR}/CMakeLists.txt")
   file(RENAME "${CMAKE_BINARY_DIR}/laz_logger-${LAZLOGGER_VER}" "${LAZLOGGER_DIR}")
 endif()
 
-set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+# laz_logger (cmake/SpdLog.cmake) force-sets BUILD_TESTING OFF in the cache, keep this project's value
+set(_kasx_build_testing ${BUILD_TESTING})
 add_subdirectory("${LAZLOGGER_DIR}" EXCLUDE_FROM_ALL)
+set(BUILD_TESTING ${_kasx_build_testing} CACHE BOOL "Build the testing suite" FORCE)
 
 list(FILTER ALL_CXX_FILES EXCLUDE REGEX ".*/vendor/laz_logger-1\\.1\\.0/.*")
