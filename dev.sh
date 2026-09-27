@@ -34,6 +34,14 @@ run)
   "$EXECUTABLE" "$@"
   ;;
 
+test)
+  shift || true
+  echo "[dev] Building unit tests in '$BUILD_DIR'…"
+  cmake --build "$BUILD_DIR" --config "$BUILD_TYPE" --target kasx_unit_test -j"$(nproc)"
+  echo "[dev] Running: ctest $*"
+  ctest --test-dir "$BUILD_DIR" -C "$BUILD_TYPE" --output-on-failure --no-tests=error "$@"
+  ;;
+
 docs)
   echo "[dev] Building the Docs"
   cmake --build "$BUILD_DIR" --target docs
@@ -57,12 +65,13 @@ Commands:
   build          Build the project.
   docs           Generate the documentation.
   run [args...]  Run the built program with optional args.
+  test [args...] Build and run the unit tests with ctest (args go to ctest, e.g. -R Foo -j8).
   all            Configure, build, and run (no args to program).
 
 Env vars you can override:
   BUILD_DIR      (default: build)
   BUILD_TYPE     (default: Debug)
-  EXECUTABLE     (default: \$BUILD_DIR/bin/my_program)
+  EXECUTABLE     (default: \$BUILD_DIR/bin/kasx)
 EOF
   ;;
 esac
