@@ -58,10 +58,34 @@ Commands:
   build          Build the project.
   docs           Generate the documentation.
   run [args...]  Run the built program with optional args.
+  test [args...] Build and run the unit tests with ctest (args go to ctest, e.g. -R Foo -j8).
   all            Configure, build, and run (no args to program).
 
 Env vars you can override:
   BUILD_DIR      (default: build)
   BUILD_TYPE     (default: Debug)
-  EXECUTABLE     (default: $BUILD_DIR/bin/my_program)
+  EXECUTABLE     (default: $BUILD_DIR/bin/kasx)
+```
+
+To run or test the project in Release mode use the following commands.
+
+```bash
+BUILD_TYPE=Release ./dev.sh run <args>
+BUILD_TYPE=Release ./dev.sh test
+```
+
+By default the project will build in Debug mode, but also you can force it too.
+
+```bash
+BUILD_TYPE=Debug ./dev.sh configure
+```
+
+You also can change the build directory.
+
+```bash
+BUILD_DIR=build-debug   BUILD_TYPE=Debug   ./dev.sh configure
+BUILD_DIR=build-release BUILD_TYPE=Release ./dev.sh configure
+
+BUILD_DIR=build-release BUILD_TYPE=Release ./dev.sh build
+BUILD_DIR=build-release BUILD_TYPE=Release ./dev.sh test
 ```
