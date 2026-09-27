@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.15)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+
+# Custom options for this project
+option(BUILD_TESTING "Build the testing suite" ON)
+
 # Cmake helper file-paths
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
@@ -92,4 +96,17 @@ log_status("Adding sub-projects: STARTED")
 add_subdirectory(apps/kasx)
 # Add the kasx_lib
 add_subdirectory(libs/kasx_lib)
+
+# Adding test library (If test option is ON)
+if(BUILD_TESTING)
+  log_status("Testing is enabled! (This project will now configure test related setup)")
+  # Master test enable switch
+  enable_testing()
+  
+  # Add the kasx_unit_tests
+  add_subdirectory(tests)
+else()
+  log_status("Testing is disabled in this configuration")
+endif()
+
 log_status("Adding sub-projects: FINISHED")
