@@ -19,10 +19,19 @@ file(
   "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
+log_status("Running google related cmake scripts: STARTED")
+# Include custom fetch google cmake script
 include(FetchGoogleTest)
 
-add_executable(kasx_unit_test ${UNIT_TEST_SRC_FILES})
+# Include GoogleTest script from cmake
+include(GoogleTest)
+log_status("Running google related cmake scripts: FINISHED")
 
+# Adding unit test executable
+add_executable(kasx_unit_test ${UNIT_TEST_SRC_FILES})
 target_link_libraries(kasx_unit_test PRIVATE GTest::GTest kasx_compiler)
+
+# Enabling auto detecting google tests (From cmake GoogleTest script)
+gtest_discover_tests(kasx_unit_test)
 
 log_status("Building the unit tests: FINISHED")
