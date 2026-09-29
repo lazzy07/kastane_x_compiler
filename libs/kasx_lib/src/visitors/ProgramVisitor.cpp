@@ -77,7 +77,7 @@ std::any ProgramVisitor::visitTypeDeclaration(KasXParser::TypeDeclarationContext
 
   ProgramVisitor::PrintStartVisit("Type-Declaration", typeDeclarationName);
   // Setting trace data
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
 
   CLI_TRACE("File trace: {}", trace.toString());
   auto* tlContext = ctx->types_list();
@@ -90,18 +90,6 @@ std::any ProgramVisitor::visitTypeDeclaration(KasXParser::TypeDeclarationContext
   ProgramVisitor::PrintEndVisit("Type-Declaration", typeDeclarationName);
 
   return 0;
-}
-
-Debug::DomainFileTrace ProgramVisitor::getTraceData(antlr4::Token* startToken, antlr4::Token* endToken) {
-  Debug::DomainFileTrace::TraceData start{startToken->getLine(), startToken->getCharPositionInLine()};
-
-  Debug::DomainFileTrace::TraceData end{endToken->getLine(),
-                                        endToken->getCharPositionInLine() + static_cast<int>(endToken->getText().size() - 1)};
-
-  // Debug Trace created to trace bugs with the domain file.
-  Debug::DomainFileTrace trace{start, end};
-
-  return trace;
 }
 
 std::any ProgramVisitor::visitTypesList(KasXParser::TypesListContext* ctx) {
@@ -147,7 +135,7 @@ std::any ProgramVisitor::visitEntityDeclaration(KasXParser::EntityDeclarationCon
 
   PrintStartVisit("Entity-Declaration", entityName);
 
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
 
   auto* tlContext = ctx->types_list();
   auto types =
@@ -169,7 +157,7 @@ std::any ProgramVisitor::visitFluentDeclaration(KasXParser::FluentDeclarationCon
 
   const std::string& dataTypeStr = ctx->data_type()->getText();
 
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
 
   m_Domain->getGlobalScope()->createFluentDeclaration(fluentName, functionHeader, dataTypeStr, trace);
 
@@ -181,7 +169,7 @@ std::any ProgramVisitor::visitFunctionHeader(KasXParser::FunctionHeaderContext* 
   const std::string& functionName = ctx->IDENTIFIER()->toString();
 
   CLI_TRACE("Accessing function header: {}", functionName);
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
   auto functionHeader = DataStructures::Declarations::Helpers::FunctionHeader(functionName, trace);
   functionHeader.parameters =
       std::any_cast<std::vector<DataStructures::Declarations::Helpers::Parameter>>(visit(ctx->param_list()));
@@ -210,7 +198,7 @@ std::any ProgramVisitor::visitParam(KasXParser::ParamContext* ctx) {
   const std::string& paramName = ctx->IDENTIFIER()->toString();
   CLI_TRACE("Visiting param: {}", paramName);
 
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
   auto param = DataStructures::Declarations::Helpers::Parameter(paramName, trace);
 
   auto* const paramType = ctx->data_type();
@@ -286,7 +274,7 @@ std::any ProgramVisitor::visitExprNot(KasXParser::ExprNotContext* ctx) {
     return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
 
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
   auto operation = std::make_shared<DataStructures::Expressions::UnaryOpearation>(
       DataStructures::Expressions::UNARY_OPERATION_TYPES::UNARY_NOT, "Unary Not", *expression, trace);
   return DataStructures::Expressions::ExpressionPtr(operation);
@@ -308,7 +296,7 @@ std::any ProgramVisitor::visitExprNegation(KasXParser::ExprNegationContext* ctx)
     return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
 
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
   auto operation = std::make_shared<DataStructures::Expressions::UnaryOpearation>(
       DataStructures::Expressions::UNARY_OPERATION_TYPES::UNARY_NEGATION, "Unary Negation", *expression, trace);
   return DataStructures::Expressions::ExpressionPtr(operation);
@@ -385,7 +373,7 @@ std::any ProgramVisitor::visitExprBinaryOp(KasXParser::ExprBinaryOpContext* ctx)
     return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
 
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
   auto operationType = getBinaryOperationType(ctx->binary_op());
   std::string operationName = (*leftExpression)->name + " " + ctx->binary_op()->getText() + " " + (*rightExpression)->name;
 
@@ -415,7 +403,7 @@ std::any ProgramVisitor::visitFluentVal(KasXParser::FluentValContext* ctx) {
     }
   }
 
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
   auto fluent = std::make_shared<DataStructures::Expressions::Fluent>(fluentName, arguments, trace);
   auto* groundedFluent = m_Domain->getGlobalScope()->getGroundedFluentByName(fluent->name);
 
@@ -455,7 +443,7 @@ std::any ProgramVisitor::visitExprIdentifier(KasXParser::ExprIdentifierContext* 
     identifierName = currentScope->getReplaceString(identifierName);
   }
 
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
 
   auto identifier = std::make_shared<DataStructures::Expressions::Expression>(
       true, DataStructures::Expressions::EXPRESSION_TYPES::IDENTIFIER, identifierName, trace);
@@ -465,7 +453,7 @@ std::any ProgramVisitor::visitExprIdentifier(KasXParser::ExprIdentifierContext* 
 
 std::any ProgramVisitor::visitExprNumber(KasXParser::ExprNumberContext* ctx) {
   const std::string& numberText = ctx->NUMBER()->getText();
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
 
   auto number = std::make_shared<DataStructures::Expressions::DataTypes::Number>(std::stof(numberText), numberText, trace);
 
@@ -474,7 +462,7 @@ std::any ProgramVisitor::visitExprNumber(KasXParser::ExprNumberContext* ctx) {
 
 std::any ProgramVisitor::visitExprUnknown(KasXParser::ExprUnknownContext* ctx) {
   const std::string& unknownText = ctx->UNKNOWN_KEYWORD()->getText();
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
 
   auto unknown = std::make_shared<DataStructures::Expressions::Expression>(
       true, DataStructures::Expressions::EXPRESSION_TYPES::UNKNOWN_VALUE, unknownText, trace);
@@ -544,7 +532,8 @@ std::any ProgramVisitor::visitBelives_expression(KasXParser::Belives_expressionC
     return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
 
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
+
   auto believes = std::make_shared<DataStructures::Expressions::Believes>(characterName, *argumentExpression, trace);
 
   CLI_TRACE("Visiting believes expression for: {} done", characterName);
@@ -553,7 +542,7 @@ std::any ProgramVisitor::visitBelives_expression(KasXParser::Belives_expressionC
 
 std::any ProgramVisitor::visitExprForAll(KasXParser::ExprForAllContext* ctx) {
   CLI_TRACE("Visiting for-all expression started");
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
   auto forAll = std::make_shared<DataStructures::Expressions::ForAllOperation>(trace);
   const auto forAllName = "For-All-" + std::to_string(forAll->id);
   auto* scope = this->m_Domain->getCurrentScope()->createChildScope(forAllName, Core::Scopes::SCOPE_TYPES::FOR_ALL);
@@ -709,7 +698,7 @@ void ProgramVisitor::assignObservations(KasXParser::Observing_funContext* observ
 std::any ProgramVisitor::visitActionDecl(KasXParser::ActionDeclContext* ctx) {
   PrintStartVisit("Action Declaration", "");
 
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
   auto functionHeader = std::any_cast<DataStructures::Declarations::Helpers::FunctionHeader>(visit(ctx->function_header()));
 
   auto* scope = this->m_Domain->getCurrentScope()->createChildScope(functionHeader.name, Core::Scopes::SCOPE_TYPES::ACTION);
@@ -739,7 +728,7 @@ std::any ProgramVisitor::visitActionDecl(KasXParser::ActionDeclContext* ctx) {
 std::any ProgramVisitor::visitTriggerDecl(KasXParser::TriggerDeclContext* ctx) {
   PrintStartVisit("Trigger Declaration", "");
 
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
   auto functionHeader = std::any_cast<DataStructures::Declarations::Helpers::FunctionHeader>(visit(ctx->function_header()));
 
   auto* scope = this->m_Domain->getCurrentScope()->createChildScope(functionHeader.name, Core::Scopes::SCOPE_TYPES::TRIGGER);
@@ -767,7 +756,7 @@ std::any ProgramVisitor::visitTriggerDecl(KasXParser::TriggerDeclContext* ctx) {
 std::any ProgramVisitor::visitUtilityDecl(KasXParser::UtilityDeclContext* ctx) {
   PrintStartVisit("Utility Declaration", "");
 
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
   const std::string utilityName = (ctx->IDENTIFIER() != nullptr) ? ctx->IDENTIFIER()->getText()
                                                                  : "Utility-" + std::to_string(trace.start.line) + "-" +
                                                                        std::to_string(trace.start.character);
@@ -825,7 +814,7 @@ void ProgramVisitor::visitPartIfElse(KasXParser::ExprIfElseContext* ctx,
 std::any ProgramVisitor::visitExprIfElse(KasXParser::ExprIfElseContext* ctx) {
   CLI_TRACE("Accessing If Else Expression started");
   auto* ifElseCtx = ctx->if_else_block();
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
 
   auto ifElseExpr = std::make_shared<DataStructures::Expressions::IfElseOperation>(trace);
 
@@ -863,7 +852,7 @@ std::any ProgramVisitor::visitExprIfElse(KasXParser::ExprIfElseContext* ctx) {
 
 std::any ProgramVisitor::visitExprSum(KasXParser::ExprSumContext* ctx) {
   CLI_TRACE("Starting visiting sum expression");
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
   auto* scope = this->m_Domain->getCurrentScope()->createChildScope(
       "Sum: " + std::to_string(trace.start.line) + "-" + std::to_string(trace.start.character), Core::Scopes::SCOPE_TYPES::SUM);
   this->m_Domain->setCurrentScope(scope);
@@ -893,7 +882,7 @@ std::any ProgramVisitor::visitExprSum(KasXParser::ExprSumContext* ctx) {
 
 std::any ProgramVisitor::visitExprExists(KasXParser::ExprExistsContext* ctx) {
   CLI_TRACE("Started visiting exists expression");
-  auto trace = getTraceData(ctx->getStart(), ctx->getStop());
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
   auto* scope = this->m_Domain->getCurrentScope()->createChildScope(
       "Exists: " + std::to_string(trace.start.line) + "-" + std::to_string(trace.start.character),
       Core::Scopes::SCOPE_TYPES::SUM);
