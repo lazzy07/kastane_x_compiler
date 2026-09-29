@@ -11,6 +11,7 @@
 
 #include <Log.hpp>
 #include <kasx/Types.hpp>
+#include <kasx/debug/DiagnosticEngine.hpp>
 #include <lazlogger/LoggerManager.hpp>
 
 namespace KasX::Compiler {
@@ -37,6 +38,7 @@ class KasXCompiler {
   static void InitLogger();
 
  private:
+  Debug::DiagnosticEngine m_DiagnosticEngine;
   inline static std::unique_ptr<LazLogger::LoggerManager> s_Logger = nullptr;  // Reference to the LIB logger
 };
 }  // namespace KasX::Compiler
