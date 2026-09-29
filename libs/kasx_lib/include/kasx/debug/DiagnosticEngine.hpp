@@ -7,10 +7,17 @@
  * ------
  */
 
+#pragma once
+
+#include <string>
 #include <vector>
 
 #include "Diagnostic.hpp"
 #include "kasx/debug/DomainFileTrace.hpp"
+
+namespace antlr4 {
+class CharStream;
+}
 
 namespace KasX::Compiler::Debug {
 class DiagnosticEngine {
@@ -18,7 +25,9 @@ class DiagnosticEngine {
   /**
    * @brief Diagnostic engine constructor
    */
-  DiagnosticEngine();
+  explicit DiagnosticEngine();
+
+  void init(antlr4::CharStream* charStream);
 
   /**
    * @brief Diagnostic engine distructor
@@ -30,10 +39,19 @@ class DiagnosticEngine {
    *
    * @param trace Trace of the diagnostic or error
    * @param severity Severity of the error
+   * @param diagnosticType Type of the diagnostic
    * @param message Message of the error
    */
-  void createDiagnostic(Debug::DomainFileTrace& trace, SERVERITY severity, DIAGNOSTIC_TYPE diagnosticType,
+  void createDiagnostic(const Debug::DomainFileTrace* trace, SERVERITY severity, DIAGNOSTIC_TYPE diagnosticType,
                         const std::string& message);
+
+  /**
+   * @brief Get the culprit string from the domain file
+   *
+   * @param trace Domain file trace
+   * @return returns the actual string that correspond to the error
+   */
+  std::string getCulpritStr(const Debug::DomainFileTrace* trace);
 
   /**
    * @brief Creates the final diagnostic report and returns the report as a string
@@ -45,5 +63,8 @@ class DiagnosticEngine {
  private:
   std::vector<Diagnostic> m_Diagnostics;
   std::string m_DiagnosticReport;
+
+  antlr4::CharStream* m_Input;
+  size_t m_ErrorCount = 0;  ///< Error count means the diagnoses that actually are considered errors: excluding Warnings etc.
 };
 }  // namespace KasX::Compiler::Debug
