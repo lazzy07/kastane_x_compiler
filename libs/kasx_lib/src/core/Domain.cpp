@@ -27,10 +27,14 @@ Domain::Domain(DomainData& data) : m_DomainData(std::move(data)) {
 Domain::~Domain() { CORE_TRACE("Domain Terminated"); };
 
 void Domain::initVisitor() {
+  CORE_TRACE("Visitor Initialized");
+  m_InputStream = new antlr4::ANTLRInputStream(m_DomainData.fileStream);
+}
+
+void Domain::startVisit() {
   CORE_TRACE("Visitor Started");
 
-  antlr4::ANTLRInputStream input(m_DomainData.fileStream);
-  KasXLexer lexer(&input);
+  KasXLexer lexer(m_InputStream);
   antlr4::CommonTokenStream tokens(&lexer);
   KasXParser parser(&tokens);
 
