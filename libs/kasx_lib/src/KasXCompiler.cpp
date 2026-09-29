@@ -11,6 +11,8 @@
 #include <kasx/KasXCompiler.hpp>
 #include <lazlogger/LoggerManager.hpp>
 
+#include "visitors/AntlrSafeRuntime.hpp"
+
 namespace KasX::Compiler {
 KasXCompiler::KasXCompiler() { CORE_TRACE("Compiler Initialized"); }
 
@@ -26,6 +28,8 @@ void KasXCompiler::compile(DomainData data, COMPILER_OPTIONS options) {
 
   KasX::Compiler::Core::Domain domain(data);
   domain.initVisitor();
+  m_DiagnosticEngine.init(domain.getInputStream());
+  domain.startVisit();
 }
 
 void KasXCompiler::InitLogger() {
