@@ -153,7 +153,6 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
   std::any visitExprFluent(KasXParser::ExprFluentContext* ctx) override;
 
   /**
-   * @brief Bare identifier expression visitor function, eg: Jafar, Castle
    *
    * @param ctx Identifier expression context
    */
@@ -251,8 +250,6 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
   static void PrintEndVisit(std::string_view type, std::string_view identifier);
 
   static void EditParentsData(const std::string& typeDeclarationName, std::vector<std::string>& parents);
-
-  static Debug::DomainFileTrace getTraceData(antlr4::Token* startToken, antlr4::Token* endToken);
 
   static DataStructures::Expressions::BINARY_OPERATION_TYPES getBinaryOperationType(KasXParser::Binary_opContext* ctx);
 
