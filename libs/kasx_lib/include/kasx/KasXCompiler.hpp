@@ -37,6 +37,13 @@ class KasXCompiler {
    */
   static void InitLogger();
 
+  /**
+   * @brief Get the reference to the Diagnsotic engine
+   *
+   * @return Diagnostic Engine
+   */
+  [[nodiscard]] const Debug::DiagnosticEngine& getDiagnosticEngineRef() const { return m_DiagnosticEngine; };
+
  private:
   Debug::DiagnosticEngine m_DiagnosticEngine;
   inline static std::unique_ptr<LazLogger::LoggerManager> s_Logger = nullptr;  // Reference to the LIB logger

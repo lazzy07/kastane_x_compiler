@@ -83,6 +83,11 @@ class Domain {
    */
   [[nodiscard]] antlr4::ANTLRInputStream* getInputStream() const { return m_InputStream; }
 
+  /**
+   * @brief Get the diagnostic engine reference
+   *
+   * @return Diagnostic Engine pointer
+   */
   [[nodiscard]] Debug::DiagnosticEngine* getDiagnosticEngine() const { return m_DiagnosticEngine; }
 
  private:
