@@ -7,6 +7,7 @@
 * ------
 */
 
+#include <Log.hpp>
 #include <kasx/Domain.hpp>
 #include <kasx/KasXCompiler.hpp>
 #include <lazlogger/LoggerManager.hpp>
