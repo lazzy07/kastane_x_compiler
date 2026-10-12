@@ -35,6 +35,6 @@ class DeclarationTests : public testing::Test {
 };
 
 TEST_F(DeclarationTests, ParamNotDeclaredTest) {
-  setDomainFile("tests/modules/declarations/param_not_declared.sabre");
-  ASSERT_EQ(runTestAndGetErrorCount(), 0);
+  setDomainFile(std::string(KASX_TEST_DATA_DIR) + "/modules/declarations/param_not_declared.sabre");
+  ASSERT_EQ(runTestAndGetErrorCount(), 1);
 }
