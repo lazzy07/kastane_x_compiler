@@ -47,14 +47,6 @@ class DiagnosticEngine {
                         const std::string& message);
 
   /**
-   * @brief Get the culprit string from the domain file
-   *
-   * @param trace Domain file trace
-   * @return returns the actual string that correspond to the error
-   */
-  std::string getCulpritStr(const Debug::DomainFileTrace* trace);
-
-  /**
    * @brief Creates the final diagnostic report and returns the report as a string
    *
    * @return final diagnostic report as a string
@@ -74,5 +66,13 @@ class DiagnosticEngine {
 
   antlr4::CharStream* m_Input;
   size_t m_ErrorCount = 0;  ///< Error count means the diagnoses that actually are considered errors: excluding Warnings etc.
+
+  /**
+   * @brief Get the culprit string from the domain file
+   *
+   * @param trace Domain file trace
+   * @return returns the actual string that correspond to the error
+   */
+  std::string getCulpritStr(const Debug::DomainFileTrace* trace);
 };
 }  // namespace KasX::Compiler::Debug
