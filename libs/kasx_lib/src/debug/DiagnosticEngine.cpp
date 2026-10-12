@@ -11,6 +11,7 @@
 
 #include "../visitors/AntlrSafeRuntime.hpp"
 #include "Log.hpp"
+#include "kasx/debug/Diagnostic.hpp"
 
 namespace KasX::Compiler::Debug {
 
@@ -26,7 +27,10 @@ DiagnosticEngine::~DiagnosticEngine() { CORE_TRACE("Diagnostic engine terminated
 void DiagnosticEngine::createDiagnostic(const Debug::DomainFileTrace& trace, SERVERITY severity, DIAGNOSTIC_TYPE diagnosticType,
                                         const std::string& message) {
   m_Diagnostics.emplace_back(Diagnostic{trace, severity, diagnosticType, message});
-  CORE_TRACE("New diagnostic log added: {}", message);
+  if (severity == SERVERITY::ERROR) {
+    m_ErrorCount++;
+  }
+  CORE_TRACE("New diagnostic log added: {}, Error count: {}", message, m_ErrorCount);
 }
 
 std::string DiagnosticEngine::getCulpritStr(const Debug::DomainFileTrace* trace) {
