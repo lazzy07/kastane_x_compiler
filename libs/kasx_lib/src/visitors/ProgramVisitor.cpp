@@ -227,7 +227,7 @@ std::any ProgramVisitor::visitParam(KasXParser::ParamContext* ctx) {
       param.dataType = nullptr;
       m_Domain->getDiagnosticEngine()->createDiagnostic(
           trace, Debug::SERVERITY::ERROR, Debug::DIAGNOSTIC_TYPE::COMPILER_ERROR,
-          "Could not find the data type " + paramName + " in the global scope for param " + param.name);
+          "Could not find the data type " + dataTypeStr + " in the global scope for param " + param.name);
       // TODO: lazzy07 - Handle error
       CLI_ERROR("Could not find the data type : {} in the global scope for param: {}", dataTypeStr, param.name);
     } else {
