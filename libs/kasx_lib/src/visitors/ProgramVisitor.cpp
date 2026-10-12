@@ -36,6 +36,7 @@
 #include "kasx/data_structures/expressions/operations/UnaryOperation.hpp"
 #include "kasx/data_structures/grounded/GroundedAction.hpp"
 #include "kasx/data_structures/grounded/GroundedTrigger.hpp"
+#include "kasx/debug/Diagnostic.hpp"
 
 namespace KasX::Compiler::Visitors {
 using std::string;
@@ -209,6 +210,8 @@ std::any ProgramVisitor::visitParam(KasXParser::ParamContext* ctx) {
     auto* entityType = m_Domain->getGlobalScope()->getEntityDeclaration(paramName);
 
     if (entityType == nullptr) {
+      m_Domain->getDiagnosticEngine()->createDiagnostic(trace, Debug::SERVERITY::ERROR, Debug::DIAGNOSTIC_TYPE::COMPILER_ERROR,
+                                                        "Entity type " + paramName + " is not declared in the global scope");
       // TODO: lazzy07 - Handle error
       CLI_ERROR("Entity type: {} not declared in the global scope", paramName);
     } else {
@@ -221,8 +224,12 @@ std::any ProgramVisitor::visitParam(KasXParser::ParamContext* ctx) {
     auto* dataType = m_Domain->getGlobalScope()->getTypeDeclaration(dataTypeStr);
 
     if (dataType == nullptr) {
+      param.dataType = nullptr;
+      m_Domain->getDiagnosticEngine()->createDiagnostic(
+          trace, Debug::SERVERITY::ERROR, Debug::DIAGNOSTIC_TYPE::COMPILER_ERROR,
+          "Could not find the data type " + paramName + " in the global scope for param " + param.name);
       // TODO: lazzy07 - Handle error
-      CLI_ERROR("Could not find the data type: {} in the global scope for param: {}", dataTypeStr, param.name);
+      CLI_ERROR("Could not find the data type : {} in the global scope for param: {}", dataTypeStr, param.name);
     } else {
       param.dataType = dataType;
       CLI_TRACE("Param {} has been identified as data type: {}", param.name, param.dataType->name);
