@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -59,6 +60,13 @@ class DiagnosticEngine {
    * @return final diagnostic report as a string
    */
   const std::string& createDiagnosticReport();
+
+  /**
+   * @brief Get the number of errors (Critical errors while compiling the domain file)
+   *
+   * @return No of errors
+   */
+  [[nodiscard]] size_t getErrorCount() const { return m_ErrorCount; };
 
  private:
   std::vector<Diagnostic> m_Diagnostics;
