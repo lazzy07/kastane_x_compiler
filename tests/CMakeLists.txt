@@ -1,10 +1,10 @@
 
 cmake_minimum_required(VERSION 3.15)
 
-project(KasXUnitTests LANGUAGES CXX)
+project(KasXTests LANGUAGES CXX)
 
-set(LOGGER_PREPEND "[KasX UNIT_TESTS] ")
-log_status("Building the unit tests: STARTED")
+set(LOGGER_PREPEND "[KasX TESTS_SUITE] ")
+log_status("Building the tests: STARTED")
 
 # ################## General project configs ###########################
 set(CMAKE_CXX_STANDARD 17)
@@ -28,10 +28,10 @@ include(GoogleTest)
 log_status("Running google related cmake scripts: FINISHED")
 
 # Adding unit test executable
-add_executable(kasx_unit_test ${UNIT_TEST_SRC_FILES})
-target_link_libraries(kasx_unit_test PRIVATE GTest::GTest kasx_compiler)
+add_executable(kasx_test_suite ${UNIT_TEST_SRC_FILES})
+target_link_libraries(kasx_test_suite PRIVATE GTest::GTest kasx_compiler)
 
 # Enabling auto detecting google tests (From cmake GoogleTest script)
-gtest_discover_tests(kasx_unit_test)
+gtest_discover_tests(kasx_test_suite)
 
-log_status("Building the unit tests: FINISHED")
+log_status("Building the tests: FINISHED")
