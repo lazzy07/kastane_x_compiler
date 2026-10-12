@@ -15,7 +15,7 @@
       "type": "lldb-dap",
       "request": "launch",
       "program": "${workspaceFolder}/build/dist/linux/x86_64/Debug/kasx",
-      "args": ["tests/problems/aladdin.txt"],
+      "args": ["tests/modules/param_not_declared.sabre"],
       "cwd": "${workspaceFolder}",
       "stopOnEntry": false
     },
