@@ -29,7 +29,7 @@ void KasXCompiler::compile(DomainData data, COMPILER_OPTIONS options) {
   KasX::Compiler::Core::Domain domain(data);
   domain.initVisitor();
   m_DiagnosticEngine.init(domain.getInputStream());
-  domain.startVisit();
+  domain.startVisit(&m_DiagnosticEngine);
 }
 
 void KasXCompiler::InitLogger() {

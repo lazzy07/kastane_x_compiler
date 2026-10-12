@@ -13,6 +13,7 @@
 
 #include "../visitors/AntlrSafeRuntime.hpp"
 #include "kasx/Types.hpp"
+#include "kasx/debug/DiagnosticEngine.hpp"
 #include "kasx/debug/DomainFileTrace.hpp"
 #include "kasx/visitors/AntlrSafeBase.hpp"
 #include "kasx/visitors/ProgramVisitor.hpp"
@@ -31,8 +32,9 @@ void Domain::initVisitor() {
   m_InputStream = new antlr4::ANTLRInputStream(m_DomainData.fileStream);
 }
 
-void Domain::startVisit() {
+void Domain::startVisit(Debug::DiagnosticEngine* diagnosticEngine) {
   CORE_TRACE("Visitor Started");
+  m_DiagnosticEngine = diagnosticEngine;
 
   KasXLexer lexer(m_InputStream);
   antlr4::CommonTokenStream tokens(&lexer);
