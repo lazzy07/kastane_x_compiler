@@ -35,7 +35,7 @@ target_compile_definitions(kasx_compiler PRIVATE
 
 # Adding kasx_parser custom target created by Antlr.cmake
 add_dependencies(kasx_compiler kasx_parser)
-target_link_libraries(kasx_compiler PRIVATE antlr4_shared PRIVATE lazlogger)
+target_link_libraries(kasx_compiler PRIVATE antlr4_shared PUBLIC lazlogger)
 
 target_include_directories(
   kasx_compiler
