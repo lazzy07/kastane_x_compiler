@@ -36,8 +36,8 @@ run)
 
 test)
   shift || true
-  echo "[dev] Building unit tests in '$BUILD_DIR'…"
-  cmake --build "$BUILD_DIR" --config "$BUILD_TYPE" --target kasx_unit_test -j"$(nproc)"
+  echo "[dev] Building tests in '$BUILD_DIR'…"
+  cmake --build "$BUILD_DIR" --config "$BUILD_TYPE" --target kasx_test_suite -j"$(nproc)"
   # ctest pipes the test output, so gtest turns off colors unless forced (only force it on a terminal)
   if [ -t 1 ]; then export GTEST_COLOR="${GTEST_COLOR:-yes}"; fi
   echo "[dev] Running: ctest $*"
