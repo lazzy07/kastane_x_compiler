@@ -12,8 +12,8 @@
 #include <Log.hpp>
 #include <kasx/KasXCompiler.hpp>
 #include <kasx/Types.hpp>
+#include <kasx/io/FileHandler.hpp>
 
-#include "../io/FileHandler.hpp"
 #include "Execution.hpp"
 #include "VersionPrinter.hpp"
 
@@ -37,7 +37,7 @@ void KasX::App::Core::ApplicationManager::execute() {
       CORE_TRACE("Executing File Parsing");
       std::string filePath = m_Arguments.filePath;
 
-      auto* fileHandler = new KasX::App::IO::FileHandler();
+      auto* fileHandler = new KasX::Compiler::IO::FileHandler();
 
       KasX::DomainData domainData = fileHandler->openProblemFile(filePath);
 
