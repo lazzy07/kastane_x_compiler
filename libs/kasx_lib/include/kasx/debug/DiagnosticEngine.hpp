@@ -42,7 +42,7 @@ class DiagnosticEngine {
    * @param diagnosticType Type of the diagnostic
    * @param message Message of the error
    */
-  void createDiagnostic(const Debug::DomainFileTrace* trace, SERVERITY severity, DIAGNOSTIC_TYPE diagnosticType,
+  void createDiagnostic(const Debug::DomainFileTrace& trace, SERVERITY severity, DIAGNOSTIC_TYPE diagnosticType,
                         const std::string& message);
 
   /**

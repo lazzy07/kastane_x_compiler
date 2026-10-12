@@ -25,10 +25,10 @@ enum class DIAGNOSTIC_TYPE : uint8_t { PARSE_ERROR, COMPILER_ERROR };
  *
  */
 struct Diagnostic {
-  const Debug::DomainFileTrace* trace;  ///< Trace of the diagnostic
-  SERVERITY severity;                   ///< Severity of the error/diagnsotic
-  DIAGNOSTIC_TYPE diagnosticType;       ///< Type of the diagnostic
-  const std::string message;            ///< Message related to the error/diagnostic
-  const std::string culprit;            ///< Actual text of the error
+  const Debug::DomainFileTrace trace;  ///< Trace of the diagnostic
+  SERVERITY severity;                  ///< Severity of the error/diagnsotic
+  DIAGNOSTIC_TYPE diagnosticType;      ///< Type of the diagnostic
+  const std::string message;           ///< Message related to the error/diagnostic
+  const std::string culprit;           ///< Actual text of the error
 };
 }  // namespace KasX::Compiler::Debug

@@ -23,7 +23,7 @@ void DiagnosticEngine::init(antlr4::CharStream* charStream) {
 
 DiagnosticEngine::~DiagnosticEngine() { CORE_TRACE("Diagnostic engine terminated"); }
 
-void DiagnosticEngine::createDiagnostic(const Debug::DomainFileTrace* trace, SERVERITY severity, DIAGNOSTIC_TYPE diagnosticType,
+void DiagnosticEngine::createDiagnostic(const Debug::DomainFileTrace& trace, SERVERITY severity, DIAGNOSTIC_TYPE diagnosticType,
                                         const std::string& message) {
   m_Diagnostics.emplace_back(Diagnostic{trace, severity, diagnosticType, message});
   CORE_TRACE("New diagnostic log added: {}", message);
