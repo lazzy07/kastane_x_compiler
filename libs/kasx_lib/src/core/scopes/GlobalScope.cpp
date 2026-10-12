@@ -126,6 +126,9 @@ void GlobalScope::groundFluentDeclaration(DataStructures::Declarations::FluentDe
       entities.at(index).emplace_back(param.entityType);
     } else {
       auto& currPos = entities.at(index);
+      if (param.dataType == nullptr) {
+        return;
+      }
       auto entitiesForParam = getAllEntitiesFromType(param.dataType);
       currPos.insert(currPos.end(), entitiesForParam.begin(), entitiesForParam.end());
     }
@@ -137,6 +140,7 @@ void GlobalScope::groundFluentDeclaration(DataStructures::Declarations::FluentDe
 std::vector<DataStructures::Declarations::EntityDeclaration*> GlobalScope::getAllEntitiesFromType(
     DataStructures::Declarations::TypeDeclaration* type) {
   std::vector<DataStructures::Declarations::EntityDeclaration*> entities;
+
   entities.insert(entities.end(), type->entities.begin(), type->entities.end());
 
   for (auto& child : type->children) {
