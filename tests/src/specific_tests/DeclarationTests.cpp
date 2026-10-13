@@ -21,7 +21,8 @@ class DeclarationTests : public testing::Test {
   size_t runTestAndGetErrorCount() {
     auto* fileHandler = new KasX::Compiler::IO::FileHandler();
 
-    KasX::DomainData domainData = fileHandler->openProblemFile(m_DomainFilePath);
+    KasX::DomainData domainData =
+        fileHandler->openProblemFile(std::string(KASX_TEST_DATA_DIR) + "/modules/declarations/" + m_DomainFilePath);
 
     auto* compiler = new KasX::Compiler::KasXCompiler();
 
@@ -34,7 +35,12 @@ class DeclarationTests : public testing::Test {
   std::string m_DomainFilePath;
 };
 
+TEST_F(DeclarationTests, ParamTypeNotDeclaredTest) {
+  setDomainFile("param_type_not_declared.sabre");
+  ASSERT_EQ(runTestAndGetErrorCount(), 1);
+}
+
 TEST_F(DeclarationTests, ParamNotDeclaredTest) {
-  setDomainFile(std::string(KASX_TEST_DATA_DIR) + "/modules/declarations/param_not_declared.sabre");
+  setDomainFile("param_not_declared.sabre");
   ASSERT_EQ(runTestAndGetErrorCount(), 1);
 }
