@@ -123,12 +123,15 @@ void GlobalScope::groundFluentDeclaration(DataStructures::Declarations::FluentDe
   int index = 0;
   for (auto& param : params) {
     if (!param.isTypeDeclaration) {
+      if (param.entityType == nullptr) {
+        return;
+      }
       entities.at(index).emplace_back(param.entityType);
     } else {
-      auto& currPos = entities.at(index);
       if (param.dataType == nullptr) {
         return;
       }
+      auto& currPos = entities.at(index);
       auto entitiesForParam = getAllEntitiesFromType(param.dataType);
       currPos.insert(currPos.end(), entitiesForParam.begin(), entitiesForParam.end());
     }
