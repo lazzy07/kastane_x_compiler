@@ -210,6 +210,7 @@ std::any ProgramVisitor::visitParam(KasXParser::ParamContext* ctx) {
     auto* entityType = m_Domain->getGlobalScope()->getEntityDeclaration(paramName);
 
     if (entityType == nullptr) {
+      param.entityType = nullptr;
       m_Domain->getDiagnosticEngine()->createDiagnostic(trace, Debug::SERVERITY::ERROR, Debug::DIAGNOSTIC_TYPE::COMPILER_ERROR,
                                                         "Entity type " + paramName + " is not declared in the global scope");
       // TODO: lazzy07 - Handle error
