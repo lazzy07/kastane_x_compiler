@@ -17,7 +17,15 @@
 namespace KasX::Compiler::Debug {
 enum class SERVERITY : uint8_t { ERROR, WARNING, NOTE };
 
-enum class DIAGNOSTIC_TYPE : uint8_t { PARSE_ERROR, COMPILER_ERROR };
+enum class DIAGNOSTIC_TYPE : uint8_t {
+  PARSE_ERROR,                          ///< A parse related error
+  UNKNOWN_COMPILER_ERROR,               ///< Unknown compiler error: an error other than the errors that are known
+  ENTITY_NOT_DECLARED,                  ///< A reference to unknown entity found
+  TYPE_NOT_DECLARED,                    ///< Data type not found in the global scope error
+  UNRESOLVED_INITIAL_STATE_EXPRESSION,  ///< An unresolvable expression related to initial state
+  EXPRESSION_TYPE_MISMATCH,             ///< Expression types mismatch issues like RHS is boolean and LHS is number
+  NULL_EXPRESSION_TYPE,                 ///< Issues with expression types
+};
 
 /**
  * @class Diagnostic
