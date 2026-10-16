@@ -283,8 +283,8 @@ std::any ProgramVisitor::visitExprNot(KasXParser::ExprNotContext* ctx) {
       negatedType == DataStructures::Expressions::EXPRESSION_TYPES::IDENTIFIER) {
     m_Domain->getDiagnosticEngine()->createDiagnostic(trace, Debug::SERVERITY::ERROR,
                                                       Debug::DIAGNOSTIC_TYPE::EXPRESSION_TYPE_MISMATCH,
-                                                      "Expression to '!' operator cannot be null");
-    CLI_ERROR("Expression '!' only acccepts boolean values");
+                                                      "Expression to '!' only accepts boolean values");
+    CLI_ERROR("Expression '!' only accepts boolean values");
     return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
 
@@ -297,19 +297,24 @@ std::any ProgramVisitor::visitExprNegation(KasXParser::ExprNegationContext* ctx)
   auto anyResult = visit(ctx->negation_expression()->arithmetic_expression());
   auto* expression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&anyResult);
 
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
+
   if (expression == nullptr || *expression == nullptr) {
-    // TODO: lazzy07 - Handle error
+    m_Domain->getDiagnosticEngine()->createDiagnostic(trace, Debug::SERVERITY::ERROR,
+                                                      Debug::DIAGNOSTIC_TYPE::NULL_EXPRESSION_TYPE,
+                                                      "Expression to '-' operator cannot be null");
     CLI_ERROR("Expression to '-' operator cannot be null");
     return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
 
   if ((*expression)->expressionType != DataStructures::Expressions::EXPRESSION_TYPES::NUMBER_OPERATION) {
-    // TODO: lazzy07 - Handle error
+    m_Domain->getDiagnosticEngine()->createDiagnostic(trace, Debug::SERVERITY::ERROR,
+                                                      Debug::DIAGNOSTIC_TYPE::EXPRESSION_TYPE_MISMATCH,
+                                                      "Expression to '-' only accepts boolean values");
     CLI_ERROR("Expression '-' only acccepts number values");
     return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
 
-  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
   auto operation = std::make_shared<DataStructures::Expressions::UnaryOpearation>(
       DataStructures::Expressions::UNARY_OPERATION_TYPES::UNARY_NEGATION, "Unary Negation", *expression, trace);
   return DataStructures::Expressions::ExpressionPtr(operation);
@@ -319,8 +324,12 @@ std::any ProgramVisitor::visitExprInBracket(KasXParser::ExprInBracketContext* ct
   auto anyResult = visit(ctx->arithmetic_expression());
   auto* expression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&anyResult);
 
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
+
   if (expression == nullptr || *expression == nullptr) {
-    // TODO: lazzy07 - Handle error
+    m_Domain->getDiagnosticEngine()->createDiagnostic(trace, Debug::SERVERITY::ERROR,
+                                                      Debug::DIAGNOSTIC_TYPE::NULL_EXPRESSION_TYPE,
+                                                      "Expression inside brackets cannot be null");
     CLI_ERROR("Expression inside brackets cannot be null");
     return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
@@ -361,7 +370,10 @@ DataStructures::Expressions::BINARY_OPERATION_TYPES ProgramVisitor::getBinaryOpe
     case KasXParser::COLON:
       return BINARY_OPERATION_TYPES::INHERITANCE;
     default:
-      // TODO: lazzy07 - Handle error
+      auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
+      m_Domain->getDiagnosticEngine()->createDiagnostic(trace, Debug::SERVERITY::ERROR,
+                                                        Debug::DIAGNOSTIC_TYPE::UNKNOWN_BINARY_OPERATION,
+                                                        "Unknown binary operator: " + ctx->getText());
       CLI_ERROR("Unknown binary operator: {}", ctx->getText());
       return BINARY_OPERATION_TYPES::EQUAL_TO;
   }
@@ -371,17 +383,25 @@ std::any ProgramVisitor::visitExprBinaryOp(KasXParser::ExprBinaryOpContext* ctx)
   auto leftResult = visit(ctx->arithmetic_expression(0));
   auto rightResult = visit(ctx->arithmetic_expression(1));
 
+  auto leftTrace =
+      Debug::DomainFileTrace::GetTraceData(ctx->arithmetic_expression(0)->getStart(), ctx->arithmetic_expression(0)->getStop());
+  auto rightTrace =
+      Debug::DomainFileTrace::GetTraceData(ctx->arithmetic_expression(1)->getStart(), ctx->arithmetic_expression(1)->getStop());
   auto* leftExpression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&leftResult);
   auto* rightExpression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&rightResult);
 
   if (leftExpression == nullptr || *leftExpression == nullptr) {
-    // TODO: lazzy07 - Handle error
+    m_Domain->getDiagnosticEngine()->createDiagnostic(leftTrace, Debug::SERVERITY::ERROR,
+                                                      Debug::DIAGNOSTIC_TYPE::NULL_EXPRESSION_TYPE,
+                                                      "Left side of a binary operation cannot be null");
     CLI_ERROR("Left side of a binary operation cannot be null");
     return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
 
   if (rightExpression == nullptr || *rightExpression == nullptr) {
-    // TODO: lazzy07 - Handle error
+    m_Domain->getDiagnosticEngine()->createDiagnostic(rightTrace, Debug::SERVERITY::ERROR,
+                                                      Debug::DIAGNOSTIC_TYPE::NULL_EXPRESSION_TYPE,
+                                                      "Right side of a binary operation cannot be null");
     CLI_ERROR("Right side of a binary operation cannot be null");
     return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
