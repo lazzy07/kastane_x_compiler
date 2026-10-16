@@ -251,7 +251,7 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
 
   static void EditParentsData(const std::string& typeDeclarationName, std::vector<std::string>& parents);
 
-  static DataStructures::Expressions::BINARY_OPERATION_TYPES getBinaryOperationType(KasXParser::Binary_opContext* ctx);
+  DataStructures::Expressions::BINARY_OPERATION_TYPES getBinaryOperationType(KasXParser::Binary_opContext* ctx);
 
   /**
    * @brief Check whether a type declaration is, or inherits from (directly or transitively), a type with the given name.
