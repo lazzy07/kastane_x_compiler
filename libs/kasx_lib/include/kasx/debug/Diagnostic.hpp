@@ -25,6 +25,7 @@ enum class DIAGNOSTIC_TYPE : uint8_t {
   UNRESOLVED_INITIAL_STATE_EXPRESSION,  ///< An unresolvable expression related to initial state
   EXPRESSION_TYPE_MISMATCH,             ///< Expression types mismatch issues like RHS is boolean and LHS is number
   NULL_EXPRESSION_TYPE,                 ///< Issues with expression types
+  UNKNOWN_BINARY_OPERATION              ///< Unknown binary operation type
 };
 
 /**
