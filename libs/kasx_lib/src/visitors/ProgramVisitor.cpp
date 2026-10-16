@@ -211,9 +211,9 @@ std::any ProgramVisitor::visitParam(KasXParser::ParamContext* ctx) {
 
     if (entityType == nullptr) {
       param.entityType = nullptr;
-      m_Domain->getDiagnosticEngine()->createDiagnostic(trace, Debug::SERVERITY::ERROR, Debug::DIAGNOSTIC_TYPE::COMPILER_ERROR,
+      m_Domain->getDiagnosticEngine()->createDiagnostic(trace, Debug::SERVERITY::ERROR,
+                                                        Debug::DIAGNOSTIC_TYPE::ENTITY_NOT_DECLARED,
                                                         "Entity type " + paramName + " is not declared in the global scope");
-      // TODO: lazzy07 - Handle error
       CLI_ERROR("Entity type: {} not declared in the global scope", paramName);
     } else {
       param.entityType = entityType;
@@ -227,10 +227,9 @@ std::any ProgramVisitor::visitParam(KasXParser::ParamContext* ctx) {
     if (dataType == nullptr) {
       param.dataType = nullptr;
       m_Domain->getDiagnosticEngine()->createDiagnostic(
-          trace, Debug::SERVERITY::ERROR, Debug::DIAGNOSTIC_TYPE::COMPILER_ERROR,
-          "Could not find the data type " + dataTypeStr + " in the global scope for param " + param.name);
-      // TODO: lazzy07 - Handle error
-      CLI_ERROR("Could not find the data type : {} in the global scope for param: {}", dataTypeStr, param.name);
+          trace, Debug::SERVERITY::ERROR, Debug::DIAGNOSTIC_TYPE::TYPE_NOT_DECLARED,
+          "Could not find the type " + dataTypeStr + " in the global scope for param " + param.name);
+      CLI_ERROR("Could not find the type : {} in the global scope for param: {}", dataTypeStr, param.name);
     } else {
       param.dataType = dataType;
       CLI_TRACE("Param {} has been identified as data type: {}", param.name, param.dataType->name);
@@ -247,9 +246,11 @@ std::any ProgramVisitor::visitInitialStateDecl(KasXParser::InitialStateDeclConte
 
   auto anyResult = visit(ctx->arithmetic_expression());
   auto* expression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&anyResult);
-
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
   if (expression == nullptr || *expression == nullptr) {
-    // TODO: lazzy07 - Handle error
+    m_Domain->getDiagnosticEngine()->createDiagnostic(trace, Debug::SERVERITY::ERROR,
+                                                      Debug::DIAGNOSTIC_TYPE::UNRESOLVED_INITIAL_STATE_EXPRESSION,
+                                                      "Initial-State expression could not be resolved");
     CLI_ERROR("Initial-State expression could not be resolved");
     PrintEndVisit("InitialState-Declaration", "");
     return nullptr;
@@ -264,9 +265,12 @@ std::any ProgramVisitor::visitInitialStateDecl(KasXParser::InitialStateDeclConte
 std::any ProgramVisitor::visitExprNot(KasXParser::ExprNotContext* ctx) {
   auto anyResult = visit(ctx->unary_not_expression()->arithmetic_expression());
   auto* expression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&anyResult);
+  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
 
   if (expression == nullptr || *expression == nullptr) {
-    // TODO: lazzy07 - Handle error
+    m_Domain->getDiagnosticEngine()->createDiagnostic(trace, Debug::SERVERITY::ERROR,
+                                                      Debug::DIAGNOSTIC_TYPE::NULL_EXPRESSION_TYPE,
+                                                      "Expression to '!' operator cannot be null");
     CLI_ERROR("Expression to '!' operator cannot be null");
     return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
@@ -277,12 +281,13 @@ std::any ProgramVisitor::visitExprNot(KasXParser::ExprNotContext* ctx) {
   auto negatedType = (*expression)->expressionType;
   if (negatedType == DataStructures::Expressions::EXPRESSION_TYPES::NUMBER_OPERATION ||
       negatedType == DataStructures::Expressions::EXPRESSION_TYPES::IDENTIFIER) {
-    // TODO: lazzy07 - Handle error
+    m_Domain->getDiagnosticEngine()->createDiagnostic(trace, Debug::SERVERITY::ERROR,
+                                                      Debug::DIAGNOSTIC_TYPE::EXPRESSION_TYPE_MISMATCH,
+                                                      "Expression to '!' operator cannot be null");
     CLI_ERROR("Expression '!' only acccepts boolean values");
     return DataStructures::Expressions::ExpressionPtr(nullptr);
   }
 
-  auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
   auto operation = std::make_shared<DataStructures::Expressions::UnaryOpearation>(
       DataStructures::Expressions::UNARY_OPERATION_TYPES::UNARY_NOT, "Unary Not", *expression, trace);
   return DataStructures::Expressions::ExpressionPtr(operation);
