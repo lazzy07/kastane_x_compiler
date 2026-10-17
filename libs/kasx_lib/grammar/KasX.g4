@@ -152,11 +152,38 @@ exists_clause
   : EXISTENTIAL_QUANTIFICATION_KEYWORD OPEN_BRACKET param CLOSE_BRACKET arithmetic_expression
   ;
 
+/*
+  Operator precedence (highest to lowest), ANTLR resolves it by the order of the alternatives below:
+    : (inheritance)
+    !, - (unary)
+    *, /
+    +, -
+    <, >, <=, >=
+    ==, !=
+    = (assignment, right associative)
+    &
+    |
+  Inheritance binds tightest so !item : coin is read as !(item : coin). Unary operators bind only to the operand next
+  to them (eg: -1 & a is (-1) & a), and assignment binds tighter than '&' so effects like a = -1 & b = 1 are read as
+  (a = -1) & (b = 1).
+*/
 arithmetic_expression
-  : unary_not_expression                                          # ExprNot
-  | negation_expression                                           # ExprNegation
+  : arithmetic_expression op = COLON arithmetic_expression        # ExprBinaryOp
+  | NEGATION_KEYWORD arithmetic_expression                        # ExprNot
+  | SUBTRACTION_KEYWORD arithmetic_expression                     # ExprNegation
   | OPEN_BRACKET arithmetic_expression CLOSE_BRACKET              # ExprInBracket
-  | arithmetic_expression binary_op arithmetic_expression         # ExprBinaryOp
+  | arithmetic_expression op = (MULTIPLICATION_KEYWORD | DIVISION_KEYWORD) arithmetic_expression # ExprBinaryOp
+  | arithmetic_expression op = (ADDITION_KEYWORD | SUBTRACTION_KEYWORD) arithmetic_expression    # ExprBinaryOp
+  | arithmetic_expression op = (
+      LESS_THAN_KEYWORD
+    | GREATER_THAN_KEYWORD
+    | LESS_THAN_OR_EQUAL_TO_KEYWORD
+    | GREATER_THAN_OR_EQUAL_TO_KEYWORD
+    ) arithmetic_expression                                       # ExprBinaryOp
+  | arithmetic_expression op = (EQUAL_TO_KEYWORD | NOT_EQUAL_TO_KEYWORD) arithmetic_expression # ExprBinaryOp
+  | <assoc = right> arithmetic_expression op = ASSIGNMENT_KEYWORD arithmetic_expression        # ExprBinaryOp
+  | arithmetic_expression op = CONJUNCTION_KEYWORD arithmetic_expression                       # ExprBinaryOp
+  | arithmetic_expression op = DISJUNCTION_KEYWORD arithmetic_expression                       # ExprBinaryOp
   | belives_expression                                            # ExprBelives
   | fluent                                                        # ExprFluent
   | if_else_block                                                 # ExprIfElse
@@ -182,14 +209,6 @@ sum_function
   : SUM_KEYWORD OPEN_BRACKET IDENTIFIER COLON IDENTIFIER CLOSE_BRACKET arithmetic_expression
   ;
 
-unary_not_expression
-  : NEGATION_KEYWORD arithmetic_expression
-  ;
-
-negation_expression
-  : SUBTRACTION_KEYWORD arithmetic_expression
-  ;
-
 fluent
   : IDENTIFIER OPEN_BRACKET argument_list? CLOSE_BRACKET        # FluentVal
   ;
@@ -206,25 +225,6 @@ if_else_block
     (CONDITIONAL_LAST_BRANCH_KEYWORD conditions_list)? 
     DEFINITION_SEPARATOR?
     ;
-
-binary_op
-  : op = (
-    SUBTRACTION_KEYWORD                   
-  | ADDITION_KEYWORD                      
-  | DIVISION_KEYWORD                      
-  | MULTIPLICATION_KEYWORD                
-  | LESS_THAN_KEYWORD                     
-  | GREATER_THAN_KEYWORD                  
-  | LESS_THAN_OR_EQUAL_TO_KEYWORD         
-  | GREATER_THAN_OR_EQUAL_TO_KEYWORD      
-  | NOT_EQUAL_TO_KEYWORD                  
-  | EQUAL_TO_KEYWORD                      
-  | ASSIGNMENT_KEYWORD                    
-  | DISJUNCTION_KEYWORD                   
-  | CONJUNCTION_KEYWORD                   
-  | COLON                                 
-  )
-  ;
 
 boolean_data
   : TRUE_KEYWORD                          # TrueValue
