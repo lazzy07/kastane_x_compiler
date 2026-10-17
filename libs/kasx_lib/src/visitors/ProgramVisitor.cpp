@@ -263,7 +263,7 @@ std::any ProgramVisitor::visitInitialStateDecl(KasXParser::InitialStateDeclConte
 }
 
 std::any ProgramVisitor::visitExprNot(KasXParser::ExprNotContext* ctx) {
-  auto anyResult = visit(ctx->unary_not_expression()->arithmetic_expression());
+  auto anyResult = visit(ctx->arithmetic_expression());
   auto* expression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&anyResult);
   auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
 
@@ -294,7 +294,7 @@ std::any ProgramVisitor::visitExprNot(KasXParser::ExprNotContext* ctx) {
 }
 
 std::any ProgramVisitor::visitExprNegation(KasXParser::ExprNegationContext* ctx) {
-  auto anyResult = visit(ctx->negation_expression()->arithmetic_expression());
+  auto anyResult = visit(ctx->arithmetic_expression());
   auto* expression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(&anyResult);
 
   auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
@@ -337,7 +337,7 @@ std::any ProgramVisitor::visitExprInBracket(KasXParser::ExprInBracketContext* ct
   return *expression;
 }
 
-DataStructures::Expressions::BINARY_OPERATION_TYPES ProgramVisitor::getBinaryOperationType(KasXParser::Binary_opContext* ctx) {
+DataStructures::Expressions::BINARY_OPERATION_TYPES ProgramVisitor::getBinaryOperationType(KasXParser::ExprBinaryOpContext* ctx) {
   using DataStructures::Expressions::BINARY_OPERATION_TYPES;
 
   switch (ctx->op->getType()) {
@@ -370,11 +370,11 @@ DataStructures::Expressions::BINARY_OPERATION_TYPES ProgramVisitor::getBinaryOpe
     case KasXParser::COLON:
       return BINARY_OPERATION_TYPES::INHERITANCE;
     default:
-      auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
+      auto trace = Debug::DomainFileTrace::GetTraceData(ctx->op, ctx->op);
       m_Domain->getDiagnosticEngine()->createDiagnostic(trace, Debug::SERVERITY::ERROR,
                                                         Debug::DIAGNOSTIC_TYPE::UNKNOWN_BINARY_OPERATION,
-                                                        "Unknown binary operator: " + ctx->getText());
-      CLI_ERROR("Unknown binary operator: {}", ctx->getText());
+                                                        "Unknown binary operator: " + ctx->op->getText());
+      CLI_ERROR("Unknown binary operator: {}", ctx->op->getText());
       return BINARY_OPERATION_TYPES::EQUAL_TO;
   }
 }
@@ -407,8 +407,8 @@ std::any ProgramVisitor::visitExprBinaryOp(KasXParser::ExprBinaryOpContext* ctx)
   }
 
   auto trace = Debug::DomainFileTrace::GetTraceData(ctx->getStart(), ctx->getStop());
-  auto operationType = getBinaryOperationType(ctx->binary_op());
-  std::string operationName = (*leftExpression)->name + " " + ctx->binary_op()->getText() + " " + (*rightExpression)->name;
+  auto operationType = getBinaryOperationType(ctx);
+  std::string operationName = (*leftExpression)->name + " " + ctx->op->getText() + " " + (*rightExpression)->name;
 
   auto operation = std::make_shared<DataStructures::Expressions::BinaryOperation>(operationType, operationName, *leftExpression,
                                                                                   *rightExpression, trace);
@@ -946,6 +946,7 @@ std::any ProgramVisitor::visitExprExists(KasXParser::ExprExistsContext* ctx) {
   }
 
   scope->disableReplaceMode();
+  this->m_Domain->setCurrentScope(scope->getParentScope());
   CLI_TRACE("Visiting exists expression done");
 
   return DataStructures::Expressions::ExpressionPtr(existsExpression);
