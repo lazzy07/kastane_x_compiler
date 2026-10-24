@@ -149,52 +149,54 @@ belives_expression
   ;
 
 exists_clause
-  : EXISTENTIAL_QUANTIFICATION_KEYWORD OPEN_BRACKET param CLOSE_BRACKET arithmetic_expression
+  : EXISTENTIAL_QUANTIFICATION_KEYWORD OPEN_BRACKET param CLOSE_BRACKET
   ;
 
 /*
-  Operator precedence (highest to lowest), ANTLR resolves it by the order of the alternatives below:
-    : (inheritance)
-    !, - (unary)
-    *, /
-    +, -
-    <, >, <=, >=
-    ==, !=
-    = (assignment, right associative)
+  Operator precedence, the same as Sabre's (edu.uky.cs.nil.sabre.io.DefaultParser). From the loosest to the tightest:
     &
     |
-  Inheritance binds tightest so !item : coin is read as !(item : coin). Unary operators bind only to the operand next
-  to them (eg: -1 & a is (-1) & a), and assignment binds tighter than '&' so effects like a = -1 & b = 1 are read as
-  (a = -1) & (b = 1).
+    !, if/elseif/else, forall, exists   prefix forms, they cover everything after them up to the next '&' or '|'
+    =                                    right associative
+    ==, !=, >=, <=, >, <                 each one is a separate level, in this order, all right associative
+    :                                    type constraint
+    sum                                  covers the arithmetic after it
+    *, /, +, -                           each one is a separate level, in this order, all right associative
+  ANTLR reads the alternatives below from the tightest to the loosest.
+
+  Sabre's arithmetic is not the usual mathematical one: f() + g() * h() is (f() + g()) * h() and f() - g() - h() is
+  f() - (g() - h()). Sabre has no unary minus (-1 is a number), so the unary '-' below binds tightest and only stands for
+  negative numbers.
 */
 arithmetic_expression
-  : arithmetic_expression op = COLON arithmetic_expression        # ExprBinaryOp
-  | NEGATION_KEYWORD arithmetic_expression                        # ExprNot
-  | SUBTRACTION_KEYWORD arithmetic_expression                     # ExprNegation
-  | OPEN_BRACKET arithmetic_expression CLOSE_BRACKET              # ExprInBracket
-  | arithmetic_expression op = (MULTIPLICATION_KEYWORD | DIVISION_KEYWORD) arithmetic_expression # ExprBinaryOp
-  | arithmetic_expression op = (ADDITION_KEYWORD | SUBTRACTION_KEYWORD) arithmetic_expression    # ExprBinaryOp
-  | arithmetic_expression op = (
-      LESS_THAN_KEYWORD
-    | GREATER_THAN_KEYWORD
-    | LESS_THAN_OR_EQUAL_TO_KEYWORD
-    | GREATER_THAN_OR_EQUAL_TO_KEYWORD
-    ) arithmetic_expression                                       # ExprBinaryOp
-  | arithmetic_expression op = (EQUAL_TO_KEYWORD | NOT_EQUAL_TO_KEYWORD) arithmetic_expression # ExprBinaryOp
-  | <assoc = right> arithmetic_expression op = ASSIGNMENT_KEYWORD arithmetic_expression        # ExprBinaryOp
-  | arithmetic_expression op = CONJUNCTION_KEYWORD arithmetic_expression                       # ExprBinaryOp
-  | arithmetic_expression op = DISJUNCTION_KEYWORD arithmetic_expression                       # ExprBinaryOp
-  | belives_expression                                            # ExprBelives
-  | fluent                                                        # ExprFluent
-  | if_else_block                                                 # ExprIfElse
-  | exists_clause                                                 # ExprExists
-  | sum_function                                                  # ExprSum
-  | forall_function                                               # ExprForAll
-  | boolean_data                                                  # ExprBoolean
-  | IDENTIFIER                                                    # ExprIdentifier
-  | NUMBER                                                        # ExprNumber
-  | UNKNOWN_KEYWORD                                               # ExprUnknown
-  | NULL_CLAUSE_KEYWORD                                           # ExprNullClause
+  : SUBTRACTION_KEYWORD arithmetic_expression                                                          # ExprNegation
+  | OPEN_BRACKET arithmetic_expression CLOSE_BRACKET                                                   # ExprInBracket
+  | <assoc = right> arithmetic_expression op = SUBTRACTION_KEYWORD arithmetic_expression               # ExprBinaryOp
+  | <assoc = right> arithmetic_expression op = ADDITION_KEYWORD arithmetic_expression                  # ExprBinaryOp
+  | <assoc = right> arithmetic_expression op = DIVISION_KEYWORD arithmetic_expression                  # ExprBinaryOp
+  | <assoc = right> arithmetic_expression op = MULTIPLICATION_KEYWORD arithmetic_expression            # ExprBinaryOp
+  | sum_function arithmetic_expression                                                                 # ExprSum
+  | arithmetic_expression op = COLON arithmetic_expression                                             # ExprBinaryOp
+  | <assoc = right> arithmetic_expression op = LESS_THAN_KEYWORD arithmetic_expression                 # ExprBinaryOp
+  | <assoc = right> arithmetic_expression op = GREATER_THAN_KEYWORD arithmetic_expression              # ExprBinaryOp
+  | <assoc = right> arithmetic_expression op = LESS_THAN_OR_EQUAL_TO_KEYWORD arithmetic_expression     # ExprBinaryOp
+  | <assoc = right> arithmetic_expression op = GREATER_THAN_OR_EQUAL_TO_KEYWORD arithmetic_expression  # ExprBinaryOp
+  | <assoc = right> arithmetic_expression op = NOT_EQUAL_TO_KEYWORD arithmetic_expression              # ExprBinaryOp
+  | <assoc = right> arithmetic_expression op = EQUAL_TO_KEYWORD arithmetic_expression                  # ExprBinaryOp
+  | <assoc = right> arithmetic_expression op = ASSIGNMENT_KEYWORD arithmetic_expression                # ExprBinaryOp
+  | forall_function arithmetic_expression                                                              # ExprForAll
+  | exists_clause arithmetic_expression                                                                # ExprExists
+  | if_else_block arithmetic_expression                                                                # ExprIfElse
+  | NEGATION_KEYWORD arithmetic_expression                                                             # ExprNot
+  | arithmetic_expression op = DISJUNCTION_KEYWORD arithmetic_expression                               # ExprBinaryOp
+  | arithmetic_expression op = CONJUNCTION_KEYWORD arithmetic_expression                               # ExprBinaryOp
+  | belives_expression                                                                                 # ExprBelives
+  | fluent                                                                                             # ExprFluent
+  | boolean_data                                                                                       # ExprBoolean
+  | IDENTIFIER                                                                                         # ExprIdentifier
+  | NUMBER                                                                                             # ExprNumber
+  | UNKNOWN_KEYWORD                                                                                    # ExprUnknown
+  | NULL_CLAUSE_KEYWORD                                                                                # ExprNullClause
   ;
 
 inheritance_expression
@@ -202,11 +204,11 @@ inheritance_expression
   ;
 
 forall_function
-  : UNIVERSAL_QUANTIFICATION_KEYWORD OPEN_BRACKET IDENTIFIER COLON IDENTIFIER CLOSE_BRACKET arithmetic_expression
+  : UNIVERSAL_QUANTIFICATION_KEYWORD OPEN_BRACKET IDENTIFIER COLON IDENTIFIER CLOSE_BRACKET
   ;
 
 sum_function
-  : SUM_KEYWORD OPEN_BRACKET IDENTIFIER COLON IDENTIFIER CLOSE_BRACKET arithmetic_expression
+  : SUM_KEYWORD OPEN_BRACKET IDENTIFIER COLON IDENTIFIER CLOSE_BRACKET
   ;
 
 fluent
@@ -217,13 +219,14 @@ argument_list
   : IDENTIFIER (COMMA IDENTIFIER)*                              # ArgumentList
   ;
 
+/*
+  Everything of a conditional except its last branch (the last branch is the arithmetic_expression after it in ExprIfElse,
+  so it gets the conditional's precedence). Branches followed by elseif/else are complete expressions.
+*/
 if_else_block
-    : CONDITIONAL_FIRST_BRANCH_KEYWORD OPEN_BRACKET arithmetic_expression CLOSE_BRACKET 
-    conditions_list 
-    (CONDITIONAL_MIDDLE_BRANCH_KEYWORD OPEN_BRACKET arithmetic_expression CLOSE_BRACKET
-     conditions_list)*
-    (CONDITIONAL_LAST_BRANCH_KEYWORD conditions_list)? 
-    DEFINITION_SEPARATOR?
+    : CONDITIONAL_FIRST_BRANCH_KEYWORD OPEN_BRACKET arithmetic_expression CLOSE_BRACKET
+    (conditions_list CONDITIONAL_MIDDLE_BRANCH_KEYWORD OPEN_BRACKET arithmetic_expression CLOSE_BRACKET)*
+    (conditions_list CONDITIONAL_LAST_BRANCH_KEYWORD)?
     ;
 
 boolean_data
