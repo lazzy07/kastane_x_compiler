@@ -328,7 +328,6 @@ class ProgramVisitor : public KasXBaseVisitor, public Core::TraceableClass {
   void visitConditionalPart(KasXParser::ExprIfElseContext* ctx, size_t index,
                             DataStructures::Expressions::IfElseOperation* ifElseOperation);
   void visitPartIfElse(KasXParser::ExprIfElseContext* ctx, DataStructures::Expressions::IfElseOperation* ifElseOperation);
-  void visitPartElse(KasXParser::ExprIfElseContext* ctx, size_t expressionIndex,
-                     DataStructures::Expressions::IfElseOperation* ifElseOperation);
+  void visitPartElse(KasXParser::ExprIfElseContext* ctx, DataStructures::Expressions::IfElseOperation* ifElseOperation);
 };
 }  // namespace KasX::Compiler::Visitors
