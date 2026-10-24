@@ -599,7 +599,7 @@ std::any ProgramVisitor::visitExprForAll(KasXParser::ExprForAllContext* ctx) {
   for (auto* entity : entities) {
     scope->addIdentifierToReplace(toBeReplaced, entity->name);
 
-    auto val = visit(ctx->forall_function()->arithmetic_expression());
+    auto val = visit(ctx->arithmetic_expression());
     auto expr = std::any_cast<DataStructures::Expressions::ExpressionPtr>(val);
     forAll->expressions.push_back(expr);
   }
@@ -818,18 +818,22 @@ std::any ProgramVisitor::visitUtilityDecl(KasXParser::UtilityDeclContext* ctx) {
 
 void ProgramVisitor::visitConditionalPart(KasXParser::ExprIfElseContext* ctx, size_t index,
                                           DataStructures::Expressions::IfElseOperation* ifElseOperation) {
-  auto ifConditionRet = visit(ctx->if_else_block()->arithmetic_expression(index));
+  auto* ifElseBlock = ctx->if_else_block();
+  auto ifConditionRet = visit(ifElseBlock->arithmetic_expression(index));
   auto ifCondition = std::any_cast<DataStructures::Expressions::ExpressionPtr>(ifConditionRet);
-  auto ifExpressionRet = visit(ctx->if_else_block()->conditions_list(index)->arithmetic_expression());
+  // Branches followed by elseif/else are in the if else block, the last branch is the expression after it
+  auto* branchCtx = index < ifElseBlock->conditions_list().size() ? ifElseBlock->conditions_list(index)->arithmetic_expression()
+                                                                   : ctx->arithmetic_expression();
+  auto ifExpressionRet = visit(branchCtx);
   auto ifExpression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(ifExpressionRet);
 
   ifElseOperation->ifConditions.emplace_back(ifCondition);
   ifElseOperation->ifExpressions.emplace_back(ifExpression);
 }
 
-void ProgramVisitor::visitPartElse(KasXParser::ExprIfElseContext* ctx, size_t expressionIndex,
-                                   DataStructures::Expressions::IfElseOperation* ifElseOperation) {
-  auto elseExpressionRet = visit(ctx->if_else_block()->conditions_list(expressionIndex)->arithmetic_expression());
+void ProgramVisitor::visitPartElse(KasXParser::ExprIfElseContext* ctx, DataStructures::Expressions::IfElseOperation* ifElseOperation) {
+  // The else branch is always the last branch, which is the expression after the if else block
+  auto elseExpressionRet = visit(ctx->arithmetic_expression());
   auto elseExpression = std::any_cast<DataStructures::Expressions::ExpressionPtr>(elseExpressionRet);
 
   ifElseOperation->elseExpression = DataStructures::Expressions::ExpressionPtr(elseExpression);
@@ -869,14 +873,13 @@ std::any ProgramVisitor::visitExprIfElse(KasXParser::ExprIfElseContext* ctx) {
 
   // Visit else part
   if (ctx->if_else_block()->CONDITIONAL_LAST_BRANCH_KEYWORD() != nullptr) {
-    // Check if the if else expression size is correct (2 comes from the if expression and else expression)
-    if (ctx->if_else_block()->conditions_list().size() != ifElsePartSize + 2) {
+    // Check if the if else expression size is correct (1 comes from the if branch, the else branch is not in the block)
+    if (ctx->if_else_block()->conditions_list().size() != ifElsePartSize + 1) {
       // TODO: lazzy07 - Handle Error
       CLI_ERROR("If else arithmetic expression size not matched");
       return std::make_shared<DataStructures::Expressions::ExpressionPtr>(nullptr);
     }
-    // + 1 because if part of the expression includes an conditions_list as well
-    this->visitPartElse(ctx, ifElsePartSize + 1, ifElseExpr.get());
+    this->visitPartElse(ctx, ifElseExpr.get());
   }
   CLI_TRACE("Acccessing If Else Expression done");
 
@@ -903,7 +906,7 @@ std::any ProgramVisitor::visitExprSum(KasXParser::ExprSumContext* ctx) {
   for (const auto* entity : entities) {
     scope->addIdentifierToReplace(replace, entity->name);
     auto expression =
-        std::any_cast<DataStructures::Expressions::ExpressionPtr>(visit(ctx->sum_function()->arithmetic_expression()));
+        std::any_cast<DataStructures::Expressions::ExpressionPtr>(visit(ctx->arithmetic_expression()));
     sumExpression->expressions.emplace_back(expression);
   }
   scope->disableReplaceMode();
@@ -935,13 +938,13 @@ std::any ProgramVisitor::visitExprExists(KasXParser::ExprExistsContext* ctx) {
     for (const auto* entity : entities) {
       scope->addIdentifierToReplace(replace, entity->name);
       auto expression =
-          std::any_cast<DataStructures::Expressions::ExpressionPtr>(visit(ctx->exists_clause()->arithmetic_expression()));
+          std::any_cast<DataStructures::Expressions::ExpressionPtr>(visit(ctx->arithmetic_expression()));
       existsExpression->expressions.emplace_back(expression);
     }
   } else {
     scope->addIdentifierToReplace(replace, replace);
     auto expression =
-        std::any_cast<DataStructures::Expressions::ExpressionPtr>(visit(ctx->exists_clause()->arithmetic_expression()));
+        std::any_cast<DataStructures::Expressions::ExpressionPtr>(visit(ctx->arithmetic_expression()));
     existsExpression->expressions.emplace_back(expression);
   }
 
